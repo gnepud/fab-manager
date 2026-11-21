@@ -24,7 +24,7 @@ json.array!(@availabilities) do |availability|
     json.is_reserved availability.reserved?
     json.borderColor availability_border_color(availability)
     if availability.reserved? && !@user.nil? && availability.reserved_by?(@user.id)
-      json.title "#{availability.title}' - #{t('trainings.i_ve_reserved')}"
+      json.title "#{availability.title} - #{t('trainings.i_ve_reserved')}"
     elsif availability.full?
       json.title "#{availability.title} - #{t('trainings.completed')}"
       json.borderColor AvailabilityHelper::IS_FULL
