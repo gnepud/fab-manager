@@ -554,6 +554,16 @@ Application.Controllers.controller('SettingsController', ['$scope', '$rootScope'
         }
       });
 
+      $scope.$watch('windowStart.value', function (newValue, oldValue, scope) {
+        if (scope.windowEnd) {
+          const startTime = moment(newValue).format('HH:mm:ss');
+          const endTime = moment(scope.windowEnd.value).format('HH:mm:ss');
+          if (startTime >= endTime) {
+            scope.windowStart.value = oldValue;
+          }
+        }
+      });
+
       // change form methods to PUT if items already exists
       if (cguFile.custom_asset) {
         $scope.methods.cgu = 'put';

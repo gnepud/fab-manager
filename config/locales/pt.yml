@@ -579,6 +579,7 @@ pt:
     select_user: "Por favor, selecione um usuário antes de continuar"
   settings:
     locked_setting: "a configuração está bloqueada."
+    invalid_booking_window: "A hora de abertura deve ser anterior à hora de fechamento."
     about_title: "\"Sobre\" título da página"
     about_body: "\"Sobre\" conteúdo da página"
     about_contacts: "\"Sobre\" página de contatos"

@@ -90,4 +90,63 @@ class SettingsTest < ActionDispatch::IntegrationTest
     assert_equal 'fablab_name', resp[:setting][:name], 'wrong parameter name'
     assert_equal 'Fab Lab de La Casemate', resp[:setting][:value], 'wrong parameter value'
   end
+
+  test 'booking window rejects inverted and equal hours' do
+    set_booking_window('08:00', '12:00')
+
+    [['booking_window_start', '13:00'], ['booking_window_start', '12:00'],
+     ['booking_window_end', '07:00'], ['booking_window_end', '08:00']].each do |name, time|
+      put "/api/settings/#{name}", params: { setting: { value: "2001-02-03T#{time}:00.000Z" } }
+      assert_response :unprocessable_entity
+      assert_equal I18n.t('settings.invalid_booking_window'), json_response(response.body)[:error]
+    end
+
+    assert_equal 8, Time.zone.parse(Setting.get('booking_window_start')).utc.hour
+    assert_equal 12, Time.zone.parse(Setting.get('booking_window_end')).utc.hour
+  end
+
+  test 'booking window accepts valid hours and a bulk move past the old closing time' do
+    set_booking_window('08:00', '12:00')
+    put '/api/settings/booking_window_start', params: { setting: { value: '2001-02-03T09:00:00.000Z' } }
+    assert_response :ok
+
+    patch '/api/settings/bulk_update', params: { settings: [
+      { name: 'booking_window_start', value: '2000-01-01T14:00:00.000Z' },
+      { name: 'booking_window_end', value: '2000-01-01T18:00:00.000Z' }
+    ] }
+    assert_response :ok
+    assert json_response(response.body)[:settings].none? { |setting| setting[:error] }
+    assert_equal 14, Time.zone.parse(Setting.get('booking_window_start')).utc.hour
+    assert_equal 18, Time.zone.parse(Setting.get('booking_window_end')).utc.hour
+  end
+
+  test 'booking window rejects empty and malformed times' do
+    set_booking_window('08:00', '12:00')
+    ['', 'not a time'].each do |value|
+      put '/api/settings/booking_window_start', params: { setting: { value: value } }
+      assert_response :unprocessable_entity
+    end
+    assert_equal 8, Time.zone.parse(Setting.get('booking_window_start')).utc.hour
+  end
+
+  test 'bulk update rejects an inverted booking window' do
+    set_booking_window('08:00', '12:00')
+    patch '/api/settings/bulk_update', params: { settings: [
+      { name: 'booking_window_start', value: '2000-01-01T16:00:00.000Z' },
+      { name: 'booking_window_end', value: '2000-01-01T15:00:00.000Z' }
+    ] }
+    assert_response :ok
+    assert json_response(response.body)[:settings].all? { |setting| setting[:error].present? }
+    assert_equal 8, Time.zone.parse(Setting.get('booking_window_start')).utc.hour
+    assert_equal 12, Time.zone.parse(Setting.get('booking_window_end')).utc.hour
+  end
+
+  private
+
+  def set_booking_window(start_time, end_time)
+    { 'booking_window_start' => start_time, 'booking_window_end' => end_time }.each do |name, time|
+      setting = Setting.find_or_create_by!(name: name)
+      SettingService.save_and_update(setting, "2000-01-01T#{time}:00.000Z", @admin)
+    end
+  end
 end

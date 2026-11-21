@@ -579,6 +579,7 @@ zh-CN:
     select_user: "请在继续之前选择用户"
   settings:
     locked_setting: "该设置已锁定。"
+    invalid_booking_window: "开放时间必须早于关闭时间。"
     about_title: "\"关于\"页面标题"
     about_body: "\"关于\"页面内容"
     about_contacts: "\"关于\"页面联系方式"

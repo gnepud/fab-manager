@@ -13,9 +13,10 @@ class SettingService
     end
 
     # @param setting [Hash{Symbol->String}]
-    # @return [StandardError,NilClass]
-    def check_before_update(setting)
-      check_home_scss(setting)
+    # @param settings [Array<Hash{Symbol->String}>]
+    # @return [StandardError,String,NilClass]
+    def check_before_update(setting, settings: [])
+      check_home_scss(setting) || check_booking_window(setting, settings)
     end
 
     # @param setting [Setting]
@@ -44,6 +45,22 @@ class SettingService
     end
 
     private
+
+    def check_booking_window(setting, settings)
+      names = %w[booking_window_start booking_window_end]
+      return unless names.include?(setting[:name])
+
+      times = names.map do |name|
+        pending = name == setting[:name] ? setting : settings.find { |item| item[:name] == name && item[:value].present? }
+        value = pending ? pending[:value] : Setting.get(name)
+        Time.zone.parse(value.to_s)&.utc&.strftime('%H:%M:%S')
+      end
+      return if times.all?(&:present?) && times.first < times.last
+
+      I18n.t('settings.invalid_booking_window')
+    rescue ArgumentError, TypeError
+      I18n.t('settings.invalid_booking_window')
+    end
 
     # @param setting [String]
     # @param value [String]

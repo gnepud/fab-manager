@@ -579,6 +579,7 @@
     select_user: "Please select a user before continuing"
   settings:
     locked_setting: "innstillingen er låst."
+    invalid_booking_window: "Åpningstiden må være før stengetiden."
     about_title: "\"Om\" sidetittel"
     about_body: "\"Om\" sideinnhold"
     about_contacts: "\"Om\"-side, kontakter"

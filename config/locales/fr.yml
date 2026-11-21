@@ -581,6 +581,7 @@ fr:
     select_user: "Veuillez sélectionner un utilisateur avant de continuer"
   settings:
     locked_setting: "le paramètre est verrouillé."
+    invalid_booking_window: "L'heure d'ouverture doit précéder l'heure de fermeture."
     about_title: "Le titre de la page \"À propos\""
     about_body: "Le corps de la page \"À propos\""
     about_contacts: "Les contacts sur la page \"À propos\""

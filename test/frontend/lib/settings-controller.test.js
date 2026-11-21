@@ -4,6 +4,7 @@ import moment from 'moment';
 describe('SettingsController upload errors', () => {
   let scope;
   let growl;
+  let setting;
 
   beforeAll(() => {
     global.moment = moment;
@@ -14,16 +15,18 @@ describe('SettingsController upload errors', () => {
   afterAll(() => { delete global.moment; });
 
   beforeEach(() => {
-    scope = { $watch: jest.fn() };
+    const injector = angular.injector(['ng', 'settingsControllerTest']);
+    scope = injector.get('$rootScope').$new();
+    setting = { update: jest.fn() };
     growl = { error: jest.fn(), success: jest.fn() };
     angular.injector(['ng', 'settingsControllerTest']).get('$controller')('SettingsController', {
       $scope: scope,
       $rootScope: { summernoteOpts: { toolbar: [[], [], [], [], [], ['insert', []]] } },
       $uibModal: {},
       dialogs: {},
-      Setting: {},
+      Setting: setting,
       growl,
-      settingsPromise: {},
+      settingsPromise: { booking_window_start: '2000-01-01T08:00:00.000Z', booking_window_end: '2000-01-01T15:00:00.000Z' },
       privacyDraftsPromise: { setting: { history: [] } },
       cgvFile: {},
       cguFile: {},
@@ -39,6 +42,32 @@ describe('SettingsController upload errors', () => {
       uiTourService: {},
       ReservationContext: {}
     });
+    scope.$digest();
+  });
+
+  test.each(['15:00', '16:00'])('reverts opening at %s before saving', time => {
+    const previous = scope.windowStart.value;
+    scope.windowStart.value = new Date(`2000-01-01T${time}:00`);
+    scope.$digest();
+    expect(scope.windowStart.value).toBe(previous);
+    scope.save(scope.windowStart);
+    expect(setting.update.mock.calls[0][1].value).toBe(previous);
+  });
+
+  test('accepts opening before closing', () => {
+    const value = new Date('2000-01-01T09:00:00');
+    scope.windowStart.value = value;
+    scope.$digest();
+    expect(scope.windowStart.value).toBe(value);
+    scope.save(scope.windowStart);
+    expect(setting.update.mock.calls[0][1].value).toBe(value.toISOString());
+  });
+
+  test('still rejects closing at opening time', () => {
+    const previous = scope.windowEnd.value;
+    scope.windowEnd.value = new Date('2000-01-01T08:00:00');
+    scope.$digest();
+    expect(scope.windowEnd.value).toBe(previous);
   });
 
   test.each([
