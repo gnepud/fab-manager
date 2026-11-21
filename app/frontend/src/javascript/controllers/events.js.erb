@@ -1030,6 +1030,9 @@ Application.Controllers.controller('ShowEventController', ['$scope', '$state', '
         'events_reservations'
       ].map(function(k) {
         return _.filter($scope.ctrl.member[k], function(r) {
+          if (r.canceled_at || (r.reservable_type === 'Event' && r.is_valid === false)) {
+            return false;
+          }
           if (r.reservable_type === 'Event' && r.reservable.id === $scope.event.id) {
             return false;
           }

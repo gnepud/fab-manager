@@ -90,4 +90,18 @@ describe('event booking overlap warning', () => {
     expect(modal.open).not.toHaveBeenCalled();
     expect(scope.reserve.toReserve).toBe(true);
   });
+
+  test('ignores a cancelled overlapping reservation', () => {
+    member.machine_reservations = [{ ...reservation('10:00', '11:00'), canceled_at: '2027-12-01T10:00:00+01:00' }];
+    scope.reserveEvent();
+    expect(modal.open).not.toHaveBeenCalled();
+    expect(scope.reserve.toReserve).toBe(true);
+  });
+
+  test('ignores a rejected event registration', () => {
+    member.events_reservations = [{ ...reservation('10:00', '11:00'), reservable_type: 'Event', reservable: { id: 43 }, is_valid: false }];
+    scope.reserveEvent();
+    expect(modal.open).not.toHaveBeenCalled();
+    expect(scope.reserve.toReserve).toBe(true);
+  });
 });
