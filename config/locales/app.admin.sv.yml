@@ -1738,6 +1738,7 @@ sv:
         reservations_parameters: "Parametrar för bokning"
         confine_the_booking_agenda: "Begränsa bokningsagendan"
         opening_time: "Öppningstid"
+        invalid_booking_window: "Öppningstiden måste vara före stängningstiden."
         closing_time: "Stängningstid"
         max_visibility: "Maximal synlighet (i månader)"
         visibility_for_yearly_members: "För pågående abonnemang, minst 1 år lång"

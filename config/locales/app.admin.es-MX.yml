@@ -1738,6 +1738,7 @@ es-MX:
         reservations_parameters: "Parámetros de reservas"
         confine_the_booking_agenda: "Confine la agenda de reserva"
         opening_time: "Hora de apertura"
+        invalid_booking_window: "La hora de apertura debe ser anterior a la hora de cierre."
         closing_time: "Tiempo de cierre"
         max_visibility: "Máxima visibilidad (en meses)"
         visibility_for_yearly_members: "Para las suscripciones en curso, por lo menos 1 año"

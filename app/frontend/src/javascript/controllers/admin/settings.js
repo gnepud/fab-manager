@@ -545,21 +545,27 @@ Application.Controllers.controller('SettingsController', ['$scope', '$rootScope'
 
       // we prevent the admin from setting the closing time before the opening time
       $scope.$watch('windowEnd.value', function (newValue, oldValue, scope) {
+        if (newValue === oldValue) return;
+
         if (scope.windowStart) {
           const startTime = moment($scope.windowStart.value).format('HH:mm:ss');
           const endTime = moment(newValue).format('HH:mm:ss');
           if (startTime >= endTime) {
             scope.windowEnd.value = oldValue;
+            growl.error(_t('app.admin.settings.invalid_booking_window'));
           }
         }
       });
 
       $scope.$watch('windowStart.value', function (newValue, oldValue, scope) {
+        if (newValue === oldValue) return;
+
         if (scope.windowEnd) {
           const startTime = moment(newValue).format('HH:mm:ss');
           const endTime = moment(scope.windowEnd.value).format('HH:mm:ss');
           if (startTime >= endTime) {
             scope.windowStart.value = oldValue;
+            growl.error(_t('app.admin.settings.invalid_booking_window'));
           }
         }
       });

@@ -1738,6 +1738,7 @@ en:
         reservations_parameters: "Reservations parameters"
         confine_the_booking_agenda: "Confine the booking agenda"
         opening_time: "Opening time"
+        invalid_booking_window: "The opening time must be before the closing time."
         closing_time: "Closing time"
         max_visibility: "Maximum visibility (in months)"
         visibility_for_yearly_members: "For currently running subscriptions, at least 1 year long"

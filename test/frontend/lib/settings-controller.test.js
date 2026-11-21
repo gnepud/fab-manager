@@ -50,6 +50,8 @@ describe('SettingsController upload errors', () => {
     scope.windowStart.value = new Date(`2000-01-01T${time}:00`);
     scope.$digest();
     expect(scope.windowStart.value).toBe(previous);
+    expect(growl.error).toHaveBeenCalledTimes(1);
+    expect(growl.error).toHaveBeenCalledWith('app.admin.settings.invalid_booking_window');
     scope.save(scope.windowStart);
     expect(setting.update.mock.calls[0][1].value).toBe(previous);
   });
@@ -59,15 +61,31 @@ describe('SettingsController upload errors', () => {
     scope.windowStart.value = value;
     scope.$digest();
     expect(scope.windowStart.value).toBe(value);
+    expect(growl.error).not.toHaveBeenCalled();
     scope.save(scope.windowStart);
     expect(setting.update.mock.calls[0][1].value).toBe(value.toISOString());
   });
 
-  test('still rejects closing at opening time', () => {
+  test.each(['07:00', '08:00'])('rejects closing at %s with an error', time => {
     const previous = scope.windowEnd.value;
-    scope.windowEnd.value = new Date('2000-01-01T08:00:00');
+    scope.windowEnd.value = new Date(`2000-01-01T${time}:00`);
     scope.$digest();
     expect(scope.windowEnd.value).toBe(previous);
+    expect(growl.error).toHaveBeenCalledTimes(1);
+    expect(growl.error).toHaveBeenCalledWith('app.admin.settings.invalid_booking_window');
+  });
+
+  test('does not show an error on initialization or unchanged values', () => {
+    scope.$digest();
+    expect(growl.error).not.toHaveBeenCalled();
+  });
+
+  test('accepts closing after opening without an error', () => {
+    const value = new Date('2000-01-01T14:00:00');
+    scope.windowEnd.value = value;
+    scope.$digest();
+    expect(scope.windowEnd.value).toBe(value);
+    expect(growl.error).not.toHaveBeenCalled();
   });
 
   test.each([
