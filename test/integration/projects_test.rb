@@ -237,6 +237,24 @@ class ProjectsTest < ActionDispatch::IntegrationTest
     assert_includes project_ids, draft.id
   end
 
+  test 'project search by keyword returns matching projects' do
+    matching = Project.create!(
+      name: 'Lampe sculptée au laser',
+      description: '<p>Une lampe de chevet découpée au laser</p>',
+      author: StatisticProfile.find(5),
+      licence_id: 1,
+      status_id: 1,
+      state: 'published'
+    )
+
+    get '/api/projects/search', params: { search: { q: 'lampe' }.to_json }, headers: default_headers
+
+    assert_response :success
+    project_ids = json_response(response.body)[:projects].map { |p| p[:id] }
+    assert_includes project_ids, matching.id
+    refute_includes project_ids, projects(:project_1).id
+  end
+
   test 'ProjectPolicy::Scope resolves appropriately for managers, admins, and users without profile' do
     draft = Project.create!(
       name: 'Scope Draft Test',
