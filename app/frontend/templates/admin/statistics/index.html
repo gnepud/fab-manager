@@ -241,7 +241,7 @@
               <li ng-show="selectedIndex.ca">{{ 'app.admin.statistics.revenue_' | translate }} {{sumCA | currency}}</li>
               <li>{{ 'app.admin.statistics.average_age' | translate }} {{averageAge}} {{ 'app.admin.statistics.years_old' | translate }}</li>
               <li ng-if="!type.active.simple">{{ 'app.admin.statistics.total' | translate }} {{type.active.label}} : {{sumStat}}</li>
-              <li ng-repeat="custom in type.active.custom_aggregations">{{ customFieldName(custom.field) }} {{customAggs[custom.field]}}</li>
+              <li ng-repeat="custom in type.active.custom_aggregations">{{ customFieldName(custom.field) }} {{custom.data_type === 'currency' ? (customAggs[custom.field] | currency) : (customAggs[custom.field] | number:2)}}</li>
             </ul>
           </div>
 
