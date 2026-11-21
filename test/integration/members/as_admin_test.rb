@@ -10,6 +10,20 @@ class MembersTest < ActionDispatch::IntegrationTest
     login_as(@admin, scope: :user)
   end
 
+  test 'member avatar is returned under its nested attributes key after reload' do
+    user = User.find(2)
+    avatar = user.profile.user_avatar
+    assert avatar
+
+    get "/api/members/#{user.id}", headers: default_headers
+
+    assert_response :success
+    result = json_response(response.body).dig(:profile_attributes, :user_avatar_attributes)
+    assert result, 'avatar must use the key consumed by the profile form'
+    assert_equal avatar.id, result[:id]
+    assert_equal "#{avatar.attachment_url}?#{avatar.updated_at.to_i}", result[:attachment_url]
+  end
+
   test 'admin creates member' do
     group_id = Group.first.id
     email = 'robert.dubois@gmail.com'

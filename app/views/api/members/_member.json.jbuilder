@@ -36,7 +36,7 @@ json.profile_attributes do
     json.website member.profile.website
     json.job member.profile.job
     if member.profile.user_avatar
-      json.user_avatar do
+      json.user_avatar_attributes do
         json.id member.profile.user_avatar.id
         json.attachment_url "#{member.profile.user_avatar.attachment_url}?#{member.profile.user_avatar.updated_at.to_i}"
       end
