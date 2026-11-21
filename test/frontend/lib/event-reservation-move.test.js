@@ -36,7 +36,7 @@ describe('event reservation move modal', () => {
     }) };
     const definition = controllers.ShowEventController;
     const locals = Object.fromEntries(definition.slice(0, -1).map(name => [name, {}]));
-    Object.assign(locals, { $scope: scope, $uibModal: modal, eventPromise: event, settingsPromise: {} });
+    Object.assign(locals, { $scope: scope, $uibModal: modal, eventPromise: event, settingsPromise: {}, _t: key => key });
     injector.invoke(definition, null, locals);
     scope.reservations = [reservation];
     scope.modifyReservation(reservation);
@@ -56,7 +56,7 @@ describe('event reservation move modal', () => {
     reservationApi.update.mock.calls[0][3]({
       data: { 'tickets.booked': ['must be greater than 0'] }, status: 422, config: { url: '/api/reservations/1' }
     });
-    expect(modalScope.alerts).toEqual([{ msg: 'tickets.booked: must be greater than 0', type: 'danger' }]);
+    expect(modalScope.alerts).toEqual([{ msg: 'must be greater than 0', type: 'danger' }]);
     expect(modalScope.attempting).toBe(false);
     expect(instance.close).not.toHaveBeenCalled();
   });
@@ -64,7 +64,7 @@ describe('event reservation move modal', () => {
   test('handles an empty validation response', () => {
     modalScope.ok();
     reservationApi.update.mock.calls[0][3]({ data: {}, status: 422 });
-    expect(modalScope.alerts).toEqual([]);
+    expect(modalScope.alerts).toEqual([{ msg: 'app.shared.card_payment_modal.unexpected_error', type: 'danger' }]);
     expect(modalScope.attempting).toBe(false);
   });
 });

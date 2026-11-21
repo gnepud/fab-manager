@@ -429,7 +429,7 @@ Application.Controllers.controller('ShowEventController', ['$scope', '$state', '
       }
       , function (response) {
       // reservation failed
-        growl.error(response && response.data && _.keys(response.data)[0] && response.data[_.keys(response.data)[0]][0] || 'server error');
+        growl.error(reservationErrorMessage(response));
         // unset the attempting marker
         $scope.attempting = false;
       })
@@ -522,12 +522,7 @@ Application.Controllers.controller('ShowEventController', ['$scope', '$state', '
               $scope.attempting = true;
             }
             , function (response) {
-              $scope.alerts = [];
-              angular.forEach(response.data, function (v, k) {
-                angular.forEach(v, function (err) {
-                  $scope.alerts.push({ msg: k + ': ' + err, type: 'danger' });
-                });
-              });
+              $scope.alerts = [{ msg: reservationErrorMessage(response), type: 'danger' }];
               $scope.attempting = false;
             });
           };
@@ -681,6 +676,13 @@ Application.Controllers.controller('ShowEventController', ['$scope', '$state', '
     }
 
     /* PRIVATE SCOPE */
+
+    const reservationErrorMessage = function (response) {
+      const data = response && response.data;
+      const values = typeof data === 'string' || Array.isArray(data) ? data : Object.values(data || {});
+      const messages = [values].flat(2).filter(message => typeof message === 'string' && message.trim()).map(message => message.trim());
+      return [...new Set(messages)].join('; ') || _t('app.shared.card_payment_modal.unexpected_error');
+    };
 
     /**
      * Kind of constructor: these actions will be realized first when the controller is loaded
@@ -989,15 +991,7 @@ Application.Controllers.controller('ShowEventController', ['$scope', '$state', '
                 return $scope.attempting = true;
               }
               , function (response) {
-                $scope.alerts = [];
-                angular.forEach(response, function (v, k) {
-                  angular.forEach(v, function (err) {
-                    $scope.alerts.push({
-                      msg: k + ': ' + err,
-                      type: 'danger'
-                    });
-                  });
-                });
+                $scope.alerts = [{ msg: reservationErrorMessage(response), type: 'danger' }];
                 return $scope.attempting = false;
               });
             };
