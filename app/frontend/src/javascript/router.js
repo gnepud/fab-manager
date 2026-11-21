@@ -48,6 +48,7 @@ angular.module('application.router', ['ui.router'])
             statistics: (modulesPromise.statistics_module === 'true')
           };
           $rootScope.settings = {
+            publicRegistrations: (settingsPromise.public_registrations === 'true'),
             familyAccount: (settingsPromise.family_account === 'true')
           };
         }]

@@ -463,6 +463,11 @@ Application.Controllers.controller('SettingsController', ['$scope', '$rootScope'
       if (settingName) {
         $scope.allSettings[settingName] = value;
       }
+      if (settingName === 'public_registrations') {
+        $rootScope.$applyAsync(function () {
+          $rootScope.settings.publicRegistrations = (value === 'true');
+        });
+      }
     };
 
     $scope.onError = function (message) {

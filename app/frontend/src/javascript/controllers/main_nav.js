@@ -18,7 +18,7 @@ Application.Controllers.controller('MainNavController', ['$scope', 'settingsProm
    * Returns the current state of the public registration setting (allowed/blocked).
    */
   $scope.registrationEnabled = function () {
-    return settingsPromise.public_registrations === 'true';
+    return $scope.settings.publicRegistrations;
   };
 
   /**
