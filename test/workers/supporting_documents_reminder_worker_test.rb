@@ -80,4 +80,33 @@ class SupportingDocumentsReminderWorkerTest < ActiveSupport::TestCase
       @worker.perform
     end
   end
+
+  test 'notify transferred members missing a document required by their current group' do
+    user = @users.first
+    previous_group = Group.create!(name: 'Previous group', slug: 'previous-group')
+    previous_type = SupportingDocumentType.create!(name: 'Previous document', groups: [previous_group])
+    user.update!(group: previous_group)
+    user.supporting_document_files.create!(supporting_document_type: previous_type,
+                                           attachment: fixture_file_upload('document.pdf'))
+    user.update!(group: groups(:group_1))
+
+    assert_enqueued_emails @users.length do
+      @worker.perform
+    end
+    assert user.reload.supporting_documents_reminder_sent_at
+  end
+
+  test 'send exactly one reminder to a member missing two required documents' do
+    user = @users.first
+    User.members.where.not(id: user.id).update_all(supporting_documents_reminder_sent_at: Time.current)
+
+    assert_enqueued_emails 1 do
+      @worker.perform
+    end
+    assert user.reload.supporting_documents_reminder_sent_at
+
+    assert_enqueued_emails 0 do
+      @worker.perform
+    end
+  end
 end
