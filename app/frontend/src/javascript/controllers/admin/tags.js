@@ -44,8 +44,8 @@ Application.Controllers.controller('TagsController', ['$scope', 'tagsPromise', '
    */
   $scope.saveTag = function (data, id) {
     if (id != null) {
-      return Tag.update({ id }, { tag: data }, response => growl.success(_t('app.admin.members.tag_form.changes_successfully_saved'))
-        , () => growl.error(_t('app.admin.members.tag_form.an_error_occurred_while_saving_changes')));
+      return Tag.update({ id }, { tag: data }, response => growl.success(_t('app.admin.members.changes_successfully_saved'))
+        , () => growl.error(_t('app.admin.members.an_error_occurred_while_saving_changes')));
     } else {
       return Tag.save({ tag: data }, function (resp) {
         growl.success(_t('app.admin.members.tag_form.new_tag_successfully_saved'));
