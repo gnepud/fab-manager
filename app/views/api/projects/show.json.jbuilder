@@ -18,6 +18,7 @@ json.author do
   end
   json.username @project.author&.user&.username
   json.slug @project.author&.user&.slug
+  json.can_view_profile current_user.present? && @project.author&.user.present? && policy(@project.author.user).show?
 end
 json.project_caos_attributes @project.project_caos do |f|
   json.id f.id
@@ -58,6 +59,7 @@ json.project_users @project.project_users do |pu|
   end
   json.username pu.user.username
   json.slug pu.user.slug
+  json.can_view_profile current_user.present? && policy(pu.user).show?
   json.is_valid pu.is_valid
 end
 json.project_steps_attributes @project.project_steps.order('project_steps.step_nb ASC') do |s|
