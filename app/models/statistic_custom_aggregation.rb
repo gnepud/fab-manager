@@ -9,8 +9,10 @@ class StatisticCustomAggregation < ApplicationRecord
   def data_type
     return 'number' unless es_index == 'stats'
 
-    aggregation = JSON.parse(query.presence || '{}').dig('aggregations', '%<aggs_name>s') || {}
-    monetary = %w[avg sum min max].any? { |operation| aggregation.dig(operation, 'field') == 'ca' }
+    aggregations = JSON.parse(query.presence || '{}')['aggregations'] || {}
+    monetary = aggregations.values.any? do |aggregation|
+      %w[avg sum min max].any? { |operation| aggregation.dig(operation, 'field') == 'ca' }
+    end
     monetary ? 'currency' : 'number'
   rescue JSON::ParserError
     'number'

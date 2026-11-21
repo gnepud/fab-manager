@@ -12,6 +12,10 @@ class StatisticCustomAggregationTest < ActiveSupport::TestCase
     end
   end
 
+  test 'recognizes monetary metrics stored with the legacy aggregation name placeholder' do
+    assert_equal 'currency', statistic_custom_aggregations(:three).data_type
+  end
+
   test 'keeps counts and non-monetary metrics numeric' do
     [{ avg: { field: 'age' } }, { value_count: { field: 'ca' } }, { cardinality: { field: 'ca' } }].each do |metric|
       custom = StatisticCustomAggregation.new(es_index: 'stats', query: { aggregations: { '%<aggs_name>s' => metric } }.to_json)
