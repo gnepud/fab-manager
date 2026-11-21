@@ -2062,7 +2062,7 @@ it:
           draft_from_USER_DATE: "Bozza, salvata da {USER}, il {DATE}"
           save_or_publish: "Salvare o pubblicare?"
           save_or_publish_body: "Vuoi pubblicare una nuova versione dell'informativa sulla privacy o salvarla come bozza?"
-          publish_will_notify: "Pubblicare una nuova versione invierà una notifica ad ogni utente."
+          publish_will_notify: "Quando verrà pubblicata una nuova versione, tutti i membri riceveranno una notifica."
           publish: "Pubblica"
           users_notified: "Gli utenti della piattaforma saranno informati dell'aggiornamento."
           about_analytics: "Acconsento a condividere dati anonimi con il team di sviluppo per contribuire a migliorare Fab-manager."

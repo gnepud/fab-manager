@@ -2062,7 +2062,7 @@ fr:
           draft_from_USER_DATE: "Brouillon, enregistré par {USER}, le {DATE}"
           save_or_publish: "Enregistrer ou publier ?"
           save_or_publish_body: "Voulez-vous publier une nouvelle version de la politique de confidentialité ou bien l'enregistrer comme brouillon ?"
-          publish_will_notify: "Publier une nouvelle version enverra une notification à l'ensemble des utilisateurs."
+          publish_will_notify: "Tous les membres recevront une notification à la publication d'une nouvelle version."
           publish: "Publier"
           users_notified: "Les utilisateurs de la plateforme seront notifiés de la mise à jour."
           about_analytics: "J'accepte de partager des données anonymes avec l'équipe de développement pour aider à améliorer Fab-manager."
