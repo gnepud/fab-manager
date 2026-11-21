@@ -7,7 +7,7 @@ class SessionsController < Devise::SessionsController
     if active_provider.providable_type == 'DatabaseProvider'
       super
     else
-      redirect_post "/users/auth/#{active_provider.strategy_name}"
+      redirect_post "/users/auth/#{active_provider.strategy_name}", options: { authenticity_token: :auto }
     end
   end
 

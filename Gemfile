@@ -136,7 +136,7 @@ gem 'sys-filesystem'
 
 gem 'sha3'
 
-gem 'repost'
+gem 'repost', '~> 0.6'
 
 gem 'icalendar'
 
