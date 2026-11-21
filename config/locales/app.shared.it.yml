@@ -417,7 +417,7 @@ it:
         state_canceled: "Annullato"
         method_card: "con carta"
         method_check: "con assegno"
-        method_transfer: "con trasferimento"
+        method_transfer: "con bonifico bancario"
       payment_schedule_item_actions:
         download: "Scarica"
         cancel_subscription: "Annulla l'abbonamento"
