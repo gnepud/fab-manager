@@ -189,6 +189,28 @@ class Subscriptions::CreateAsUserTest < ActionDispatch::IntegrationTest
     assert_equal invoice.wallet_transaction_id, transaction.id
   end
 
+  test 'user pays the discounted subscription total from their wallet' do
+    plan = Plan.find_by(group_id: @user.group.id, type: 'Plan', base_name: 'Mensuel')
+    coupon = coupons(:cash2)
+    @user.wallet.update!(amount: 40)
+
+    post '/api/local_payment/confirm_payment',
+         params: {
+           items: [{ subscription: { plan_id: plan.id } }],
+           coupon_code: coupon.code,
+           payment_method: 'wallet'
+         }.to_json, headers: default_headers
+
+    assert_equal 201, response.status, response.body
+    invoice = Invoice.find(json_response(response.body)[:id])
+    assert_equal coupon, invoice.coupon
+    assert_equal 2700, invoice.total
+    assert_equal invoice.total, invoice.wallet_amount
+    assert_equal 27, invoice.wallet_transaction.amount
+    assert_equal 13, @user.wallet.reload.amount
+    assert_equal plan, @user.reload.subscribed_plan
+  end
+
   test 'user takes a subscription but does not confirm 3DS' do
     plan = Plan.find_by(group_id: @user.group.id, type: 'Plan', base_name: 'Abonnement mensualisable')
     payment_schedule_count = PaymentSchedule.count
