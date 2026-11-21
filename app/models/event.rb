@@ -37,7 +37,7 @@ class Event < ApplicationRecord
 
   attr_accessor :recurrence, :recurrence_end_at
 
-  before_save :update_nb_free_places
+  before_save :update_nb_free_places, prepend: true
   after_create :event_recurrence
 
   # update event updated_at for index cache
