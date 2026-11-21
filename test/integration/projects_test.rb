@@ -15,6 +15,27 @@ class ProjectsTest < ActionDispatch::IntegrationTest
     assert_equal "text/markdown", response.content_type
   end
 
+  test 'author can update and delete a project by its slug' do
+    project = Project.create!(
+      name: 'Slug Addressed Project',
+      description: '<p>Edited through its slug URL</p>',
+      author: StatisticProfile.find(5),
+      licence_id: 1,
+      status_id: 1,
+      state: 'published'
+    )
+    login_as(User.find(5), scope: :user)
+
+    put "/api/projects/#{project.slug}", params: { project: { description: '<p>Saved from the slug edit page</p>' } }
+    assert_response :success
+    assert_equal project.id, json_response(response.body)[:id]
+    assert_equal '<p>Saved from the slug edit page</p>', project.reload.description
+
+    delete "/api/projects/#{project.slug}"
+    assert_response :no_content
+    assert_not Project.exists?(project.id)
+  end
+
   test 'anonymous visitor cannot access draft project by id or slug' do
     draft_project = Project.create!(
       name: 'Secret Draft Project',
@@ -235,6 +256,24 @@ class ProjectsTest < ActionDispatch::IntegrationTest
     results = json_response(response.body)
     project_ids = results[:projects].map { |p| p[:id] }
     assert_includes project_ids, draft.id
+  end
+
+  test 'project search by keyword returns matching projects' do
+    matching = Project.create!(
+      name: 'Lampe sculptée au laser',
+      description: '<p>Une lampe de chevet découpée au laser</p>',
+      author: StatisticProfile.find(5),
+      licence_id: 1,
+      status_id: 1,
+      state: 'published'
+    )
+
+    get '/api/projects/search', params: { search: { q: 'lampe' }.to_json }, headers: default_headers
+
+    assert_response :success
+    project_ids = json_response(response.body)[:projects].map { |p| p[:id] }
+    assert_includes project_ids, matching.id
+    refute_includes project_ids, projects(:project_1).id
   end
 
   test 'ProjectPolicy::Scope resolves appropriately for managers, admins, and users without profile' do

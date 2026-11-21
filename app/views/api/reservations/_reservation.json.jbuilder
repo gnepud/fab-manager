@@ -18,7 +18,7 @@ json.slots_reservations_attributes reservation.slots_reservations do |sr|
 end
 json.nb_reserve_places reservation.nb_reserve_places
 json.tickets_attributes reservation.tickets do |t|
-  json.extract! t, :booked, :created_at
+  json.extract! t, :id, :event_price_category_id, :booked, :created_at
   json.event_price_category do
     json.extract! t.event_price_category, :id, :price_category_id
     json.price_category do

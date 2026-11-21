@@ -642,7 +642,7 @@ unless Setting.find_by(name: 'allowed_cad_mime_types').try(:value)
     'application/acad application/dwg application/octet-stream application/step application/iges model/iges x-world/x-3dmf ' \
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document image/png text/x-arduino text/plain application/scad ' \
     'application/vnd.sketchup.skp application/x-koan application/vnd-koan koan/x-skm application/vnd.koan application/x-tex ' \
-    'application/x-latex application/x-extension-fcstd'
+    'application/x-latex application/x-extension-fcstd model/stl application/vnd.ms-pki.stl model/x.stl-binary model/x.stl-ascii'
   )
 end
 

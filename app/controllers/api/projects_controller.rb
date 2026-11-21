@@ -82,7 +82,7 @@ class API::ProjectsController < API::APIController
   private
 
   def set_project
-    @project = Project.find(params[:id])
+    @project = Project.friendly.find(params[:id])
   end
 
   def project_params

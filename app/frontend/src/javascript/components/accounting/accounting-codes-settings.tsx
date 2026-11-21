@@ -11,6 +11,7 @@ import SettingAPI from '../../api/setting';
 import SettingLib from '../../lib/setting';
 import { FormSwitch } from '../form/form-switch';
 import { FabPanel } from '../base/fab-panel';
+import { Loader } from '../base/loader';
 
 declare const Application: IApplication;
 
@@ -154,4 +155,10 @@ export const AccountingCodesSettings: React.FC<AccountingCodesSettingsProps> = (
   );
 };
 
-Application.Components.component('accountingCodesSettings', react2angular(AccountingCodesSettings, ['onSuccess', 'onError']));
+const AccountingCodesSettingsWrapper: React.FC<AccountingCodesSettingsProps> = (props) => (
+  <Loader>
+    <AccountingCodesSettings {...props} />
+  </Loader>
+);
+
+Application.Components.component('accountingCodesSettings', react2angular(AccountingCodesSettingsWrapper, ['onSuccess', 'onError']));

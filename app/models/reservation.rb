@@ -65,6 +65,10 @@ class Reservation < ApplicationRecord
 
     reservable.update_nb_free_places
     reservable.save!
+    if saved_change_to_reservable_id? && reservable_id_before_last_save.present?
+      previous_event = Event.find(reservable_id_before_last_save)
+      previous_event.save!
+    end
   end
 
   def original_payment_schedule
