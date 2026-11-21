@@ -170,11 +170,11 @@ class InvoicesService
   # Generate an InvoiceItem for the given subscription and save it in invoice.invoice_items.
   # This method must be called only with a valid subscription
   ##
-  def self.generate_subscription_item(invoice, subscription, payment_details, main: false)
+  def self.generate_subscription_item(invoice, subscription, _payment_details, main: false)
     raise TypeError unless subscription
 
     invoice.invoice_items.push InvoiceItem.new(
-      amount: payment_details[:elements][:plan],
+      amount: subscription.plan.amount,
       description: subscription.plan.base_name,
       object: subscription,
       main: main
@@ -185,11 +185,11 @@ class InvoicesService
   # Generate an InvoiceItem for the given StatisticProfilePrepaidPack and save it in invoice.invoice_items.
   # This method must be called only with a valid pack-statistic_profile relation
   ##
-  def self.generate_prepaid_pack_item(invoice, pack, payment_details, main: false)
+  def self.generate_prepaid_pack_item(invoice, pack, _payment_details, main: false)
     raise TypeError unless pack
 
     invoice.invoice_items.push InvoiceItem.new(
-      amount: payment_details[:elements][:pack],
+      amount: pack.prepaid_pack.amount,
       description: I18n.t('invoices.pack_item', **{ COUNT: pack.prepaid_pack.minutes / 60, ITEM: pack.prepaid_pack.priceable.name }),
       object: pack,
       main: main
