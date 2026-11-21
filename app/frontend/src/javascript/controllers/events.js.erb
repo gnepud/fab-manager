@@ -256,7 +256,7 @@ Application.Controllers.controller('ShowEventController', ['$scope', '$state', '
         remain -= $scope.reserve.tickets[ticket];
       }
       // we store the total number of seats booked, this is used to know if the 'pay' button must be shown
-      $scope.reserve.totalSeats = $scope.event.nb_free_places - remain;
+      $scope.reserve.totalSeats = nb_free_places - remain;
 
       // update the available seats for full price tickets
       const fullPriceRemains = $scope.reserve.nbReservePlaces + remain;
@@ -647,6 +647,9 @@ Application.Controllers.controller('ShowEventController', ['$scope', '$state', '
      * Checks if the reservation of current event is valid
      */
     $scope.reservationIsValid = () => {
+      if ($scope.reserve.totalSeats <= 0) {
+        return false;
+      }
       if ($scope.event.event_type === 'nominative') {
         for (const key of Object.keys($scope.reserve.bookingUsers)) {
           for (const user of $scope.reserve.bookingUsers[key]) {
