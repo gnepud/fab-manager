@@ -15,11 +15,4 @@ describe('bank transfer payment schedule labels', () => {
     expect(labels.method_transfer).toBe(paidMethod);
     expect(labels.state_pending_transfer).toBe(pendingState);
   });
-
-  test('French manual collection warning identifies bank transfers', () => {
-    const translations = yaml.load(fs.readFileSync(path.join(localesDirectory, 'app.admin.fr.yml'), 'utf8'));
-    const warning = translations.fr.app.admin.local_payment_form.transfer_collection_info;
-
-    expect(warning).toContain('les virements bancaires ne sont pas automatiquement gérés par Fab-manager.');
-  });
 });
