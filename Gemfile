@@ -118,6 +118,7 @@ gem 'oj'
 gem 'chroma'
 
 gem 'message_format'
+gem 'twitter_cldr', '~> 5.4'
 
 gem 'openlab_ruby'
 

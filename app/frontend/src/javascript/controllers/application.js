@@ -1,4 +1,6 @@
 
+import FormatLib from '../lib/format';
+
 Application.Controllers.controller('ApplicationController', ['$rootScope', '$scope', '$transitions', '$window', '$locale', '$timeout', 'Session', 'AuthService', 'Auth', '$uibModal', '$state', 'growl', 'Notification', '$interval', 'Setting', '_t', 'Version', 'Help', '$cookies',
   function ($rootScope, $scope, $transitions, $window, $locale, $timeout, Session, AuthService, Auth, $uibModal, $state, growl, Notification, $interval, Setting, _t, Version, Help, $cookies) {
   /* PRIVATE STATIC CONSTANTS */
@@ -14,8 +16,7 @@ Application.Controllers.controller('ApplicationController', ['$rootScope', '$sco
     $scope.version =
       { current: '' };
 
-    // currency symbol for the current locale (cf. angular-i18n)
-    $rootScope.currencySymbol = $locale.NUMBER_FORMATS.CURRENCY_SYM;
+    $rootScope.currencySymbol = Fablab.intl_currency ? FormatLib.currencySymbol() : $locale.NUMBER_FORMATS.CURRENCY_SYM;
 
     /**
      * Set the current user to the provided value and initialize the session

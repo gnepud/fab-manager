@@ -684,6 +684,7 @@ DEPENDENCIES
   spring-watcher-listen (~> 2.1.0)
   stripe (= 5.29.0)
   sys-filesystem
+  twitter_cldr (~> 5.4)
   tzinfo-data
   vcr (~> 6.1.0)
   web-console (>= 4.2.0)

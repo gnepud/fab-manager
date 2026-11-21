@@ -190,11 +190,8 @@ See `config/locales/app.*.yml` for a list of available locales. Default is **en*
 
     RAILS_LOCALE
 
-Configure Ruby on Rails localization settings (currency, dates, number formats ...).
-
-Please, be aware that **the configured locale will imply the CURRENCY symbol used to generate invoices**.
-
-_Eg.: configuring **es-ES** will set the currency symbol to **€** but **es-MX** will set **$** as currency symbol, so setting the `RAILS_LOCALE` to simple **es** (without country indication) will probably not do what you expect._
+Configure Ruby on Rails localization settings (dates, number formats, currency placement, etc.).
+Set [`INTL_CURRENCY`](#INTL_CURRENCY) to choose the currency shown on invoices, independently of this locale.
 
 Available values: `en, en-AU-CA, en-GB, en-IE, en-IN, en-NZ, en-US, en-ZA, fr, fr-CA, fr-CH, fr-CM, fr-FR, es, es-419, es-AR, es-CL, es-CO, es-CR, es-DO, es-EC, es-ES, es-MX, es-MX, es-PA, es-PE, es-US, es-VE, no, pt, pt-BR, it, it-CH, zu, zh-CN`.
 When not defined, it defaults to **en**.
@@ -223,10 +220,6 @@ When not defined, it defaults to **en-US** (even if it's not listed).
 
 Configure the locale for angular-i18n.
 
-Please, be aware that **the configured locale will imply the CURRENCY displayed to front-end users.**
-
-_Eg.: configuring **fr-fr** will set the currency symbol to **€** but **fr-ca** will set **$** as currency symbol, so setting the `ANGULAR_LOCALE` to simple **fr** (without country indication) will probably not do what you expect._
-
 See [code.angularjs.org/i18n/angular-locale_*.js](https://code.angularjs.org/1.8.2/i18n/) for a list of available locales. When not defined, it defaults to **en**.
 <a name="FULLCALENDAR_LOCALE"></a>
 
@@ -246,7 +239,7 @@ See [Intl - Javascript | MDN](https://developer.mozilla.org/en-US/docs/Web/JavaS
 
     INTL_CURRENCY
 
-Configure the currency for the javascript Intl Object.
+Configure the currency shown in the app, including invoices, notifications and other server-generated documents.
 Possible values are the ISO 4217 currency codes, such as "USD" for the US dollar, "EUR" for the euro.
 See [Current currency & funds code list](http://www.currency-iso.org/en/home/tables/table-a1.html) for a list of available values.
 There is no default value; this setting MUST be provided.
