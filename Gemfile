@@ -123,7 +123,7 @@ gem 'openlab_ruby'
 
 gem 'api-pagination'
 gem 'apipie-rails'
-gem 'rdoc', '< 8'
+gem 'rdoc', '< 8' # Apipie breaks with RDoc 8.
 
 # XLS files generation
 gem 'caxlsx'
@@ -149,7 +149,7 @@ gem 'redis-session-store'
 gem 'acts_as_list'
 
 # Error reporting
-gem 'sentry-rails', '~> 5.10.0'
+gem 'sentry-rails', '>= 5.10'
 gem 'sentry-ruby'
 
 gem 'reverse_markdown'

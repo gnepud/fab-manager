@@ -677,7 +677,7 @@ DEPENDENCIES
   rubyzip (>= 1.3.0)
   sassc (= 2.4.0)
   seed_dump
-  sentry-rails (~> 5.10.0)
+  sentry-rails (>= 5.10)
   sentry-ruby
   sha3
   shakapacker (= 6.6.0)
