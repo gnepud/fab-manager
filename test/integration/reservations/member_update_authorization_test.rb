@@ -118,6 +118,32 @@ class Reservations::MemberUpdateAuthorizationTest < ActionDispatch::IntegrationT
     assert_equal 9, @destination.reload.nb_free_places
   end
 
+  test 'member can move an event reservation using a single nested slot hash' do
+    reservation = create_reservation
+    login_as(@member, scope: :user)
+
+    put reservation_path(reservation), params: {
+      reservation: { reservable_id: @destination.id,
+                     slots_reservations_attributes: { id: reservation.slots_reservations.first.id, slot_id: @destination_slot.id } }
+    }.to_json, headers: default_headers
+
+    assert_response :success
+    assert_equal @destination.id, reservation.reload.reservable_id
+    assert_equal @destination_slot.id, reservation.slots_reservations.first.reload.slot_id
+  end
+
+  test 'member cannot move to an arbitrary slot using a single nested slot hash' do
+    reservation = create_reservation
+    login_as(@member, scope: :user)
+
+    put reservation_path(reservation), params: {
+      reservation: { slots_reservations_attributes: { id: reservation.slots_reservations.first.id, slot_id: Slot.find(9).id } }
+    }.to_json, headers: default_headers
+
+    assert_response :forbidden
+    assert_equal @source_slot.id, reservation.reload.slots_reservations.first.slot_id
+  end
+
   test 'member cannot change tickets or reservable type in a serialized reservation' do
     reservation = create_reservation
     ticket = reservation.tickets.create!(event_price_category: event_price_categories(:one), booked: 1)

@@ -59,6 +59,8 @@ class ReservationPolicy < ApplicationPolicy
 
   def slot_attributes(attributes)
     values = attributes.fetch(:slots_reservations_attributes, [])
+    return [values] if values.respond_to?(:key?) && values.key?(:id)
+
     values.respond_to?(:values) ? values.values : values
   end
 
