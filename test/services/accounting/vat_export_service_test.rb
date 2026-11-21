@@ -8,6 +8,8 @@ class Accounting::VatExportServiceTest < ActiveSupport::TestCase
     @acamus = User.find_by(username: 'acamus')
     Setting.set('invoice_VAT-active', true)
     Setting.set('invoice_VAT-rate', '20')
+    # VatHistoryService compares dates to the second: keep the documents clear of the settings change
+    travel 1.minute
     @file = Rails.root.join('tmp', "vat_export_test_#{SecureRandom.hex(4)}.csv")
   end
 
