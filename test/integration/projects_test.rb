@@ -15,6 +15,27 @@ class ProjectsTest < ActionDispatch::IntegrationTest
     assert_equal "text/markdown", response.content_type
   end
 
+  test 'author can update and delete a project by its slug' do
+    project = Project.create!(
+      name: 'Slug Addressed Project',
+      description: '<p>Edited through its slug URL</p>',
+      author: StatisticProfile.find(5),
+      licence_id: 1,
+      status_id: 1,
+      state: 'published'
+    )
+    login_as(User.find(5), scope: :user)
+
+    put "/api/projects/#{project.slug}", params: { project: { description: '<p>Saved from the slug edit page</p>' } }
+    assert_response :success
+    assert_equal project.id, json_response(response.body)[:id]
+    assert_equal '<p>Saved from the slug edit page</p>', project.reload.description
+
+    delete "/api/projects/#{project.slug}"
+    assert_response :no_content
+    assert_not Project.exists?(project.id)
+  end
+
   test 'anonymous visitor cannot access draft project by id or slug' do
     draft_project = Project.create!(
       name: 'Secret Draft Project',
