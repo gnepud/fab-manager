@@ -134,9 +134,10 @@ Application.Controllers.controller('InvoicesController', ['$scope', '$state', 'I
      */
     $scope.onVATSuccess = (message) => {
       $scope.onSuccess(message);
-      Setting.query({ names: "['invoice_VAT-name', 'invoice_VAT-rate']" }, (vatSettings) => {
+      Setting.query({ names: "['invoice_VAT-name', 'invoice_VAT-rate', 'invoice_VAT-active']" }, (vatSettings) => {
         $scope.invoice.VAT.rate = vatSettings['invoice_VAT-rate'];
         $scope.invoice.VAT.name = vatSettings['invoice_VAT-name'];
+        $scope.invoice.VAT.active = vatSettings['invoice_VAT-active'] === 'true';
       }, $scope.onError);
     };
 
