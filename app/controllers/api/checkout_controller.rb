@@ -33,6 +33,8 @@ class API::CheckoutController < API::APIController
     authorize @current_order, policy_class: CheckoutPolicy
     res = Checkout::PaymentService.new.confirm_payment(@current_order, params[:coupon_code], params[:payment_id])
     render json: res
+  rescue Stripe::StripeError => e
+    render json: Stripe::Helper.human_error(e), status: :unprocessable_entity
   rescue StandardError => e
     render json: e, status: :unprocessable_entity
   end

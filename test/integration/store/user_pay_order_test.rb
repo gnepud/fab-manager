@@ -238,4 +238,39 @@ class Store::UserPayOrderTest < ActionDispatch::IntegrationTest
     assert_equal @cart1.wallet_amount, 200
     assert_equal 2, transaction.amount
   end
+
+  test 'user confirm payment of an intent left without payment method shows a readable error' do
+    login_as(@pjproudhon, scope: :user)
+
+    VCR.use_cassette('store_order_confirm_payment_without_payment_method') do
+      # a failed 3DS challenge, like a declined card, leaves the PaymentIntent in requires_payment_method
+      payment_intent_id = begin
+        Stripe::PaymentIntent.create(
+          {
+            amount: @cart1.total,
+            currency: Setting.get('stripe_currency'),
+            payment_method: stripe_payment_method(error: :card_declined),
+            confirmation_method: 'manual',
+            confirm: true
+          },
+          { api_key: Setting.get('stripe_secret_key') }
+        ).id
+      rescue Stripe::CardError => e
+        e.error.payment_intent.id
+      end
+
+      post '/api/checkout/confirm_payment',
+           params: {
+             payment_id: payment_intent_id,
+             order_token: @cart1.token
+           }.to_json, headers: default_headers
+    end
+
+    @cart1.reload
+
+    assert_equal 200, response.status, response.body
+    res = json_response(response.body)
+    assert_equal 'Your card was declined.', res[:payment][:error][:statusText]
+    assert_equal 'cart', @cart1.state
+  end
 end

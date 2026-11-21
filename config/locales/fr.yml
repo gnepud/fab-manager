@@ -47,6 +47,7 @@ fr:
       gateway_error: "Erreur de la passerelle de paiement : %{MESSAGE}"
       gateway_amount_too_small: "Les paiements inférieurs à %{AMOUNT} ne sont pas pris en charge. Merci de passer commande directement à l'accueil."
       gateway_amount_too_large: "Les paiements supérieurs à %{AMOUNT} ne sont pas pris en charge. Merci de passer commande directement à l'accueil."
+      gateway_authentication_failed: "Votre carte n'a pas pu être authentifiée. Veuillez réessayer ou utiliser une autre carte."
       product_in_use: "Ce produit a déjà été commandé"
       slug_already_used: "est déjà utilisée"
       birthday_less_than_18_years_ago: "L'age doit être inférieur à 18 ans"

@@ -47,6 +47,7 @@ en:
       gateway_error: "Payement gateway error: %{MESSAGE}"
       gateway_amount_too_small: "Payments under %{AMOUNT} are not supported. Please order directly at the reception."
       gateway_amount_too_large: "Payments above %{AMOUNT} are not supported. Please order directly at the reception."
+      gateway_authentication_failed: "Your card could not be authenticated. Please try again or use another card."
       product_in_use: "This product have already been ordered"
       slug_already_used: "is already used"
       birthday_less_than_18_years_ago: "Birthday must be under 18 years ago"
