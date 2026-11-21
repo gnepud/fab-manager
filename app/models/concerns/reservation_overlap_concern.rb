@@ -29,7 +29,6 @@ module ReservationOverlapConcern
 
   def pending_overlap_candidates(all_items, types)
     all_items.select { |item| item.is_a?(CartItem::Reservation) && types.include?(item.reservable_type) }
-             .reject { |item| same_event?(item) }
              .flat_map(&:cart_item_reservation_slots)
   end
 
@@ -40,10 +39,6 @@ module ReservationOverlapConcern
     return existing unless reservable_type == 'Event'
 
     existing.where.not(reservations: { reservable_type: 'Event', reservable_id: reservable_id })
-  end
-
-  def same_event?(item)
-    reservable_type == 'Event' && item.reservable_type == 'Event' && reservable_id == item.reservable_id
   end
 
   def slots_overlap?(slot, other)

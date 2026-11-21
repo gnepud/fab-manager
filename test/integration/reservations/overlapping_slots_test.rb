@@ -92,10 +92,22 @@ class Reservations::OverlappingSlotsTest < ActionDispatch::IntegrationTest
     assert_equal 201, response.status, response.body
   end
 
-  test 'same cart may contain multiple bookings for the same event' do
+  test 'same cart cannot contain multiple bookings for the same event' do
     event = free_event(Event.first)
-    confirm(event_item(event), event_item(event))
-    assert_equal 201, response.status, response.body
+    assert_no_difference ['Reservation.count', 'Invoice.count'] do
+      confirm(event_item(event), event_item(event))
+      assert_equal 422, response.status, response.body
+    end
+  end
+
+  test 'same event slot cannot appear twice within one reservation' do
+    event = free_event(Event.first)
+    reservation = event_item(event)
+    reservation[:reservation][:slots_reservations_attributes] << { slot_id: event.availability.slots.first.id }
+    assert_no_difference ['Reservation.count', 'Invoice.count'] do
+      confirm(reservation)
+      assert_equal 422, response.status, response.body
+    end
   end
 
   test 'an existing different event still prevents an overlapping event booking' do
