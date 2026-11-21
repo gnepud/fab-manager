@@ -2,6 +2,8 @@
 
 # Handle most of the emails sent by the platform. Triggered by notifications
 class NotificationsMailer < BaseMailer
+  self.delivery_job = NotificationMailDeliveryJob
+
   after_action :mark_notification_as_send
 
   def send_mail_by(notification)
