@@ -5,8 +5,6 @@ require 'test_helper'
 module Invoices; end
 
 class Invoices::VATTest < ActionDispatch::IntegrationTest
-  include ActionView::Helpers::NumberHelper
-
   def setup
     @admin = User.find_by(username: 'admin')
     login_as(@admin, scope: :user)
@@ -38,7 +36,7 @@ class Invoices::VATTest < ActionDispatch::IntegrationTest
     assert_invoice_pdf invoice do |lines|
       vat_line = I18n.t('invoices.including_VAT_RATE',
                         **{ RATE: Setting.get('invoice_VAT-rate'),
-                            AMOUNT: number_to_currency(invoice.total / 100.00, locale: CURRENCY_LOCALE),
+                            AMOUNT: CurrencyFormatter.format(invoice.total / 100.00),
                             NAME: 'TVQ+TPS' })
       assert(lines.any? { |l| /#{Regexp.escape(vat_line)}/.match(l) })
     end

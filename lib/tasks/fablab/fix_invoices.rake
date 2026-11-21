@@ -10,8 +10,6 @@ namespace :fablab do
   task fix_invoices: :environment do |_task, _args|
     next unless Invoice.where(invoiced_id: nil).count.positive?
 
-    include ActionView::Helpers::NumberHelper
-
     # check the footprints and save the archives
     Integrity::ArchiveHelper.check_footprints
     ActiveRecord::Base.transaction do
@@ -22,7 +20,7 @@ namespace :fablab do
         ii = invoice.invoice_items.where(subscription_id: nil).first
         puts '=============================================='
         puts "Invoice #{invoice.id} (# #{invoice.reference})"
-        puts "Total: #{number_to_currency(invoice.total / 100.0, locale: CURRENCY_LOCALE)}"
+        puts "Total: #{CurrencyFormatter.format(invoice.total / 100.0)}"
         puts "Subject: #{ii.description}."
         puts "Customer: #{invoice.invoicing_profile.full_name} (#{invoice.invoicing_profile.email})"
         puts "Operator: #{invoice.operator_profile&.user&.profile&.full_name} (#{invoice.operator_profile&.user&.email})"
