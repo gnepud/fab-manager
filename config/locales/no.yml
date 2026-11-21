@@ -560,6 +560,7 @@
   order:
     please_contact_FABLAB: "Please contact us for withdrawal instructions."
   cart_item_validation:
+    overlapping: "Du har allerede en reservasjon som overlapper dette tidsrommet"
     slot: "The slot doesn't exist"
     availability: "The availaility doesn't exist"
     full: "The slot is already fully reserved"

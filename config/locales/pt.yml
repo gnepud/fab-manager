@@ -560,6 +560,7 @@ pt:
   order:
     please_contact_FABLAB: "Por favor, entre em contato conosco para instruções de retirada."
   cart_item_validation:
+    overlapping: "Você já tem uma reserva que se sobrepõe a este horário"
     slot: "O slot não existe"
     availability: "A disponibilidade não existe"
     full: "O slot já está totalmente reservado"

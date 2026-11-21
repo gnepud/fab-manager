@@ -562,6 +562,7 @@ fr:
   order:
     please_contact_FABLAB: "Veuillez nous contacter pour des instructions de retrait."
   cart_item_validation:
+    overlapping: "Vous avez déjà une réservation sur un créneau qui chevauche celui-ci"
     slot: "Le créneau n'existe pas"
     availability: "La disponibilité n'existe pas"
     full: "Le créneau est déjà entièrement réservé"
