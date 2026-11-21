@@ -1,12 +1,25 @@
 # frozen_string_literal: true
 
 ENV['RAILS_ENV'] ||= 'test'
-require_relative '../../config/environment'
+require 'open3'
+require 'rbconfig'
 require 'minitest/autorun'
 require 'minitest/mock'
 
+require_relative '../../config/environment' if ENV['XLSX_LOOKUP_SUBPROCESS']
+
 class XlsxTemplateLookupTest < Minitest::Test
   def test_mailer_lookup_before_controller_load_preserves_xlsx_templates
+    unless ENV['XLSX_LOOKUP_SUBPROCESS']
+      output, status = Open3.capture2e(
+        { 'XLSX_LOOKUP_SUBPROCESS' => '1', 'CI' => nil, 'RAILS_ENV' => 'test' },
+        RbConfig.ruby, File.expand_path(__FILE__)
+      )
+      assert status.success?, output
+      return
+    end
+
+    refute Rails.application.config.eager_load
     resolver = ActionMailer::Base.view_paths.to_a.find { |path| path.to_s == Rails.root.join('app/views').to_s }
     resolver.find_all('notifications_mailer', 'layouts', false, { formats: [:html], handlers: [:erb], locale: [:en], variants: [] })
 
