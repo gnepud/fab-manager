@@ -14,6 +14,8 @@
  */
 'use strict';
 
+import { uploadErrorMessages } from '../../lib/upload-error-messages';
+
 /* COMMON CODE */
 
 /**
@@ -41,7 +43,7 @@ class TrainingsController {
       if ((content.id == null)) {
         $scope.alerts = [];
         return angular.forEach(content, function (v, k) {
-          angular.forEach(v, function (err) {
+          angular.forEach(uploadErrorMessages(v), function (err) {
             $scope.alerts.push({
               msg: k + ': ' + err,
               type: 'danger'
