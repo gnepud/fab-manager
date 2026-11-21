@@ -240,12 +240,8 @@ Application.Filters.filter('eventsReservationsFilter', [function () {
         if (angular.isUndefined(element.end_at)) { element.end_at = element.availability.end_at; }
         switch (selectedScope) {
           case 'future':
-            if (new Date(element.end_at) >= new Date()) {
-              return filteredElements.push(element);
-            }
-            break;
           case 'future_asc':
-            if (new Date(element.end_at) >= new Date()) {
+            if (!element.canceled_at && new Date(element.end_at) >= new Date()) {
               return filteredElements.push(element);
             }
             break;
