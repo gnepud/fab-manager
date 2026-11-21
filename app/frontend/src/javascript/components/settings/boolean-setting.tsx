@@ -104,7 +104,7 @@ export const BooleanSetting: React.FC<BooleanSettingProps> = ({ name, label, cla
   return (
     <div className={`boolean-setting ${className || ''}`}>
       <label htmlFor={`setting-${name}`}>{label}</label>
-      <Switch checked={value} id={`setting-${name}}`} onChange={handleChanged} className="switch"></Switch>
+      <Switch checked={value} id={`setting-${name}`} onChange={handleChanged} className="switch"></Switch>
       {!hideSave && <FabButton className="save-btn" onClick={handleSave}>{t('app.admin.boolean_setting.save')}</FabButton> }
     </div>
   );
