@@ -142,6 +142,11 @@ export default class ProductLib {
     for (const key in params) {
       if (['#', 'categoryTypeUrl'].includes(key) || !Object.prototype.hasOwnProperty.call(params, key)) continue;
 
+      if (key === 'keywords') {
+        res.keywords = params[key] ? (Array.isArray(params[key]) ? params[key] : [params[key]]) : defaultFilters.keywords;
+        continue;
+      }
+
       const value = ParsingLib.parse(params[key]) || defaultFilters[key];
       switch (key) {
         case 'category': {
