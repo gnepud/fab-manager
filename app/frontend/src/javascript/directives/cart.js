@@ -87,7 +87,9 @@ Application.Directives.directive('cart', ['$rootScope', '$uibModal', 'dialogs', 
         };
 
         // currently logged-in user
-        $scope.currentUser = $rootScope.currentUser;
+        $scope.$watch(() => $rootScope.currentUser, (user) => {
+          $scope.currentUser = user;
+        });
 
         $scope.reservationContextsData = {
           options: $scope.reservationContexts || [],
