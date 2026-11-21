@@ -1,7 +1,8 @@
 import angular from 'angular';
 
-describe('ApplicationController login redirect', () => {
+describe('ApplicationController', () => {
   let scope;
+  let rootScope;
   let onStart;
   let state;
   let modal;
@@ -15,6 +16,7 @@ describe('ApplicationController login redirect', () => {
 
   beforeEach(() => {
     scope = {};
+    rootScope = {};
     state = { go: jest.fn() };
     modal = {
       open: jest.fn(() => ({
@@ -26,10 +28,10 @@ describe('ApplicationController login redirect', () => {
     };
     const injector = angular.injector(['ng', 'applicationControllerTest']);
     injector.get('$controller')('ApplicationController', {
-      $rootScope: {},
+      $rootScope: rootScope,
       $scope: scope,
       $transitions: { onStart: (criteria, callback) => { onStart = callback; } },
-      $locale: { NUMBER_FORMATS: { CURRENCY_SYM: '€' } },
+      $locale: { NUMBER_FORMATS: { CURRENCY_SYM: '$' } },
       Session: {},
       AuthService: { isAuthorized: () => false, isAuthenticated: () => false },
       Auth: { login: () => new Promise(() => {}) },
@@ -50,6 +52,10 @@ describe('ApplicationController login redirect', () => {
   afterEach(() => {
     jest.restoreAllMocks();
     delete global.GTM;
+  });
+
+  test('uses the configured EUR symbol for legacy coupons even with an English Angular locale', () => {
+    expect(rootScope.currencySymbol).toBe('€');
   });
 
   test.each([

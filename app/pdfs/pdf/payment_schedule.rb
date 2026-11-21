@@ -3,7 +3,6 @@
 # Generate a downloadable PDF file for the recorded payment schedule
 class Pdf::PaymentSchedule < Prawn::Document
   require 'stringio'
-  include ActionView::Helpers::NumberHelper
   include ApplicationHelper
 
   ##
@@ -80,9 +79,9 @@ class Pdf::PaymentSchedule < Prawn::Document
         price = item.amount.to_i / 100.00
         date = I18n.l(item.due_date.to_date)
 
-        data += [[date, number_to_currency(price, locale: CURRENCY_LOCALE)]]
+        data += [[date, CurrencyFormatter.format(price)]]
       end
-      data += [[I18n.t('payment_schedules.total_amount'), number_to_currency(payment_schedule.total / 100.0, locale: CURRENCY_LOCALE)]]
+      data += [[I18n.t('payment_schedules.total_amount'), CurrencyFormatter.format(payment_schedule.total / 100.0)]]
 
       # display table
       font_size(8) do
@@ -100,7 +99,7 @@ class Pdf::PaymentSchedule < Prawn::Document
       payment_verbose = _t('payment_schedules.settlement_by_METHOD', METHOD: payment_schedule.payment_method)
       if payment_schedule.wallet_amount
         payment_verbose += I18n.t('payment_schedules.settlement_by_wallet',
-                                  **{ AMOUNT: number_to_currency(payment_schedule.wallet_amount / 100.00, locale: CURRENCY_LOCALE) })
+                                  **{ AMOUNT: CurrencyFormatter.format(payment_schedule.wallet_amount / 100.00) })
       end
       text payment_verbose
 
