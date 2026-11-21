@@ -45,7 +45,7 @@ class PaymentSchedule < PaymentDocument
   # This is useful to check the first item because its amount may be different from the others
   ##
   def ordered_items
-    payment_schedule_items.order(due_date: :asc)
+    payment_schedule_items.order(due_date: :asc, id: :asc)
   end
 
   def gateway_payment_mean

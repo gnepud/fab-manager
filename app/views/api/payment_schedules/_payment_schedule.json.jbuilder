@@ -22,8 +22,9 @@ if payment_schedule.gateway_subscription
   json.gateway payment_schedule.gateway_subscription.gateway
 end
 wallet_amount = payment_schedule.wallet_amount.to_i
-first_item = payment_schedule.ordered_items.first unless wallet_amount.zero?
-json.items payment_schedule.payment_schedule_items do |item|
+items = payment_schedule.payment_schedule_items
+first_item = items.min_by { |item| [item.due_date.nil? ? 1 : 0, item.due_date, item.id] } unless wallet_amount.zero?
+json.items items do |item|
   json.partial! 'api/payment_schedules/payment_schedule_item', item: item
   item_wallet_amount = item == first_item ? wallet_amount : 0
   json.amount_due (item.amount - item_wallet_amount) / 100.00
