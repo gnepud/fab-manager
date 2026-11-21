@@ -13,6 +13,8 @@
 
 'use strict';
 
+import { uploadErrorMessages } from '../lib/upload-error-messages';
+
 Application.Controllers.controller('CompleteProfileController', ['$scope', '$rootScope', '$state', '$window', '_t', 'growl', 'CSRF', 'Auth', 'Member', 'settingsPromise', 'activeProviderPromise', 'groupsPromise', 'cguFile', 'memberPromise', 'Session', 'dialogs', 'AuthProvider',
   function ($scope, $rootScope, $state, $window, _t, growl, CSRF, Auth, Member, settingsPromise, activeProviderPromise, groupsPromise, cguFile, memberPromise, Session, dialogs, AuthProvider) {
   /* PUBLIC SCOPE */
@@ -83,7 +85,7 @@ Application.Controllers.controller('CompleteProfileController', ['$scope', '$roo
       if ((content.id == null)) {
         $scope.alerts = [];
         angular.forEach(content, function (v, k) {
-          angular.forEach(v, function (err) {
+          angular.forEach(uploadErrorMessages(v), function (err) {
             $scope.alerts.push({
               msg: k + ': ' + err,
               type: 'danger'

@@ -13,6 +13,8 @@
  */
 'use strict';
 
+import { uploadErrorMessages } from '../lib/upload-error-messages';
+
 /**
  * Controller used in the members listing page
  */
@@ -185,7 +187,7 @@ Application.Controllers.controller('EditProfileController', ['$scope', '$rootSco
       if ((content.id == null)) {
         $scope.alerts = [];
         return angular.forEach(content, (v, k) =>
-          angular.forEach(v, err =>
+          angular.forEach(uploadErrorMessages(v), err =>
             $scope.alerts.push({
               msg: k + ': ' + err,
               type: 'danger'

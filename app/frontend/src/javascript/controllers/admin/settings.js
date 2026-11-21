@@ -12,6 +12,8 @@
  */
 'use strict';
 
+import { uploadErrorMessages } from '../../lib/upload-error-messages';
+
 Application.Controllers.controller('SettingsController', ['$scope', '$rootScope', '$filter', '$uibModal', 'dialogs', 'Setting', 'growl', 'settingsPromise', 'privacyDraftsPromise', 'cgvFile', 'cguFile', 'logoFile', 'logoBlackFile', 'faviconFile', 'profileImageFile', 'reservationContextsPromise', 'reservationContextApplicableOnValuesPromise', 'CSRF', '_t', 'Member', 'uiTourService', 'ReservationContext',
   function ($scope, $rootScope, $filter, $uibModal, dialogs, Setting, growl, settingsPromise, privacyDraftsPromise, cgvFile, cguFile, logoFile, logoBlackFile, faviconFile, profileImageFile, reservationContextsPromise, reservationContextApplicableOnValuesPromise, CSRF, _t, Member, uiTourService, ReservationContext) {
     /* PUBLIC SCOPE */
@@ -218,11 +220,7 @@ Application.Controllers.controller('SettingsController', ['$scope', '$rootScope'
       if ((content.custom_asset == null)) {
         $scope.alerts = [];
         return angular.forEach(content, function (v) {
-          if (angular.isString(v)) {
-            growl.error(v);
-          } else {
-            angular.forEach(v, function (err) { growl.error(err); });
-          }
+          angular.forEach(uploadErrorMessages(v), function (err) { growl.error(err); });
         });
       } else {
         growl.success(_t('app.admin.settings.file_successfully_updated'));
