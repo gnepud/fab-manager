@@ -5,6 +5,7 @@ json.data @result[:data] do |order|
   json.extract! order, :id, :statistic_profile_id, :reference, :state, :created_at, :updated_at
   json.total order.total / 100.0 if order.total.present?
   json.paid_total order.paid_total / 100.0 if order.paid_total.present?
+  json.wallet_amount order.wallet_amount / 100.0 if order.wallet_amount.present?
   if order&.statistic_profile&.user
     json.user do
       json.id order.statistic_profile.user.id

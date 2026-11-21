@@ -62,7 +62,7 @@ export const OrderItem: React.FC<OrderItemProps> = ({ order, currentUser }) => {
       </div>
       <div className='price'>
         <span>{t('app.shared.store.order_item.total')}</span>
-        <p>{FormatLib.price(order.state === 'cart' ? order.total : order.paid_total)}</p>
+        <p>{FormatLib.price(order.state === 'cart' ? order.total : order.paid_total + (order.wallet_amount ?? 0))}</p>
       </div>
       <FabButton onClick={() => showOrder(order)} icon={<i className="fas fa-eye" />} className="is-black" />
     </div>
