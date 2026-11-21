@@ -1,4 +1,4 @@
-import { ReactEventHandler, useState, useEffect, ReactElement } from 'react';
+import { ReactEventHandler, useState, useEffect, useMemo, ReactElement } from 'react';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader } from '../base/loader';
@@ -29,11 +29,11 @@ const PaymentSchedulesTable: React.FC<PaymentSchedulesTableProps> = ({ paymentSc
   // for each payment schedule: are the details (all deadlines) shown or hidden?
   const [showExpanded, setShowExpanded] = useState<Map<number, boolean>>(new Map());
   // we want to display some buttons only once. This map keep track of the buttons that have been displayed.
-  const [displayOnceMap] = useState<Map<TypeOnce, Map<number, number>>>(new Map([
+  const displayOnceMap = useMemo<Map<TypeOnce, Map<number, number>>>(() => new Map([
     ['subscription-cancel', new Map()],
     ['card-update', new Map()],
     ['update-payment-mean', new Map()]
-  ]));
+  ]), [paymentSchedules]);
   const [gateway, setGateway] = useState<Setting>(null);
 
   useEffect(() => {
