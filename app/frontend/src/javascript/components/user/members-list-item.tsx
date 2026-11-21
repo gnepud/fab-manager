@@ -5,9 +5,11 @@ import { Child } from '../../models/child';
 import { FabButton } from '../base/fab-button';
 import { CaretDown, User, Users, PencilSimple, Trash } from 'phosphor-react';
 import { ChildItem } from '../family-account/child-item';
+import { User as Operator } from '../../models/user';
 
 interface MembersListItemProps {
   member: Member,
+  operator: Operator,
   onError: (message: string) => void,
   onSuccess: (message: string) => void
   onEditChild: (child: Child) => void;
@@ -18,7 +20,7 @@ interface MembersListItemProps {
 /**
  * Members list
  */
-export const MembersListItem: React.FC<MembersListItemProps> = ({ member, onError, onEditChild, onDeleteChild, onDeleteMember }) => {
+export const MembersListItem: React.FC<MembersListItemProps> = ({ member, operator, onError, onEditChild, onDeleteChild, onDeleteMember }) => {
   const { t } = useTranslation('admin');
 
   const [childrenList, setChildrenList] = useState(false);
@@ -85,9 +87,11 @@ export const MembersListItem: React.FC<MembersListItemProps> = ({ member, onErro
           <FabButton onClick={() => toMemberEdit(member.id)} className="edit-btn">
             <PencilSimple size={20} weight="fill" />
           </FabButton>
-          <FabButton onClick={() => onDeleteMember(member.id)} className="delete-btn">
-            <Trash size={20} weight="fill" />
-          </FabButton>
+          {operator?.role === 'admin' &&
+            <FabButton onClick={() => onDeleteMember(member.id)} className="delete-btn">
+              <Trash size={20} weight="fill" />
+            </FabButton>
+          }
         </div>
       </div>
 
