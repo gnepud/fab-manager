@@ -1004,12 +1004,26 @@ Application.Controllers.controller('EditMemberController', ['$scope', '$state', 
 
     /* PRIVATE SCOPE */
 
+    const initSubscription = () => {
+      if (($scope.user.subscribed_plan != null) && ($scope.user.subscription != null)) {
+        $scope.subscription = $scope.user.subscription;
+      } else {
+        $scope.subscription = null;
+        Plan.query({ group_id: $scope.user.group_id }, function (plans) {
+          $scope.plans = plans;
+          return Array.from($scope.plans).map(function (plan) {
+            return (plan.nameToDisplay = `${plan.base_name} - ${plan.interval}`);
+          });
+        });
+      }
+    };
+
     const refreshSubscription = () => {
       Member.get({ id: $scope.user.id }, function (member) {
         $scope.user.subscription = member.subscription || null;
         $scope.user.subscribed_plan = member.subscribed_plan || null;
         $scope.user.invoices = member.invoices;
-        $scope.subscription = $scope.user.subscription;
+        initSubscription();
       }, function (error) {
         console.error(error);
         growl.error(_t('app.public.common.unexpected_error_occurred'));
@@ -1022,17 +1036,7 @@ Application.Controllers.controller('EditMemberController', ['$scope', '$state', 
     const initialize = function () {
       CSRF.setMetaTags();
 
-      // the user subscription
-      if (($scope.user.subscribed_plan != null) && ($scope.user.subscription != null)) {
-        $scope.subscription = $scope.user.subscription;
-      } else {
-        Plan.query({ group_id: $scope.user.group_id }, function (plans) {
-          $scope.plans = plans;
-          return Array.from($scope.plans).map(function (plan) {
-            return (plan.nameToDisplay = `${plan.base_name} - ${plan.interval}`);
-          });
-        });
-      }
+      initSubscription();
 
       SupportingDocumentType.query({ group_id: $scope.user.group_id }, function (supportingDocumentTypes) {
         $scope.hasProofOfIdentityTypes = supportingDocumentTypes.length > 0;

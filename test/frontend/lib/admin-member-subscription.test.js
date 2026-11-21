@@ -4,16 +4,18 @@ require('../../../app/frontend/src/javascript/controllers/admin/members');
 const definition = Application.Controllers.controller.mock.calls.find(([name]) => name === 'EditMemberController')[1];
 
 describe('admin member subscription changes', () => {
-  let scope, member, growl;
+  let scope, member, growl, plan;
 
   beforeEach(() => {
     scope = {};
     member = { get: jest.fn() };
     growl = { success: jest.fn(), error: jest.fn() };
+    plan = { query: jest.fn() };
     const dependencies = {
       $scope: scope,
       $transition$: { params: () => ({ id: 1 }) },
       Member: member,
+      Plan: plan,
       Training: { query: () => ({ $promise: Promise.resolve([]) }) },
       Group: { query: onSuccess => onSuccess([]) },
       CSRF: { setMetaTags: jest.fn() },
@@ -57,6 +59,17 @@ describe('admin member subscription changes', () => {
     expect(scope.user.subscription).toBeNull();
     expect(scope.user.subscribed_plan).toBeNull();
     expect(scope.user.invoices).toEqual([]);
+  });
+
+  test('treats a canceled subscription without subscribed plan as no subscription and loads plans', () => {
+    member.get.mockImplementation((_params, success) => success({ subscription: { id: 3, canceled_at: '2026-11-21' }, invoices: [] }));
+    plan.query.mockImplementation((_params, success) => success([{ base_name: 'Monthly', interval: 'month' }]));
+
+    scope.onCancelSuccess('Canceled');
+
+    expect(scope.subscription).toBeNull();
+    expect(plan.query).toHaveBeenCalled();
+    expect(scope.plans[0].nameToDisplay).toBe('Monthly - month');
   });
 
   test('reports a failed refresh without replacing member data', () => {
