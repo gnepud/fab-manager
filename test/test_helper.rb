@@ -40,7 +40,7 @@ class ActiveSupport::TestCase
   include PaymentScheduleHelper
 
   # Add more helper methods to be used by all tests here...
-  ActiveRecord::Migration.check_pending!
+  ActiveRecord::Migration.check_all_pending!
   fixtures :all
 
   def json_response(body)

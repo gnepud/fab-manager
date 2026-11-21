@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '7.0.8.7'
+gem 'rails', '~> 7.1.0'
 # Used by rails 5.2 to reduce the app boot time by over 50%
 gem 'bootsnap'
 # Use Puma as web server
@@ -123,6 +123,7 @@ gem 'openlab_ruby'
 
 gem 'api-pagination'
 gem 'apipie-rails'
+gem 'rdoc', '< 8' # Apipie breaks with RDoc 8.
 
 # XLS files generation
 gem 'caxlsx'
@@ -148,7 +149,7 @@ gem 'redis-session-store'
 gem 'acts_as_list'
 
 # Error reporting
-gem 'sentry-rails'
+gem 'sentry-rails', '>= 5.10'
 gem 'sentry-ruby'
 
 gem 'reverse_markdown'

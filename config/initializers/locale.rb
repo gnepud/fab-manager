@@ -16,5 +16,5 @@ I18n.config.available_locales += %i[de de-AT de-CH de-DE
 #
 # /!\ ALL locales SHOULD be configured accordingly with the default_locale. /!\
 #
-I18n.config.default_locale = Rails.application.secrets.rails_locale.to_s.split('-')[0]
-I18n.config.locale = Rails.application.secrets.rails_locale
+I18n.config.default_locale = Rails.configuration.x.settings.rails_locale.to_s.split('-')[0]
+I18n.config.locale = Rails.configuration.x.settings.rails_locale

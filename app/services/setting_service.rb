@@ -7,7 +7,7 @@ class SettingService
   class << self
     # @param setting [Setting]
     def update_allowed?(setting)
-      return false if Rails.application.secrets.locked_settings.include? setting.name
+      return false if Rails.configuration.x.settings.locked_settings.include? setting.name
 
       true
     end
