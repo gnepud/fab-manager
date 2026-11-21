@@ -68,8 +68,6 @@ class Reservation < ApplicationRecord
     if saved_change_to_reservable_id? && reservable_id_before_last_save.present?
       previous_event = Event.find(reservable_id_before_last_save)
       previous_event.save!
-      Slots::PlacesCacheService.refresh(previous_event.availability.slots.first)
-      Slots::PlacesCacheService.refresh(reservable.availability.slots.first)
     end
   end
 

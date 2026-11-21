@@ -76,4 +76,31 @@ class Reservations::MoveEventTest < ActionDispatch::IntegrationTest
     assert_equal @source.id, reservation.reload.reservable_id
     assert_equal 1, ticket.reload.booked
   end
+
+  test 'moving a reservation preserves pending cart holds on both occurrences' do
+    reservation = Reservation.create!(statistic_profile: User.members.first.statistic_profile,
+                                      reservable: @source, nb_reserve_places: 2)
+    source_slot = @source.availability.slots.first
+    destination_slot = @destination.availability.slots.first
+    slot_reservation = reservation.slots_reservations.create!(slot: source_slot)
+    @source.save!
+    [@source, @destination].each do |event|
+      slot = event.availability.slots.first
+      Slots::PlacesCacheService.refresh(slot)
+      Slots::PlacesCacheService.change_places(slot, 'Event', event.id, 1)
+    end
+
+    put "/api/reservations/#{reservation.id}", params: {
+      reservation: { reservable_id: @destination.id,
+                     slots_reservations_attributes: [{ id: slot_reservation.id, slot_id: destination_slot.id }] }
+    }.to_json, headers: default_headers
+    assert_response :success
+
+    assert_equal 1, source_slot.reload.reserved_places(@source)
+    assert_equal 3, destination_slot.reload.reserved_places(@destination)
+    assert_not_includes source_slot.reserved_users([@source]), reservation.user.id
+    assert_includes destination_slot.reserved_users([@destination]), reservation.user.id
+    assert_equal 10, @source.reload.nb_free_places
+    assert_equal 8, @destination.reload.nb_free_places
+  end
 end

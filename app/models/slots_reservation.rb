@@ -44,7 +44,9 @@ class SlotsReservation < ApplicationRecord
 
   def switch_places_cache
     old_slot_id = saved_change_to_slot_id[0]
-    remove_from_places_cache(Slot.find(old_slot_id))
+    old_slot = Slot.find(old_slot_id)
+    old_reservable_id = reservation.reservable_type == 'Event' ? old_slot.availability.event.id : reservation.reservable_id
+    remove_from_places_cache(old_slot, old_reservable_id)
     add_to_places_cache
   end
 
@@ -54,24 +56,24 @@ class SlotsReservation < ApplicationRecord
   end
 
   # @param target_slot [Slot]
-  def remove_from_places_cache(target_slot = slot)
-    update_places_cache(:-, target_slot)
+  def remove_from_places_cache(target_slot = slot, reservable_id = reservation.reservable_id)
+    update_places_cache(:-, target_slot, reservable_id)
     Slots::PlacesCacheService.remove_users(target_slot,
                                            reservation.reservable_type,
-                                           reservation.reservable_id,
+                                           reservable_id,
                                            [reservation.statistic_profile.user_id])
   end
 
   # @param operation [Symbol] :+ or :-
   # @param target_slot [Slot]
-  def update_places_cache(operation, target_slot = slot)
+  def update_places_cache(operation, target_slot = slot, reservable_id = reservation.reservable_id)
     if reservation.reservable_type == 'Event'
       total_booked_seats = reservation.nb_reserve_places
       total_booked_seats += reservation.tickets.map(&:booked).map(&:to_i).reduce(:+) if reservation.tickets.count.positive?
       total_booked_seats = 0 if reservation.reservable.pre_registration
       Slots::PlacesCacheService.change_places(target_slot,
                                               reservation.reservable_type,
-                                              reservation.reservable_id,
+                                              reservable_id,
                                               total_booked_seats,
                                               operation)
     else
