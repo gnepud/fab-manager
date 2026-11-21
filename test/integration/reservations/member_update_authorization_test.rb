@@ -31,6 +31,20 @@ class Reservations::MemberUpdateAuthorizationTest < ActionDispatch::IntegrationT
     Setting.set('booking_move_delay', 24)
   end
 
+  test 'member can update the message on a paid reservation' do
+    reservation = create_reservation
+    login_as(@member, scope: :user)
+
+    put reservation_path(reservation), params: {
+      reservation: { message: 'Updated reservation message' }
+    }.to_json, headers: default_headers
+
+    assert_response :success
+    assert_equal 'Updated reservation message', reservation.reload.message
+    assert_equal 1, reservation.nb_reserve_places
+    assert_equal false, reservation.slots_reservations.first.offered
+  end
+
   test 'member cannot change booked places on a paid reservation' do
     reservation = create_reservation
     login_as(@member, scope: :user)

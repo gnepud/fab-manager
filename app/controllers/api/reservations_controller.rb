@@ -59,7 +59,7 @@ class API::ReservationsController < API::APIController
 
   def reservation_params
     unless current_user.admin? || current_user.manager?
-      return params.require(:reservation).permit(:reservable_id, slots_reservations_attributes: %i[id slot_id])
+      return params.require(:reservation).permit(:message, :reservable_id, slots_reservations_attributes: %i[id slot_id])
     end
 
     params.require(:reservation).permit(:message, :reservable_id, :reservable_type, :nb_reserve_places,
