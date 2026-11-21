@@ -3,7 +3,7 @@
 # Provides methods for Project
 class ProjectService
   def search(params, current_user, paginate: true)
-    connection = ActiveRecord::Base.connection
+    connection = ActiveRecord::Base.lease_connection
     return { error: 'invalid adapter' } unless connection.instance_values['config'][:adapter] == 'postgresql'
 
     search_from_postgre(params, current_user, paginate: paginate)

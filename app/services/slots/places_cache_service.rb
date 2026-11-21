@@ -56,7 +56,7 @@ class Slots::PlacesCacheService
     def change_places(slot, reservable_type, reservable_id, places, operation = :+)
       return if slot.nil?
 
-      ActiveRecord::Base.connection.execute <<-SQL.squish
+      ActiveRecord::Base.lease_connection.execute <<-SQL.squish
         with reservable_places as (
           select ('{'||index-1||',reserved_places}')::text[] as path
                 ,(place->>'reserved_places')::decimal as reserved_places
@@ -80,7 +80,7 @@ class Slots::PlacesCacheService
     def remove_users(slot, reservable_type, reservable_id, user_ids)
       return if slot.nil? || user_ids.compact.empty?
 
-      ActiveRecord::Base.connection.execute <<-SQL.squish
+      ActiveRecord::Base.lease_connection.execute <<-SQL.squish
         with users as (
           select ('{'||index-1||',user_ids}')::text[] as path
                 ,place->>'user_ids' as user_ids
@@ -113,7 +113,7 @@ class Slots::PlacesCacheService
     def add_users(slot, reservable_type, reservable_id, user_ids)
       return if slot.nil?
 
-      ActiveRecord::Base.connection.execute <<-SQL.squish
+      ActiveRecord::Base.lease_connection.execute <<-SQL.squish
         with users as (
           select ('{'||index-1||',user_ids}')::text[] as path
                 ,place->>'user_ids' as user_ids

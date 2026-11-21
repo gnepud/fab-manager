@@ -85,7 +85,7 @@ class Integrity::ArchiveHelper
     end
 
     def execute(query)
-      ActiveRecord::Base.connection.execute(query)
+      ActiveRecord::Base.lease_connection.execute(query)
     end
   end
 end

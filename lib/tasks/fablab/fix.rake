@@ -7,7 +7,7 @@ namespace :fablab do
     desc '[release 2.3.0] update reservations referencing reservables not present in database'
     task reservations_not_existing_reservable: :environment do
       ActiveRecord::Base.logger = Logger.new($stdout)
-      ActiveRecord::Base.connection.execute(
+      ActiveRecord::Base.lease_connection.execute(
         'UPDATE reservations SET reservable_type = NULL, reservable_id = NULL ' \
         'WHERE NOT EXISTS (SELECT 1 FROM events WHERE events.id = reservations.reservable_id) ' \
         "AND reservations.reservable_type = 'Event'"
