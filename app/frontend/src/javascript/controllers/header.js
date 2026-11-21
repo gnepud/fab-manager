@@ -12,7 +12,7 @@ Application.Controllers.controller('HeaderController', ['$scope', '$transitions'
      * Returns the current state of the public registration setting (allowed/blocked).
      */
     $scope.registrationEnabled = function () {
-      return settingsPromise.public_registrations === 'true';
+      return $scope.settings.publicRegistrations;
     };
 
     $scope.dropdownOnToggled = function (open) {
