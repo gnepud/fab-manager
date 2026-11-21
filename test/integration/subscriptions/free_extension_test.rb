@@ -83,4 +83,78 @@ class Subscriptions::FreeExtensionTest < ActionDispatch::IntegrationTest
     res = json_response(response.body)
     assert_equal I18n.t('cart_items.must_be_after_expiration'), res
   end
+
+  test 'extension notifications retain their date after another extension and cancellation' do
+    user = User.find_by(username: 'pdurand')
+    subscription = user.subscription
+    extension_date = 2.months.from_now
+
+    post '/api/local_payment/confirm_payment',
+         params: {
+           customer_id: user.id,
+           items: [{ free_extension: { end_at: extension_date.iso8601 } }]
+         }.to_json, headers: default_headers
+    assert_response :created
+
+    notifications = extension_notifications(subscription).to_a
+    assert_equal 2, notifications.size
+    assert_extension_messages(notifications, extension_date.to_date)
+
+    OfferDay.create!(subscription: subscription, start_at: extension_date, end_at: extension_date + 1.month)
+    assert_extension_messages(notifications, extension_date.to_date)
+
+    login_as(@admin, scope: :user)
+    patch "/api/subscriptions/#{subscription.id}/cancel", headers: default_headers
+    assert_response :success
+    assert subscription.reload.expired?
+    assert_extension_messages(notifications, extension_date.to_date)
+  end
+
+  test 'legacy extension notifications use the subscription expiration' do
+    subscription = User.find_by(username: 'pdurand').subscription
+    subscription.send(:notify_subscription_extended)
+    notifications = extension_notifications(subscription).to_a
+    assert_equal 2, notifications.size
+    notifications.each { |notification| notification.update!(meta_data: { free_days: false }) }
+
+    assert_extension_messages(notifications, subscription.expired_at.to_date)
+    notifications.each { |notification| notification.update!(meta_data: nil) }
+    assert_extension_messages(notifications, subscription.expired_at.to_date)
+  end
+
+  test 'subscription extension notifications snapshot their expiration' do
+    subscription = User.find_by(username: 'pdurand').subscription
+    expiration_date = subscription.expired_at.to_date
+    subscription.send(:notify_subscription_extended)
+    notifications = extension_notifications(subscription).to_a
+    assert_equal 2, notifications.size
+    subscription.update!(expiration_date: 3.months.from_now)
+
+    assert_extension_messages(notifications, expiration_date)
+  end
+
+  private
+
+  def extension_notifications(subscription)
+    types = %w[notify_member_subscription_extended notify_admin_subscription_extended]
+    Notification.where(attached_object: subscription,
+                       notification_type_id: NotificationType.where(name: types))
+  end
+
+  def assert_extension_messages(notifications, date)
+    notifications.each do |notification|
+      login_as(notification.receiver, scope: :user)
+      get '/api/notifications'
+      assert_response :success
+      rendered = json_response(response.body)[:notifications].find { |item| item[:id] == notification.id }
+      assert_not_nil rendered
+      assert_includes rendered[:message][:description], I18n.l(date)
+
+      mail = ApplicationController.render(
+        template: "notifications_mailer/#{notification.notification_type}", layout: false,
+        assigns: { notification: notification.reload, attached_object: notification.attached_object, recipient: notification.receiver }
+      )
+      assert_includes mail, I18n.l(date)
+    end
+  end
 end

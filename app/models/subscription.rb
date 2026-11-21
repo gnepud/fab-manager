@@ -80,7 +80,7 @@ class Subscription < ApplicationRecord
   end
 
   def notify_subscription_extended
-    meta_data = { free_days: false }
+    meta_data = { free_days: false, extension_end_at: expired_at.iso8601 }
     NotificationCenter.call type: :notify_member_subscription_extended,
                             receiver: user,
                             attached_object: self,

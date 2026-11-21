@@ -61,4 +61,9 @@ class Notification < ApplicationRecord
   def get_meta_data(key)
     meta_data.try(:[], key.to_s)
   end
+
+  def subscription_extension_end_date
+    extension_end_at = get_meta_data(:extension_end_at)
+    extension_end_at.present? ? Time.zone.parse(extension_end_at).to_date : attached_object.expired_at.to_date
+  end
 end

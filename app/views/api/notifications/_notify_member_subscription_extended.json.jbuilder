@@ -3,5 +3,5 @@ json.description _t('.your_subscription_PLAN_has_been_extended_FREE_until_DATE_h
                     {
                       PLAN: notification.attached_object.plan.base_name,
                       FREE: notification.get_meta_data(:free_days).to_s,
-                      DATE: I18n.l(notification.attached_object.expired_at.to_date)
+                      DATE: I18n.l(notification.subscription_extension_end_date)
                     }) # messageFormat

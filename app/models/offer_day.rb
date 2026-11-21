@@ -21,7 +21,7 @@ class OfferDay < ApplicationRecord
   private
 
   def notify_subscription_extended
-    meta_data = { free_days: true }
+    meta_data = { free_days: true, extension_end_at: end_at.iso8601 }
     NotificationCenter.call type: :notify_member_subscription_extended,
                             receiver: subscription.user,
                             attached_object: subscription,
