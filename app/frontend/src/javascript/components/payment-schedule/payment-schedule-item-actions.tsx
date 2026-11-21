@@ -354,7 +354,7 @@ export const PaymentScheduleItemActions: React.FC<PaymentScheduleItemActionsProp
           confirmButton={t('app.shared.payment_schedule_item_actions.confirm_button')}>
           <span>
             {t('app.shared.payment_schedule_item_actions.confirm_check_cashing_body', {
-              AMOUNT: FormatLib.price(paymentScheduleItem.amount),
+              AMOUNT: FormatLib.price(paymentScheduleItem.amount_due ?? paymentScheduleItem.amount),
               DATE: FormatLib.date(paymentScheduleItem.due_date)
             })}
           </span>

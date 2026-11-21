@@ -11,6 +11,7 @@ export enum PaymentMethod {
 export interface PaymentScheduleItem {
   id: number,
   amount: number,
+  amount_due?: number,
   due_date: TDateISO,
   state: PaymentScheduleItemState,
   invoice_id: number,
