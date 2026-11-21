@@ -64,6 +64,20 @@ describe('event booking overlap warning', () => {
     expect(scope.reserve.toReserve).toBe(true);
   });
 
+  test.each([
+    ['09:00', '11:00', true],
+    ['09:00', '12:00', true],
+    ['10:00', '12:00', true],
+    ['11:00', '12:00', false]
+  ])('checks event %s–%s against reservation 10:00–11:00', (start, end, overlaps) => {
+    scope.event.availability.start_at = `2027-12-04T${start}:00+01:00`;
+    scope.event.availability.end_at = `2027-12-04T${end}:00+01:00`;
+    member.machine_reservations = [reservation('10:00', '11:00')];
+    scope.reserveEvent();
+    expect(modal.open).toHaveBeenCalledTimes(overlaps ? 1 : 0);
+    expect(scope.reserve.toReserve).toBe(!overlaps);
+  });
+
   test('allows booking without existing reservations', () => {
     scope.reserveEvent();
     expect(modal.open).not.toHaveBeenCalled();

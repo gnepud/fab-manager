@@ -1033,10 +1033,8 @@ Application.Controllers.controller('ShowEventController', ['$scope', '$state', '
           if (r.reservable_type === 'Event' && r.reservable.id === $scope.event.id) {
             return false;
           }
-          return moment($scope.event.availability.start_at).isSame(r.start_at) ||
-            (moment($scope.event.availability.end_at).isAfter(r.start_at) && moment($scope.event.availability.end_at).isBefore(r.end_at)) ||
-            (moment($scope.event.availability.start_at).isAfter(r.start_at) && moment($scope.event.availability.start_at).isBefore(r.end_at)) ||
-            (moment($scope.event.availability.start_at).isBefore(r.start_at) && moment($scope.event.availability.end_at).isAfter(r.end_at));
+          return moment($scope.event.availability.start_at).isBefore(r.end_at) &&
+            moment($scope.event.availability.end_at).isAfter(r.start_at);
         });
       });
       return _.union.apply(null, sameTimeReservations);
