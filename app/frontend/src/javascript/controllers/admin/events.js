@@ -475,15 +475,11 @@ Application.Controllers.controller('ShowEventReservationsController', ['$scope',
     * @param reservation {Reservation}
     */
   $scope.reservationAmount = function (reservation) {
-    let amount = 0;
-    for (const user of reservation.booking_users_attributes) {
-      if (user.event_price_category_id) {
-        const price_category = _.find($scope.event.event_price_categories_attributes, { id: user.event_price_category_id });
-        if (price_category) {
-          amount += price_category.amount;
-        }
-      } else {
-        amount += $scope.event.amount;
+    let amount = reservation.nb_reserve_places * $scope.event.amount;
+    for (const ticket of reservation.tickets_attributes) {
+      const price_category = _.find($scope.event.event_price_categories_attributes, { id: ticket.event_price_category.id });
+      if (price_category) {
+        amount += ticket.booked * price_category.amount;
       }
     }
     return amount;
