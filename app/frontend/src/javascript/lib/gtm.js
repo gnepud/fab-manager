@@ -6,6 +6,8 @@
   function gtag () { window.dataLayer.push(arguments); }
 
   GTM.enableAnalytics = function (trackingId) {
+    if (!trackingId) return;
+
     gtag('js', new Date());
     gtag('config', trackingId);
 
