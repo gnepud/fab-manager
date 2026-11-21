@@ -53,8 +53,8 @@ class ApplicationController < ActionController::Base
 
   def default_url_options
     {
-      host: Rails.application.secrets.default_host,
-      protocol: Rails.application.secrets.default_protocol
+      host: Rails.configuration.x.settings.default_host,
+      protocol: Rails.configuration.x.settings.default_protocol
     }
   end
 
@@ -65,7 +65,7 @@ class ApplicationController < ActionController::Base
   # Set the configured locale for each action (API call)
   # @see https://guides.rubyonrails.org/i18n.html
   def switch_locale(&)
-    locale = params[:locale] || Rails.application.secrets.rails_locale
+    locale = params[:locale] || Rails.configuration.x.settings.rails_locale
     I18n.with_locale(locale, &)
   end
 

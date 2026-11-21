@@ -12,7 +12,7 @@
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,700,800,700italic' rel='stylesheet' type='text/css'>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700,300italic' rel='stylesheet' type='text/css'>
   <link href='https://fonts.googleapis.com/css?family=Loved+by+the+King' rel='stylesheet' type='text/css'>
-  <% if Rails.env.staging? && Rails.application.secrets.enable_in_context_translation %>
+  <% if Rails.env.staging? && Rails.configuration.x.settings.enable_in_context_translation %>
     <script type="text/javascript">
       var _jipt = [];
       _jipt.push(['project', 'fab-manager']);
@@ -40,19 +40,19 @@
       Fablab.walletModule = ('<%= Setting.get('wallet_module') %>' === 'true');
       Fablab.publicAgendaModule = ('<%= Setting.get('public_agenda_module') %>' === 'true');
       Fablab.statisticsModule = ('<%= Setting.get('statistics_module') %>' === 'true');
-      Fablab.defaultHost = "<%= Rails.application.secrets.default_host %>";
+      Fablab.defaultHost = "<%= Rails.configuration.x.settings.default_host %>";
       Fablab.trackingId = "<%= Setting.get('tracking_id') %>";
       Fablab.adminSysId = parseInt("<%= User.adminsys&.id %>", 10);
       Fablab.activeProviderType = "<%= AuthProvider.active&.providable_type %>";
       Fablab.storeHidden = ('<%= Setting.get('store_hidden') %>' === 'true');
 
       // i18n stuff
-      Fablab.locale = "<%= Rails.application.secrets.app_locale %>";
-      Fablab.moment_locale = "<%= Rails.application.secrets.moment_locale %>";
-      Fablab.summernote_locale = "<%= Rails.application.secrets.summernote_locale %>";
-      Fablab.fullcalendar_locale = "<%= Rails.application.secrets.fullcalendar_locale %>";
-      Fablab.intl_locale = "<%= Rails.application.secrets.intl_locale %>";
-      Fablab.intl_currency = "<%= Rails.application.secrets.intl_currency %>";
+      Fablab.locale = "<%= Rails.configuration.x.settings.app_locale %>";
+      Fablab.moment_locale = "<%= Rails.configuration.x.settings.moment_locale %>";
+      Fablab.summernote_locale = "<%= Rails.configuration.x.settings.summernote_locale %>";
+      Fablab.fullcalendar_locale = "<%= Rails.configuration.x.settings.fullcalendar_locale %>";
+      Fablab.intl_locale = "<%= Rails.configuration.x.settings.intl_locale %>";
+      Fablab.intl_currency = "<%= Rails.configuration.x.settings.intl_currency %>";
       Fablab.timezone = "<%= Time.zone.tzinfo.name %>";
       Fablab.timezone_offset = "<%= Time.zone.formatted_offset %>";
       Fablab.translations = {
@@ -63,9 +63,9 @@
           }
         }
       };
-      Fablab.weekStartingDay = <%= Date.parse(Rails.application.secrets.week_starting_day).strftime('%w') %>;
-      Fablab.d3DateFormat = "<%= Rails.application.secrets.d3_date_format %>";
-      Fablab.uibDateFormat = "<%= Rails.application.secrets.uib_date_format %>";
+      Fablab.weekStartingDay = <%= Date.parse(Rails.configuration.x.settings.week_starting_day).strftime('%w') %>;
+      Fablab.d3DateFormat = "<%= Rails.configuration.x.settings.d3_date_format %>";
+      Fablab.uibDateFormat = "<%= Rails.configuration.x.settings.uib_date_format %>";
       Fablab.maxSupportingDocumentFileSize = <%= ENV.fetch('MAX_SUPPORTING_DOCUMENT_FILE_SIZE' ,5.megabytes.to_i) %>;
 
       // feature tour (used when feature_tour_display = session)

@@ -89,11 +89,11 @@ class Events::RecurrenceUpdateTest < ActionDispatch::IntegrationTest
       assert_includes db_event.event_theme_ids, 1
       assert_equal 1, db_event.age_range_id
       assert FileUtils.compare_file(
-        File.join(ActionDispatch::IntegrationTest.fixture_path, "files/#{new_image}"),
+        File.join(file_fixture_path, new_image),
         db_event.event_image.attachment.file.path
       )
       assert FileUtils.compare_file(
-        File.join(ActionDispatch::IntegrationTest.fixture_path, "files/#{new_file}"),
+        File.join(file_fixture_path, new_file),
         db_event.event_files[0].attachment.file.path
       )
     end
@@ -134,7 +134,7 @@ class Events::RecurrenceUpdateTest < ActionDispatch::IntegrationTest
       db_event = Event.find(res_event[:event][:id])
       assert_equal 2, db_event.category_id
       assert FileUtils.compare_file(
-        File.join(ActionDispatch::IntegrationTest.fixture_path, "files/#{new_image}"),
+        File.join(file_fixture_path, new_image),
         db_event.event_image.attachment.file.path
       )
     end

@@ -6,7 +6,7 @@ Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Code is not reloaded between requests.
-  config.cache_classes = true
+  config.enable_reloading = false
 
   # Eager load code on boot. This eager loads most of Rails and
   # your application in memory, allowing both threaded web servers
@@ -56,28 +56,28 @@ Rails.application.configure do
   config.action_mailer.perform_caching = false
 
   config.action_mailer.default_url_options = {
-    host: Rails.application.secrets.default_host,
-    protocol: Rails.application.secrets.default_protocol
+    host: Rails.configuration.x.settings.default_host,
+    protocol: Rails.configuration.x.settings.default_protocol
   }
   # config.action_mailer.perform_deliveries = true
   # config.action_mailer.raise_delivery_errors = false
   # config.action_mailer.default :charset => "utf-8"
 
   config.action_mailer.smtp_settings = {
-    address: Rails.application.secrets.smtp_address,
-    port: Rails.application.secrets.smtp_port,
-    user_name: Rails.application.secrets.smtp_user_name,
-    password: Rails.application.secrets.smtp_password,
-    authentication: Rails.application.secrets.smtp_authentication,
-    enable_starttls_auto: Rails.application.secrets.smtp_enable_starttls_auto,
-    openssl_verify_mode: Rails.application.secrets.smtp_openssl_verify_mode,
-    tls: Rails.application.secrets.smtp_tls,
-    ca_file: Rails.application.secrets.smtp_ca_file,
-    ca_path: Rails.application.secrets.smtp_ca_path
+    address: Rails.configuration.x.settings.smtp_address,
+    port: Rails.configuration.x.settings.smtp_port,
+    user_name: Rails.configuration.x.settings.smtp_user_name,
+    password: Rails.configuration.x.settings.smtp_password,
+    authentication: Rails.configuration.x.settings.smtp_authentication,
+    enable_starttls_auto: Rails.configuration.x.settings.smtp_enable_starttls_auto,
+    openssl_verify_mode: Rails.configuration.x.settings.smtp_openssl_verify_mode,
+    tls: Rails.configuration.x.settings.smtp_tls,
+    ca_file: Rails.configuration.x.settings.smtp_ca_file,
+    ca_path: Rails.configuration.x.settings.smtp_ca_path
   }
 
   # use :smtp for switch prod
-  config.action_mailer.delivery_method = Rails.application.secrets.delivery_method.to_sym
+  config.action_mailer.delivery_method = Rails.configuration.x.settings.delivery_method.to_sym
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
@@ -103,7 +103,7 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   config.action_controller.default_url_options = {
-    host: Rails.application.secrets.default_host,
-    protocol: Rails.application.secrets.default_protocol
+    host: Rails.configuration.x.settings.default_host,
+    protocol: Rails.configuration.x.settings.default_protocol
   }
 end

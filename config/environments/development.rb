@@ -8,7 +8,7 @@ Rails.application.configure do
   # In the development environment your application's code is reloaded any time
   # it changes. This slows down response time but is perfect for development
   # since you don't have to restart the web server when you make code changes.
-  config.cache_classes = false
+  config.enable_reloading = true
 
   # Do not eager load code on boot.
   config.eager_load = false
@@ -45,13 +45,13 @@ Rails.application.configure do
 
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    address: Rails.application.secrets.smtp_address,
-    port: Rails.application.secrets.smtp_port
+    address: Rails.configuration.x.settings.smtp_address,
+    port: Rails.configuration.x.settings.smtp_port
   }
   config.action_mailer.raise_delivery_errors = false
   config.action_mailer.default_url_options = {
-    host: Rails.application.secrets.default_host,
-    protocol: Rails.application.secrets.default_protocol
+    host: Rails.configuration.x.settings.default_host,
+    protocol: Rails.configuration.x.settings.default_protocol
   }
 
   # Print deprecation notices to the Rails logger.
@@ -79,12 +79,12 @@ Rails.application.configure do
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
-  config.log_level = Rails.application.secrets.log_level || :debug
+  config.log_level = Rails.configuration.x.settings.log_level || :debug
   config.log_tags = [:request_id]
 
   config.action_controller.default_url_options = {
-    host: Rails.application.secrets.default_host,
-    protocol: Rails.application.secrets.default_protocol
+    host: Rails.configuration.x.settings.default_host,
+    protocol: Rails.configuration.x.settings.default_protocol
   }
 
   # whitelist IP for web-console: local network, docker and vagrant

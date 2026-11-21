@@ -64,9 +64,9 @@ module UserRoleConcern
     end
 
     def adminsys
-      return if Rails.application.secrets.adminsys_email.blank?
+      return if Rails.configuration.x.settings.adminsys_email.blank?
 
-      User.find_by('lower(email) = ?', Rails.application.secrets.adminsys_email&.downcase)
+      User.find_by('lower(email) = ?', Rails.configuration.x.settings.adminsys_email&.downcase)
     end
   end
 end

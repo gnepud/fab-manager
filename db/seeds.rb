@@ -19,7 +19,7 @@ end
 # Create the default admin if none exists yet
 if Role.where(name: 'admin').joins(:users).count.zero?
   admin = User.new(username: 'admin', email: ENV.fetch('ADMIN_EMAIL', nil), password: ENV.fetch('ADMIN_PASSWORD', nil),
-                   password_confirmation: Rails.application.secrets.admin_password, group_id: Group.first.id,
+                   password_confirmation: Rails.configuration.x.settings.admin_password, group_id: Group.first.id,
                    profile_attributes: { first_name: 'admin', last_name: 'admin', phone: '0123456789' },
                    statistic_profile_attributes: { gender: true, birthday: Date.current })
   admin.add_role 'admin'

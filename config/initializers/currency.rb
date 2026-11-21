@@ -1,1 +1,1 @@
-CURRENCY_LOCALE = Rails.application.secrets.rails_locale
+CURRENCY_LOCALE = Rails.configuration.x.settings.rails_locale

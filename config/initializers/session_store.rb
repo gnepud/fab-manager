@@ -13,4 +13,4 @@ Rails.application.config.session_store :redis_session_store,
                                        },
                                        key: '_Fab-manager_session',
                                        secure: (Rails.env.production? || Rails.env.staging?) &&
-                                               !Rails.application.secrets.allow_insecure_http
+                                               !Rails.configuration.x.settings.allow_insecure_http

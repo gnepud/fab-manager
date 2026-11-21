@@ -20,7 +20,7 @@ class HealthService
   def self.elasticsearch?
     require 'elasticsearch/transport'
 
-    client = Elasticsearch::Client.new host: "http://#{Rails.application.secrets.elaticsearch_host}:9200"
+    client = Elasticsearch::Client.new host: "http://#{Rails.configuration.x.settings.elaticsearch_host}:9200"
     response = client.perform_request 'GET', '_cluster/health'
     !!response.body
   rescue Elasticsearch::Transport::Transport::Error, Faraday::ConnectionFailed

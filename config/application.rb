@@ -38,13 +38,16 @@ class FabManager::Application < Rails::Application
 
   config.active_record.yaml_column_permitted_classes = [Symbol, Date, Time]
 
+  config.x.settings = config_for(:secrets)
+  config.secret_key_base = config.x.settings.secret_key_base
+
   # Settings in config/environments/* take precedence over those specified here.
   # Application configuration should go into files in config/initializers
   # -- all .rb files in that directory are automatically loaded.
 
   # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
   # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
-  config.time_zone = Rails.application.secrets.time_zone
+  config.time_zone = Rails.configuration.x.settings.time_zone
 
   config.to_prepare do
     Devise::Mailer.layout 'notifications_mailer'
