@@ -523,7 +523,7 @@ Application.Controllers.controller('ShowEventController', ['$scope', '$state', '
             }
             , function (response) {
               $scope.alerts = [];
-              angular.forEach(response, function (v, k) {
+              angular.forEach(response.data, function (v, k) {
                 angular.forEach(v, function (err) {
                   $scope.alerts.push({ msg: k + ': ' + err, type: 'danger' });
                 });

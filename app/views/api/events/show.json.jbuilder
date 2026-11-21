@@ -9,4 +9,5 @@ json.recurrence_events @event.recurrence_events do |e|
   json.end_time e.availability.end_at.strftime('%R')
   json.nb_free_places e.nb_free_places
   json.availability_id e.availability_id
+  json.slot_id e.availability.slots.first&.id
 end
