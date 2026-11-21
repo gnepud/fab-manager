@@ -218,7 +218,11 @@ Application.Controllers.controller('SettingsController', ['$scope', '$rootScope'
       if ((content.custom_asset == null)) {
         $scope.alerts = [];
         return angular.forEach(content, function (v) {
-          angular.forEach(v, function (err) { growl.error(err); });
+          if (angular.isString(v)) {
+            growl.error(v);
+          } else {
+            angular.forEach(v, function (err) { growl.error(err); });
+          }
         });
       } else {
         growl.success(_t('app.admin.settings.file_successfully_updated'));
