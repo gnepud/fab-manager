@@ -35,14 +35,20 @@ class ProjectPolicy < ApplicationPolicy
   end
 
   def update?
-    user.admin? || record.author&.user_id == user.id || record.users.include?(user)
+    user.admin? || record.author&.user_id == user.id || accepted_collaborator?
   end
 
   def markdown?
-    user.admin? || user.manager? || record.author&.user_id == user.id || record.users.include?(user)
+    user.admin? || user.manager? || record.author&.user_id == user.id || accepted_collaborator?
   end
 
   def destroy?
     user.admin? || record.author&.user_id == user.id
+  end
+
+  private
+
+  def accepted_collaborator?
+    record.project_users.exists?(user_id: user.id, is_valid: true)
   end
 end
