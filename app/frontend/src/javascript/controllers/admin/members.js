@@ -873,9 +873,9 @@ Application.Controllers.controller('EditMemberController', ['$scope', '$state', 
     /**
      * Callback triggered if the subscription was successfully extended
      */
-    $scope.onExtendSuccess = (message, newExpirationDate) => {
+    $scope.onExtendSuccess = (message) => {
       growl.success(message);
-      $scope.subscription.expired_at = newExpirationDate;
+      refreshSubscription();
     };
 
     /**
@@ -886,14 +886,15 @@ Application.Controllers.controller('EditMemberController', ['$scope', '$state', 
       $scope.user.subscribed_plan = null;
       $scope.user.subscription = null;
       $scope.subscription = null;
+      refreshSubscription();
     };
 
     /**
      * Callback triggered if a new subscription was successfully taken
      */
-    $scope.onSubscribeSuccess = (message, newSubscription) => {
+    $scope.onSubscribeSuccess = (message) => {
       growl.success(message);
-      $scope.subscription = newSubscription;
+      refreshSubscription();
     };
 
     /**
@@ -1002,6 +1003,18 @@ Application.Controllers.controller('EditMemberController', ['$scope', '$state', 
     $scope.filterDisabledPlans = function (plan) { return !plan.disabled; };
 
     /* PRIVATE SCOPE */
+
+    const refreshSubscription = () => {
+      Member.get({ id: $scope.user.id }, function (member) {
+        $scope.user.subscription = member.subscription || null;
+        $scope.user.subscribed_plan = member.subscribed_plan || null;
+        $scope.user.invoices = member.invoices;
+        $scope.subscription = $scope.user.subscription;
+      }, function (error) {
+        console.error(error);
+        growl.error(_t('app.public.common.unexpected_error_occurred'));
+      });
+    };
 
     /**
      * Kind of constructor: these actions will be realized first when the controller is loaded
