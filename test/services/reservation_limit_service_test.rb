@@ -96,6 +96,33 @@ class ReservationLimitServiceTest < ActiveSupport::TestCase
     assert_not ReservationLimitService.authorized?(@plan, @acamus, reservation2, [reservation])
   end
 
+  test 'a saved midnight slot counts on its local date only' do
+    @plan.update!(limiting: true, plan_limitations_attributes: [{ limitable: @machine, limit: 2 }])
+    slots = machine_slots(Time.zone.local(2026, 11, 24, 20), Time.zone.local(2026, 11, 25, 3))
+    save_reservation(slots[4]) # November 25 at 00:00 in Paris, November 24 at 23:00 UTC
+
+    assert ReservationLimitService.authorized?(@plan, @acamus, cart_reservation(*slots[1, 2]), [])
+    assert_not ReservationLimitService.authorized?(@plan, @acamus, cart_reservation(*slots[5, 2]), [])
+  end
+
+  test 'only cart slots on the requested local date count toward the limit' do
+    @plan.update!(limiting: true, plan_limitations_attributes: [{ limitable: @machine, limit: 2 }])
+    slots = machine_slots(Time.zone.local(2026, 11, 24, 21), Time.zone.local(2026, 11, 25, 2))
+    across_midnight = cart_reservation(slots[2], slots[3])
+
+    assert ReservationLimitService.authorized?(@plan, @acamus, cart_reservation(slots[0]), [across_midnight])
+    assert_not ReservationLimitService.authorized?(@plan, @acamus, cart_reservation(*slots[0, 2]), [across_midnight])
+  end
+
+  test 'the last local hour counts on a 25-hour day' do
+    @plan.update!(limiting: true, plan_limitations_attributes: [{ limitable: @machine, limit: 2 }])
+    slots = machine_slots(Time.zone.local(2026, 10, 25, 21), Time.zone.local(2026, 10, 26, 2))
+    save_reservation(slots[2])
+
+    assert_not ReservationLimitService.authorized?(@plan, @acamus, cart_reservation(*slots[0, 2]), [])
+    assert ReservationLimitService.authorized?(@plan, @acamus, cart_reservation(*slots[3, 2]), [])
+  end
+
   test 'reservation of other resource should not conflict' do
     @plan.update(limiting: true, plan_limitations_attributes: [{ limitable_id: @machine.id, limitable_type: 'Machine', limit: 2 }])
     slots = Availabilities::AvailabilitiesService.new(@acamus)
@@ -170,5 +197,28 @@ class ReservationLimitServiceTest < ActiveSupport::TestCase
     )
     reservation.reload
     assert_nil ReservationLimitService.reached_limit_date(reservation)
+  end
+
+  private
+
+  def machine_slots(start_at, end_at)
+    availability = Availability.create!(available_type: 'machines', machine_ids: [@machine.id],
+                                        start_at: start_at, end_at: end_at, slot_duration: 60)
+    Availabilities::CreateAvailabilitiesService.new.create_slots(availability)
+    availability.slots.order(:start_at).to_a
+  end
+
+  def save_reservation(slot)
+    Reservation.create!(statistic_profile: @acamus.statistic_profile, reservable: @machine,
+                        slots_reservations_attributes: [{ slot: slot }])
+  end
+
+  def cart_reservation(*slots)
+    CartItem::MachineReservation.new(
+      customer_profile: @acamus.invoicing_profile,
+      operator_profile: @acamus.invoicing_profile,
+      reservable: @machine,
+      cart_item_reservation_slots_attributes: slots.map { |slot| { slot: slot } }
+    )
   end
 end
