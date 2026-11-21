@@ -66,7 +66,7 @@ class PostgreSQLDatabaseTasksTest < Minitest::Test
     connection = Object.new
     [:cast_bound_value, :quote].each do |method|
       connection.define_singleton_method(method) do |value|
-        ActiveRecord::Base.with_connection { |adapter| adapter.public_send(method, value) }
+        ActiveRecord::Base.connection_pool.with_connection { |adapter| adapter.public_send(method, value) }
       end
     end
     connection.define_singleton_method(:select_all) { |sql| operations << [:terminate, sql] }
