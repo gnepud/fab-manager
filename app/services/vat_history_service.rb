@@ -16,11 +16,13 @@ class VatHistoryService
 
   # return the VAT rate for the given InvoiceItem
   def invoice_item_vat(invoice_item)
-    if invoice_item.invoice.is_a?(Avoir)
-      vat_rate(invoice_item.invoice.avoir_date, invoice_item.invoice_item_type)
-    else
-      vat_rate(invoice_item.invoice.created_at, invoice_item.invoice_item_type)
-    end
+    invoice = invoice_item.invoice
+    date = if invoice.is_a?(Avoir)
+             invoice.invoice&.created_at || invoice.avoir_date
+           else
+             invoice.created_at
+           end
+    vat_rate(date, invoice_item.invoice_item_type)
   end
 
   # return the VAT rate for the given date and vat type
