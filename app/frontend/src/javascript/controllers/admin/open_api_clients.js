@@ -71,7 +71,7 @@ Application.Controllers.controller('OpenAPIClientsController', ['$scope', 'clien
       $scope.clientOriginalName = client.name;
     };
 
-    $scope.deleteClient = index =>
+    $scope.deleteClient = client =>
       dialogs.confirm({
         resolve: {
           object () {
@@ -83,8 +83,8 @@ Application.Controllers.controller('OpenAPIClientsController', ['$scope', 'clien
         }
       }
       , () =>
-        OpenAPIClient.delete({ id: $scope.clients[index].id }, function () {
-          $scope.clients.splice(index, 1);
+        OpenAPIClient.delete({ id: client.id }, function () {
+          $scope.clients.splice($scope.clients.indexOf(client), 1);
           return growl.success(_t('app.admin.open_api_clients.client_successfully_deleted'));
         })
       );
