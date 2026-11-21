@@ -2136,7 +2136,7 @@ es-MX:
         failed_to_remove: "Se ha producido un error, no se puede eliminar el informe"
       local_payment_form:
         about_to_cash: "Está a punto de confirmar el cobro por un medio de pago externo. Por favor, no haga clic en el botón de abajo hasta que haya cobrado completamente el pago solicitado."
-        about_to_confirm: "Estás a punto de confirmar su {ITEM, select, subscription{suscripción} reservation{reserva} other{pedido}}."
+        about_to_confirm: "Estás a punto de confirmar tu {ITEM, select, subscription{suscripción} reservation{reserva} prepaid_pack{paquete prepagado} other{pedido}}."
         payment_method: "Método de pago"
         method_card: "En línea por tarjeta"
         method_check: "Por cheque"

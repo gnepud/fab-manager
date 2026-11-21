@@ -2136,7 +2136,7 @@ pt:
         failed_to_remove: "Ocorreu um erro, não é possível excluir o relatório"
       local_payment_form:
         about_to_cash: "Você está prestes a confirmar o recebimento de uma forma de pagamento externa. Por favor, não clique no botão abaixo até que você tenha recebido completamente o pagamento solicitado."
-        about_to_confirm: "Você está prestes a confirmar sua {ITEM, select, subscription{assinatura} other{reserva}}."
+        about_to_confirm: "Você está prestes a confirmar {ITEM, select, subscription{sua assinatura} reservation{sua reserva} prepaid_pack{seu pacote pré-pago} other{seu pedido}}."
         payment_method: "Método de pagamento"
         method_card: "Online por cartão"
         method_check: "Por verificação"

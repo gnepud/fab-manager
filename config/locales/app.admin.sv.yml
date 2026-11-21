@@ -2136,7 +2136,7 @@ sv:
         failed_to_remove: "Ett fel uppstod, kan inte ta bort rapporten"
       local_payment_form:
         about_to_cash: "Du är på väg att bekräfta inlösen av en extern betalning. Klicka inte på knappen nedan förrän du har betalat ut den begärda betalningen."
-        about_to_confirm: "Du håller på att bekräfta din {ITEM, select, subscription{prenumeration} reservation{bokning} other{order}}."
+        about_to_confirm: "Du håller på att bekräfta {ITEM, select, subscription{din prenumeration} reservation{din bokning} prepaid_pack{ditt förbetalda paket} other{din order}}."
         payment_method: "Betalningsmetod"
         method_card: "Online med kort"
         method_check: "Med swish"

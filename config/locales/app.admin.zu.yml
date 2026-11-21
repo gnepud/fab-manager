@@ -2136,7 +2136,7 @@ zu:
         failed_to_remove: "crwdns27094:0crwdne27094:0"
       local_payment_form:
         about_to_cash: "crwdns27096:0crwdne27096:0"
-        about_to_confirm: "crwdns27098:0ITEM={ITEM}crwdne27098:0"
+        about_to_confirm: "crwdns27098:0ITEM={ITEM, select, subscription{subscription} reservation{reservation} prepaid_pack{prepaid pack} other{order}}crwdne27098:0"
         payment_method: "crwdns27100:0crwdne27100:0"
         method_card: "crwdns27102:0crwdne27102:0"
         method_check: "crwdns27104:0crwdne27104:0"

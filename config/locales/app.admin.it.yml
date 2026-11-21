@@ -2136,7 +2136,7 @@ it:
         failed_to_remove: "Si è verificato un errore, impossibile eliminare il report"
       local_payment_form:
         about_to_cash: "Stai per confermare l'incasso con un mezzo di pagamento esterno. Si prega di non cliccare sul pulsante qui sotto fino a quando non si ha incassato completamente il pagamento richiesto."
-        about_to_confirm: "Stai per confermare {ITEM, select, subscription{il tuo abbonamento} reservation{la tua prenotazione} other{il tuo ordine}}."
+        about_to_confirm: "Stai per confermare {ITEM, select, subscription{il tuo abbonamento} reservation{la tua prenotazione} prepaid_pack{il tuo pacchetto prepagato} other{il tuo ordine}}."
         payment_method: "Metodo di pagamento"
         method_card: "Online con carta"
         method_check: "Con assegno"
