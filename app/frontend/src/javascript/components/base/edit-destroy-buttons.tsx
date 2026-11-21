@@ -61,9 +61,9 @@ export const EditDestroyButtons: React.FC<EditDestroyButtonsProps> = ({ onDelete
    */
   const onDeleteConfirmed = (): void => {
     destroy(itemId).then(() => {
-      typeof onDeleteSuccess === 'function' && onDeleteSuccess(deleteSuccessMessage || t('app.admin.edit_destroy_buttons.deleted'));
+      typeof onDeleteSuccess === 'function' && onDeleteSuccess(deleteSuccessMessage || t('app.admin.edit_destroy_buttons.deleted', { TYPE: itemType }));
     }).catch((error) => {
-      onError(t('app.admin.edit_destroy_buttons.unable_to_delete') + error);
+      onError(t('app.admin.edit_destroy_buttons.unable_to_delete', { TYPE: itemType }) + error);
     });
     setDeletionModal(false);
   };
