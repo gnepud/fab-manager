@@ -36,7 +36,9 @@ describe('event booking overlap warning', () => {
         event_price_categories_attributes: []
       },
       growl: {}, _t: key => key, Wallet: {}, AuthService: { isAuthorized: () => false },
-      helpers: {}, dialogs: {}, priceCategoriesPromise: [], settingsPromise: {}, LocalPayment: {}, Child: {}
+      helpers: {}, dialogs: {}, priceCategoriesPromise: [],
+      settingsPromise: { overlapping_categories: 'training_reservations,machine_reservations,space_reservations,events_reservations' },
+      LocalPayment: {}, Child: {}
     });
   });
 
@@ -79,6 +81,22 @@ describe('event booking overlap warning', () => {
   });
 
   test('allows booking without existing reservations', () => {
+    scope.reserveEvent();
+    expect(modal.open).not.toHaveBeenCalled();
+    expect(scope.reserve.toReserve).toBe(true);
+  });
+
+  test('ignores overlapping reservations outside the configured categories', () => {
+    scope.settings.overlapping_categories = 'training_reservations,events_reservations';
+    member.machine_reservations = [reservation('10:00', '11:00')];
+    scope.reserveEvent();
+    expect(modal.open).not.toHaveBeenCalled();
+    expect(scope.reserve.toReserve).toBe(true);
+  });
+
+  test('allows booking when no overlapping categories are configured', () => {
+    scope.settings.overlapping_categories = '';
+    member.machine_reservations = [reservation('10:00', '11:00')];
     scope.reserveEvent();
     expect(modal.open).not.toHaveBeenCalled();
     expect(scope.reserve.toReserve).toBe(true);
