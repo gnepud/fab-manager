@@ -34,7 +34,14 @@ class Payments::StripeService
   end
 
   def confirm_payment(order, coupon_code, payment_id)
-    intent = Stripe::PaymentIntent.confirm(payment_id, {}, { api_key: Setting.get('stripe_secret_key') })
+    api_key = Setting.get('stripe_secret_key')
+    intent = Stripe::PaymentIntent.retrieve(payment_id, { api_key: api_key })
+    # the card was refused or failed authentication (3DS): keep the cart open so the customer can retry
+    if intent.status == 'requires_payment_method'
+      return { order: order, payment: { error: { statusText: payment_error_message(intent.last_payment_error) } } }
+    end
+
+    intent = Stripe::PaymentIntent.confirm(payment_id, {}, { api_key: api_key })
     if intent&.status == 'succeeded'
       o = payment_success(order, coupon_code, 'card', intent.id, intent.class.name)
       { order: o }
@@ -42,5 +49,13 @@ class Payments::StripeService
       order.update(state: 'payment_failed')
       { order: order, payment: { error: { statusText: 'payment failed' } } }
     end
+  end
+
+  private
+
+  def payment_error_message(error)
+    return error.message if error&.type == 'card_error'
+
+    I18n.t('errors.messages.gateway_authentication_failed')
   end
 end

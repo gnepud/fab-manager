@@ -92,7 +92,7 @@ export const StripeForm: React.FC<GatewayFormProps> = ({ onSubmit, onSuccess, on
           try {
             if (order) {
               const confirmation = await CheckoutAPI.confirmPayment(order, result.paymentIntent.id);
-              await handleServerConfirmation(confirmation.order);
+              await handleServerConfirmation((confirmation.payment as PaymentConfirmation) || confirmation.order);
             } else {
               const confirmation = await StripeAPI.confirmIntent(result.paymentIntent.id, cart);
               await handleServerConfirmation(confirmation);
