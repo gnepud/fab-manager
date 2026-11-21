@@ -82,7 +82,8 @@ class WalletService
             else
               payment.total
             end
-    total = CouponService.new.apply(total, payment.coupon, user.id) if payment.coupon
+    # invoices and payment schedules already store discounted amounts, orders store the total before coupon
+    total = CouponService.new.apply(total, payment.coupon, user.id) if payment.is_a?(Order) && payment.coupon
 
     wallet_amount = (user.wallet.amount * 100).to_i
 

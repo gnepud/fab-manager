@@ -53,6 +53,17 @@ class WalletServiceTest < ActiveSupport::TestCase
     assert_equal @vlonchamp_wallet.amount, expected_amount
   end
 
+  test 'wallet debit does not apply the coupon again to the discounted first installment' do
+    coupon = coupons(:cash2)
+    schedule = PaymentSchedule.new(
+      total: 4700,
+      coupon: coupon,
+      payment_schedule_items: [PaymentScheduleItem.new(amount: 700), PaymentScheduleItem.new(amount: 4000)]
+    )
+
+    assert_equal 700, WalletService.wallet_amount_debit(schedule, @vlonchamp)
+  end
+
   test 'rollback debited amount if has an error when create wallet transaction' do
     service = WalletService.new(wallet: @vlonchamp_wallet)
     expected_amount = @vlonchamp_wallet.amount

@@ -259,8 +259,7 @@ class Reservations::PayWithWalletTest < ActionDispatch::IntegrationTest
     assert_equal 2, payment_schedule.payment_gateway_objects.count
     assert_not_nil payment_schedule.gateway_payment_mean
     assert_not_nil payment_schedule.wallet_transaction
-    assert_equal CouponService.new.apply(payment_schedule.ordered_items.first.amount, payment_schedule.coupon, user.id),
-                 payment_schedule.wallet_amount
+    assert_equal payment_schedule.ordered_items.first.amount, payment_schedule.wallet_amount
     assert_equal Coupon.find_by(code: 'GIME3EUR').id, payment_schedule.coupon_id
     assert_equal 'test', payment_schedule.environment
     assert payment_schedule.check_footprint
