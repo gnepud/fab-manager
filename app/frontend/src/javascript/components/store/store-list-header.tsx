@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import Select from 'react-select';
+import { FabSelect as Select } from '../base/fab-select';
 import Switch from 'react-switch';
 import { SortOption } from '../../models/api';
 import { SelectOption } from '../../models/select';

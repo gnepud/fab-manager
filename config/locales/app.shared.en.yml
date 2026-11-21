@@ -444,6 +444,8 @@ en:
       payzen_card_update_modal:
         update_card: "Update the card"
         validate_button: "Validate the new card"
+      fab_select:
+        placeholder: "Select..."
       form_multi_select:
         create_label: "Add {VALUE}"
       form_checklist:

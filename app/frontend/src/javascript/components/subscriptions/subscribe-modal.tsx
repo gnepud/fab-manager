@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import * as React from 'react';
-import Select from 'react-select';
+import { FabSelect as Select } from '../base/fab-select';
 import { useTranslation } from 'react-i18next';
 import { Subscription } from '../../models/subscription';
 import { User } from '../../models/user';
