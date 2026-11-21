@@ -373,7 +373,7 @@ Application.Controllers.controller('ApplicationController', ['$rootScope', '$sco
             return false;
           } else {
           // user is not logged in
-            openLoginModal(trans.$to().name, trans.$to().params);
+            openLoginModal(trans.$to().name, trans.params());
             return false;
           }
         }
