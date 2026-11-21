@@ -84,6 +84,42 @@ class Reservations::OverlappingSlotsTest < ActionDispatch::IntegrationTest
     assert_equal 201, response.status, response.body
   end
 
+  test 'members may book more tickets for an event they already registered to' do
+    event = free_event(Event.first)
+    confirm(event_item(event))
+    assert_equal 201, response.status, response.body
+    confirm(event_item(event))
+    assert_equal 201, response.status, response.body
+  end
+
+  test 'same cart may contain multiple bookings for the same event' do
+    event = free_event(Event.first)
+    confirm(event_item(event), event_item(event))
+    assert_equal 201, response.status, response.body
+  end
+
+  test 'an existing different event still prevents an overlapping event booking' do
+    event, other = Event.order(:id).limit(2).map { |record| free_event(record) }
+    confirm(event_item(other))
+    assert_equal 201, response.status, response.body
+    confirm(event_item(event))
+    assert_equal 422, response.status, response.body
+  end
+
+  test 'same cart bookings for different overlapping events are rejected' do
+    event, other = Event.order(:id).limit(2).map { |record| free_event(record) }
+    confirm(event_item(event), event_item(other))
+    assert_equal 422, response.status, response.body
+  end
+
+  test 'an existing space reservation still prevents an overlapping event booking' do
+    event = free_event(Event.first)
+    confirm(item(@space, @space_slot))
+    assert_equal 201, response.status, response.body
+    confirm(event_item(event))
+    assert_equal 422, response.status, response.body
+  end
+
   test 'enabled overlapping permits existing reservations and same cart overlaps' do
     Setting.set('book_overlapping_slots', true)
     confirm(item(@machine, @machine_slot), item(@space, @space_slot))
@@ -124,6 +160,18 @@ class Reservations::OverlappingSlotsTest < ActionDispatch::IntegrationTest
   end
 
   private
+
+  def free_event(event)
+    event.update!(amount: 0)
+    event.availability.slots.first.update!(start_at: @start, end_at: @start + 1.hour)
+    event
+  end
+
+  def event_item(event)
+    reservation = item(event, event.availability.slots.first)
+    reservation[:reservation][:nb_reserve_places] = 1
+    reservation
+  end
 
   def reserve_event
     event = Event.first
