@@ -53,7 +53,7 @@ class SettingService
       times = names.map do |name|
         pending = name == setting[:name] ? setting : settings.find { |item| item[:name] == name && item[:value].present? }
         value = pending ? pending[:value] : Setting.get(name)
-        Time.zone.parse(value.to_s)&.utc&.strftime('%H:%M:%S')
+        Time.zone.parse(value.to_s)&.strftime('%H:%M:%S')
       end
       return if times.all?(&:present?) && times.first < times.last
 

@@ -129,6 +129,17 @@ class SettingsTest < ActionDispatch::IntegrationTest
     assert_equal 8, Time.zone.parse(Setting.get('booking_window_start')).utc.hour
   end
 
+  test 'booking window accepts local hours crossing midnight UTC' do
+    Time.use_zone('Europe/Paris') do
+      set_booking_window('00:00', '07:00')
+      put '/api/settings/booking_window_start', params: { setting: { value: '2000-01-01T23:30:00.000Z' } }
+
+      assert_response :ok
+      assert_equal '00:30', Time.zone.parse(Setting.get('booking_window_start')).strftime('%H:%M')
+      assert_equal '08:00', Time.zone.parse(Setting.get('booking_window_end')).strftime('%H:%M')
+    end
+  end
+
   test 'bulk update rejects an inverted booking window' do
     set_booking_window('08:00', '12:00')
     patch '/api/settings/bulk_update', params: { settings: [
