@@ -40,11 +40,17 @@ export const ChangeGroup: React.FC<ChangeGroupProps> = ({ user, onSuccess, onErr
 
   useEffect(() => {
     GroupAPI.index({ disabled: false }).then(setGroups).catch(onError);
-    MemberAPI.current().then(setOperator).catch(onError);
     SettingAPI.get('user_change_group').then((setting) => {
       setAllowedUserChangeGoup(setting.value === 'true');
     }).catch(onError);
   }, []);
+
+  // a visitor has no current member to fetch, only load the operator once there is a user to display
+  useEffect(() => {
+    if (user && !operator) {
+      MemberAPI.current().then(setOperator).catch(onError);
+    }
+  }, [user]);
 
   useEffect(() => {
     setChangeRequested(false);
