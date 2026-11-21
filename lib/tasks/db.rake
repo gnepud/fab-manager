@@ -9,14 +9,14 @@ namespace :db do
 
     begin
       ActiveRecord::Base.establish_connection
-      ActiveRecord::Base.connection.tables.each do |table_name|
+      ActiveRecord::Base.lease_connection.tables.each do |table_name|
         next if tables_to_skip.include?(table_name)
         next if args.table && args.table != table_name
 
         counter = '000'
         file_path = Rails.root.join("test/fixtures/#{table_name}.yml")
         File.open(file_path, File::WRONLY | File::CREAT) do |file|
-          rows = ActiveRecord::Base.connection.select_all("SELECT * FROM #{table_name}")
+          rows = ActiveRecord::Base.lease_connection.select_all("SELECT * FROM #{table_name}")
           data = rows.each_with_object({}) do |record, hash|
             suffix = record['id'].presence || counter.succ!
             # FIXME, this is broken with jsonb columns: it records a String but a Hash must be saved
@@ -27,7 +27,7 @@ namespace :db do
         end
       end
     ensure
-      ActiveRecord::Base.connection&.close
+      ActiveRecord::Base.release_connection
     end
   end
 

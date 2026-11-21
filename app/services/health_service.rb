@@ -4,9 +4,7 @@
 class HealthService
   def self.database?
     ActiveRecord::Base.establish_connection
-    ActiveRecord::Base.connection
-
-    ActiveRecord::Base.connected?
+    ActiveRecord::Base.with_connection { |connection| connection.select_value('SELECT 1') == 1 }
   rescue ActiveRecord::ActiveRecordError
     false
   end
@@ -28,7 +26,7 @@ class HealthService
   end
 
   def self.migrations?
-    !ActiveRecord::Base.connection.migration_context.needs_migration?
+    !ActiveRecord::Base.connection_pool.migration_context.needs_migration?
   end
 
   def self.row_stats

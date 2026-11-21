@@ -99,7 +99,7 @@ namespace :fablab do
     desc 'save the footprint original data'
     task save_footprint_data: :environment do
       [Invoice, InvoiceItem, HistoryValue, PaymentSchedule, PaymentScheduleItem, PaymentScheduleObject].each do |klass|
-        next if klass == PaymentScheduleObject && !ActiveRecord::Base.connection.table_exists?(PaymentScheduleObject.arel_table)
+        next if klass == PaymentScheduleObject && !ActiveRecord::Base.lease_connection.table_exists?(PaymentScheduleObject.arel_table)
 
         order = klass == HistoryValue ? :created_at : :id
         previous = nil

@@ -12,7 +12,7 @@ class Order < PaymentDocument
   has_one :coupon_usage, as: :object, dependent: :destroy
 
   ALL_STATES = %w[cart paid payment_failed refunded in_progress ready canceled delivered].freeze
-  enum state: ALL_STATES.zip(ALL_STATES).to_h
+  enum :state, ALL_STATES.zip(ALL_STATES).to_h
 
   validates :token, :state, presence: true
 

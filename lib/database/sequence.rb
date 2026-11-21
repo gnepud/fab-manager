@@ -9,9 +9,9 @@ class Database::Sequence
     # update the ID sequence for the given table
     # @param table_name [String]
     def update_id_seq(table_name)
-      return unless ActiveRecord::Base.connection.instance_values['config'][:adapter] == 'postgresql'
+      return unless ActiveRecord::Base.lease_connection.instance_values['config'][:adapter] == 'postgresql'
 
-      ActiveRecord::Base.connection.execute <<~SQL.squish
+      ActiveRecord::Base.lease_connection.execute <<~SQL.squish
         WITH max_id AS (
          SELECT max(id) as max FROM #{table_name}
         )

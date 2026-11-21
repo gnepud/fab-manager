@@ -70,7 +70,7 @@ class Event < ApplicationRecord
   # <b>DEPRECATED:</b> Please use <tt>event_price_categories</tt> instead.
   # This method is for backward compatibility only, do not use in new code
   def reduced_amount
-    if ActiveRecord::Base.connection.column_exists?(:events, :reduced_amount)
+    if ActiveRecord::Base.lease_connection.column_exists?(:events, :reduced_amount)
       read_attribute(:reduced_amount)
     else
       pc = PriceCategory.find_by(name: I18n.t('price_category.reduced_fare'))

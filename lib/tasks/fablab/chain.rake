@@ -14,7 +14,7 @@ namespace :fablab do
       chain_history_values
       chain_payment_schedules
       chain_payment_schedules_items
-      chain_payment_schedules_objects if ActiveRecord::Base.connection.table_exists? PaymentScheduleObject.arel_table
+      chain_payment_schedules_objects if ActiveRecord::Base.lease_connection.table_exists? PaymentScheduleObject.arel_table
     end
 
     desc 'assign all footprints to existing Invoice records'

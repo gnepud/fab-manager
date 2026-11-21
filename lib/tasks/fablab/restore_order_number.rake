@@ -8,7 +8,7 @@ namespace :fablab do
       I18n.t('invoices.order_number', locale: 'en', **{ NUMBER: 'REPLACE' }).gsub('REPLACE', ''),
       I18n.t('invoices.order_number', locale: 'fr', **{ NUMBER: 'REPLACE' }).gsub('REPLACE', '')
     ]
-    max_id = ActiveRecord::Base.connection.execute('SELECT max(id) as max_id FROM invoices').first['max_id']
+    max_id = ActiveRecord::Base.lease_connection.execute('SELECT max(id) as max_id FROM invoices').first['max_id']
     Invoice.order(id: :asc).find_each do |invoice|
       print "Processing: #{invoice.id} / #{max_id}\r"
       next unless File.exist?(invoice.file)
