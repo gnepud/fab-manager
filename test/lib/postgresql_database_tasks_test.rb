@@ -60,4 +60,27 @@ class PostgreSQLDatabaseTasksTest < Minitest::Test
   ensure
     structure_file&.close!
   end
+
+  def test_drop_connects_to_public_schema_and_terminates_idle_connections_before_dropping_database
+    operations = []
+    connection = Object.new
+    [:cast_bound_value, :quote].each do |method|
+      connection.define_singleton_method(method) do |value|
+        ActiveRecord::Base.with_connection { |adapter| adapter.public_send(method, value) }
+      end
+    end
+    connection.define_singleton_method(:select_all) { |sql| operations << [:terminate, sql] }
+    connection.define_singleton_method(:drop_database) { |database| operations << [:drop, database] }
+    @tasks.singleton_class.define_method(:establish_connection) { |config| operations << [:connect, config] }
+    @tasks.singleton_class.define_method(:connection) { connection }
+
+    @tasks.drop
+
+    assert_equal [:connect, @db_config.configuration_hash.merge(database: 'postgres', schema_search_path: 'public')], operations[0]
+    assert_equal :terminate, operations[1][0]
+    assert_includes operations[1][1], 'pg_terminate_backend(pg_stat_activity.pid)'
+    assert_includes operations[1][1], "datname= 'fabmanager_test' AND state='idle'"
+    assert_equal [:drop, 'fabmanager_test'], operations[2]
+    assert_equal 3, operations.length
+  end
 end
