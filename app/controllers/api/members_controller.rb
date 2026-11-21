@@ -225,7 +225,7 @@ class API::MembersController < API::APIController
                                    profile_attributes: [:id, :first_name, :last_name, :phone, :interest, :software_mastered, :website, :job,
                                                         :facebook, :twitter, :google_plus, :viadeo, :linkedin, :instagram, :youtube, :vimeo,
                                                         :dailymotion, :github, :echosciences, :pinterest, :lastfm, :flickr,
-                                                        { user_avatar_attributes: %i[id attachment destroy] }],
+                                                        { user_avatar_attributes: %i[id attachment _destroy] }],
                                    invoicing_profile_attributes: [
                                      :id, :organization,
                                      {
@@ -242,7 +242,7 @@ class API::MembersController < API::APIController
                                    profile_attributes: [:id, :first_name, :last_name, :phone, :interest, :software_mastered, :website, :job,
                                                         :facebook, :twitter, :google_plus, :viadeo, :linkedin, :instagram, :youtube, :vimeo,
                                                         :dailymotion, :github, :echosciences, :pinterest, :lastfm, :flickr, :note,
-                                                        { user_avatar_attributes: %i[id attachment destroy] }],
+                                                        { user_avatar_attributes: %i[id attachment _destroy] }],
                                    invoicing_profile_attributes: [
                                      :id, :organization, :external_id,
                                      {
