@@ -23,7 +23,11 @@ interface SupportingDocumentsRefusalModalProps {
 /**
  * Modal dialog to notify the member that his documents are refused
  */
-export const SupportingDocumentsRefusalModal: React.FC<SupportingDocumentsRefusalModalProps> = ({ isOpen, toggleModal, onSuccess, proofOfIdentityTypes, operator, supportable, onError, documentType }) => {
+export const SupportingDocumentsRefusalModal: React.FC<SupportingDocumentsRefusalModalProps> = ({ isOpen, ...props }) => {
+  return isOpen ? <SupportingDocumentsRefusalDialog {...props} /> : null;
+};
+
+const SupportingDocumentsRefusalDialog: React.FC<Omit<SupportingDocumentsRefusalModalProps, 'isOpen'>> = ({ toggleModal, onSuccess, proofOfIdentityTypes, operator, supportable, onError, documentType }) => {
   const { t } = useTranslation('admin');
 
   const [data, setData] = useState<SupportingDocumentRefusal>({
@@ -66,7 +70,7 @@ export const SupportingDocumentsRefusalModal: React.FC<SupportingDocumentsRefusa
 
   return (
     <FabModal title={t('app.admin.supporting_documents_refusal_modal.title')}
-      isOpen={isOpen}
+      isOpen={true}
       toggleModal={toggleModal}
       closeButton={false}
       confirmButton={t('app.admin.supporting_documents_refusal_modal.confirm')}
