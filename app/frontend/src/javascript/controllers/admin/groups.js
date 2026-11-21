@@ -28,13 +28,13 @@ Application.Controllers.controller('GroupsController', ['$scope', 'groupsPromise
   /**
    * Removes the newly inserted but not saved group / Cancel the current group modification
    * @param rowform {Object} see http://vitalets.github.io/angular-xeditable/
-   * @param index {number} group index in the $scope.groups array
+   * @param group {Object} group to cancel editing
    */
-  $scope.cancelGroup = function (rowform, index) {
-    if ($scope.groups[index].id != null) {
+  $scope.cancelGroup = function (rowform, group) {
+    if (group.id != null) {
       return rowform.$cancel();
     } else {
-      return $scope.groups.splice(index, 1);
+      return $scope.groups.splice($scope.groups.indexOf(group), 1);
     }
   };
 
