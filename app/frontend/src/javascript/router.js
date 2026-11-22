@@ -1067,6 +1067,9 @@ angular.module('application.router', ['ui.router'])
       })
       .state('app.admin.members_import', {
         url: '/admin/members/import',
+        data: {
+          authorizedRoles: ['admin']
+        },
         views: {
           'main@': {
             templateUrl: '/admin/members/import.html',
@@ -1079,6 +1082,9 @@ angular.module('application.router', ['ui.router'])
       })
       .state('app.admin.members_import_result', {
         url: '/admin/members/import/:id/results',
+        data: {
+          authorizedRoles: ['admin']
+        },
         views: {
           'main@': {
             templateUrl: '/admin/members/import_result.html',
