@@ -53,6 +53,7 @@ fr:
       gateway_amount_too_large: "Les paiements supérieurs à %{AMOUNT} ne sont pas pris en charge. Merci de passer commande directement à l'accueil."
       gateway_authentication_failed: "Votre carte n'a pas pu être authentifiée. Veuillez réessayer ou utiliser une autre carte."
       product_in_use: "Ce produit a déjà été commandé"
+      invalid_category_hierarchy: "Les catégories sont limitées à deux niveaux : choisissez un parent sans parent et n'attribuez pas de parent à une catégorie ayant des enfants ni à elle-même."
       invalid_order_state: "Impossible de modifier le statut de cette commande depuis son statut actuel."
       slug_already_used: "est déjà utilisée"
       birthday_less_than_18_years_ago: "L'age doit être inférieur à 18 ans"
