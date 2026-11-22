@@ -198,6 +198,8 @@ zu:
       subject: "crwdns29690:0crwdne29690:0"
       body:
         member_cancelled: "crwdns29692:0%{NAME}crwdne29692:0"
+        reservation_cancelled_by: "%{ACTOR} cancelled %{NAME}'s reservation."
+        reservation_cancelled: "The reservation of %{NAME} was cancelled."
         item_details: "crwdns29694:0%{START}crwdnd29694:0%{END}crwdnd29694:0%{RESERVABLE}crwdne29694:0"
         generate_refund: "crwdns29696:0crwdne29696:0"
     notify_admin_when_user_is_imported:

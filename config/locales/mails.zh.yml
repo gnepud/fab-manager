@@ -198,6 +198,8 @@ zh-CN:
       subject: "预订已取消"
       body:
         member_cancelled: "用户 %{NAME} 已取消其预订"
+        reservation_cancelled_by: "%{ACTOR} 已取消 %{NAME} 的预订。"
+        reservation_cancelled: "%{NAME} 的预订已取消。"
         item_details: "%{START} - %{END}，涉及 %{RESERVABLE}"
         generate_refund: "不要忘记生成信用凭证或退款。"
     notify_admin_when_user_is_imported:
