@@ -12,6 +12,10 @@ it:
       other: '%{count} settimane'
   activerecord:
     attributes:
+      user:
+        reset_password_token: "Link per reimpostare la password"
+        password: "Password"
+        password_confirmation: "Conferma della password"
       product:
         amount: "Il prezzo"
         slug: "URL"

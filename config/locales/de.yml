@@ -12,6 +12,10 @@ de:
       other: '%{count} Wochen'
   activerecord:
     attributes:
+      user:
+        reset_password_token: "Link zum Zurücksetzen des Passworts"
+        password: "Passwort"
+        password_confirmation: "Passwortbestätigung"
       product:
         amount: "Der Preis"
         slug: "Link"

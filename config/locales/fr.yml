@@ -12,6 +12,10 @@ fr:
       other: '%{count} semaines'
   activerecord:
     attributes:
+      user:
+        reset_password_token: "Lien de réinitialisation du mot de passe"
+        password: "Mot de passe"
+        password_confirmation: "Confirmation du mot de passe"
       product:
         amount: "Le Prix"
         slug: "URL"

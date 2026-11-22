@@ -240,12 +240,10 @@ Application.Controllers.controller('ApplicationController', ['$rootScope', '$sco
             return $http.put('/users/password.json', { user: $scope.user }).then(function () {
               $uibModalInstance.close();
             }).catch(function (data) {
-              angular.forEach(data.data.errors, function (v, k) {
-                angular.forEach(v, function (err) {
-                  $scope.alerts.push({
-                    msg: k + ': ' + err,
-                    type: 'danger'
-                  });
+              angular.forEach(data.data.errors, function (err) {
+                $scope.alerts.push({
+                  msg: err,
+                  type: 'danger'
                 });
               });
             });

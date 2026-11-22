@@ -12,6 +12,10 @@ sv:
       other: '%{count} veckor'
   activerecord:
     attributes:
+      user:
+        reset_password_token: "Länk för återställning av lösenord"
+        password: "Lösenord"
+        password_confirmation: "Lösenordsbekräftelse"
       product:
         amount: "Priset"
         slug: "URL"
