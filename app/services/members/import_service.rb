@@ -7,7 +7,7 @@ class Members::ImportService
       require 'csv'
       log = []
       begin
-        CSV.foreach(import.attachment.url, headers: true, col_sep: ';') do |row|
+        CSV.foreach(import.attachment.url, headers: true, col_sep: ';', encoding: 'bom|utf-8') do |row|
           password = hide_password(row)
           log << { row: row.to_hash }
 
