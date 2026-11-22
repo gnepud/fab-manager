@@ -280,7 +280,7 @@ class CartItem::Reservation < CartItem::BaseItem
       return false
     end
 
-    if slot.full?
+    if slot_full?(reservation_slot)
       errors.add(:slot, I18n.t('cart_item_validation.full'))
       return false
     end
@@ -313,5 +313,13 @@ class CartItem::Reservation < CartItem::BaseItem
     else
       false
     end
+  end
+
+  def slot_full?(reservation_slot)
+    slot = reservation_slot.slot
+    return slot.full? unless reservation_slot.persisted? && reservation_slot.slots_reservation_id.nil?
+
+    capacity = slot.availability.available_places_per_slot
+    capacity.present? && slot.reserved_places > capacity
   end
 end
