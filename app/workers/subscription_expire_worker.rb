@@ -5,7 +5,9 @@ class SubscriptionExpireWorker
   include Sidekiq::Worker
 
   def perform(expire_in)
-    Subscription.where('expiration_date >= ?', Time.current.at_beginning_of_day).each do |s|
+    today = Time.current.at_beginning_of_day
+    Subscription.where('expiration_date >= ?', today)
+                .or(Subscription.where(id: OfferDay.where('end_at >= ?', today).select(:subscription_id))).each do |s|
       if (s.expired_at - expire_in.days).to_date == Time.current.to_date
         if expire_in.zero?
           NotificationCenter.call type: 'notify_member_subscription_is_expired',
