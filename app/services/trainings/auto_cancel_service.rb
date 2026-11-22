@@ -21,21 +21,23 @@ class Trainings::AutoCancelService
 
         auto_refund = Setting.get('wallet_module')
 
-        NotificationCenter.call type: 'notify_admin_training_auto_cancelled',
-                                receiver: User.admins_and_managers,
-                                attached_object: availability,
-                                meta_data: { auto_refund: auto_refund }
-
         availability.update(lock: true)
+        any_refunded = false
         availability.slots_reservations.where(canceled_at: nil).find_each do |sr|
+          SlotsReservationsService.cancel(sr)
+          refunded = auto_refund && !sr.offered? && refund_after_cancel(sr)
+          any_refunded ||= refunded.present?
+
           NotificationCenter.call type: 'notify_member_training_auto_cancelled',
                                   receiver: sr.reservation.user,
                                   attached_object: sr,
-                                  meta_data: { auto_refund: auto_refund && !sr.offered? }
-
-          SlotsReservationsService.cancel(sr)
-          refund_after_cancel(sr) if auto_refund && !sr.offered?
+                                  meta_data: { auto_refund: refunded.present? }
         end
+
+        NotificationCenter.call type: 'notify_admin_training_auto_cancelled',
+                                receiver: User.admins_and_managers,
+                                attached_object: availability,
+                                meta_data: { auto_refund: any_refunded, manual_refund: !auto_refund }
       end
     end
 

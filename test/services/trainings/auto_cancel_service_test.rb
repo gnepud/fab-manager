@@ -145,7 +145,7 @@ class Trainings::AutoCancelServiceTest < ActiveSupport::TestCase
       attached_object_id: r.slots_reservations.first&.id
     )
     assert_not_nil notification, 'user notification was not created'
-    assert notification.get_meta_data(:auto_refund)
+    assert_not notification.get_meta_data(:auto_refund)
 
     # Check notification was sent to the admin
     notification = Notification.find_by(
@@ -154,7 +154,7 @@ class Trainings::AutoCancelServiceTest < ActiveSupport::TestCase
       attached_object_id: @availability.id
     )
     assert_not_nil notification, 'admin notification was not created'
-    assert notification.get_meta_data(:auto_refund)
+    assert_not notification.get_meta_data(:auto_refund)
 
     # Check customer was not refunded on his wallet
     assert_equal wallet_transactions, WalletTransaction.count

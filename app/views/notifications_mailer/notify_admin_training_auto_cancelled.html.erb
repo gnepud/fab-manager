@@ -9,5 +9,9 @@
   }) %>
 </p>
 <p>
-  <%= @notification.get_meta_data(:auto_refund) ? t('.body.auto_refund') : t('.body.manual_refund') %>
+  <% if @notification.get_meta_data(:auto_refund) %>
+    <%= t('.body.auto_refund') %>
+  <% elsif @notification.get_meta_data(:manual_refund) != false %>
+    <%= t('.body.manual_refund') %>
+  <% end %>
 </p>
