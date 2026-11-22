@@ -25,15 +25,6 @@ Application.Controllers.controller('DashboardController', ['$scope', 'memberProm
 
     $scope.hasProofOfIdentityTypes = proofOfIdentityTypesPromise.length > 0;
 
-    /**
-     * Check if the member has used his training credits for the given credit
-     * @param trainingCredits array of credits used by the member
-     * @param trainingId id of the training to find
-     */
-    $scope.hasUsedTrainingCredit = function (trainingCredits, trainingId) {
-      return trainingCredits.find(tc => tc.training_id === trainingId);
-    };
-
     $scope.trainingIsActive = function (trainingId) {
       const training = trainingsPromise.find(t => t.id === trainingId);
       return training && !training.disabled;
