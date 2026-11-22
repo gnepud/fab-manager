@@ -4,7 +4,7 @@
 class NotificationsMailer < BaseMailer
   self.delivery_job = NotificationMailDeliveryJob
 
-  after_action :mark_notification_as_send
+  around_deliver :deliver_notification
 
   def send_mail_by(notification)
     @notification = notification
@@ -22,9 +22,9 @@ class NotificationsMailer < BaseMailer
       RUBY
     end
 
-    send(notification.notification_type)
+    @notification_mail = send(notification.notification_type)
   rescue StandardError => e
-    Rails.logger.error "[NotificationsMailer] notification cannot be sent: #{e}"
+    log_delivery_error(e)
   end
 
   def notify_user_when_invoice_ready
@@ -57,7 +57,20 @@ class NotificationsMailer < BaseMailer
 
   private
 
+  def deliver_notification
+    return unless @notification_mail
+
+    message.raise_delivery_errors = true
+    yield.tap { mark_notification_as_send if message.perform_deliveries }
+  rescue StandardError => e
+    log_delivery_error(e)
+  end
+
   def mark_notification_as_send
     @notification.mark_as_send unless @notification.is_send
+  end
+
+  def log_delivery_error(error)
+    Rails.logger.error "[NotificationsMailer] notification cannot be sent: #{error}"
   end
 end
