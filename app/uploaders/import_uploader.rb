@@ -29,5 +29,4 @@ class ImportUploader < CarrierWave::Uploader::Base
   def content_type_allowlist
     %w[text/csv text/plain]
   end
-
 end
