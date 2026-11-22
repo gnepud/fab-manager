@@ -13,6 +13,12 @@ class Members::ImportService
 
           # try to find member based on import.update_field
           user = User.find_by(import.update_field.to_sym => row[import.update_field])
+          errors = association_errors(row)
+          unless errors.empty?
+            log << { user: user&.id, status: user ? 'update' : 'create', result: false }
+            log << errors
+            next
+          end
           params = row_to_params(row, user, password)
           if user
             service = Members::MembersService.new(user)
@@ -35,6 +41,19 @@ class Members::ImportService
     end
 
     private
+
+    def association_errors(row)
+      errors = {}
+      { tags: Tag, trainings: Training }.each do |property, model|
+        next unless row[property.to_s]
+
+        ids = row[property.to_s].split(',').map(&:strip)
+        found_ids = model.where(id: ids).pluck(:id)
+        unknown_ids = ids.reject { |id| /\A\d+\z/.match?(id) && found_ids.include?(id.to_i) }
+        errors[property] = ["Unknown #{property} IDs: #{unknown_ids.uniq.join(', ')}"] unless unknown_ids.empty?
+      end
+      errors
+    end
 
     def hashify(row, property, value: row[property], key: property.to_sym)
       res = {}
