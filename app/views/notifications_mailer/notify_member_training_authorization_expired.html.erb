@@ -1,8 +1,9 @@
 <%= render 'notifications_mailer/shared/hello', recipient: @recipient %>
 
+<% authorization_created_at = @notification.get_meta_data(:authorization_created_at) %>
 <%= t('.body.training_expired_html', **{
   TRAINING: @attached_object.name,
   MACHINES: @attached_object.machines.map(&:name).join(', '),
-  DATE: I18n.l((DateTime.current - @attached_object.authorization_period.months).to_date),
+  DATE: authorization_created_at.present? ? I18n.l(Time.zone.parse(authorization_created_at).to_date) : '—',
   PERIOD: @attached_object.authorization_period
 }) %>
