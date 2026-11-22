@@ -3,7 +3,7 @@ import 'angular-ui-tour';
 import fs from 'fs';
 import path from 'path';
 import React from 'react';
-import { cleanup, render } from '@testing-library/react';
+import { cleanup, render, waitFor } from '@testing-library/react';
 import { MachineCard } from '../../../app/frontend/src/javascript/components/machines/machine-card';
 import SettingAPI from '../../../app/frontend/src/javascript/api/setting';
 
@@ -19,12 +19,8 @@ describe('admin machines tour targets', () => {
     Application.Controllers = angular.module('adminMachinesTourTest', ['bm.uiTour'])
       .value('$rootElement', angular.element(document.body))
       .filter('translate', () => key => key)
-      .config(['$provide', function ($provide) {
-        $provide.decorator('TourStepService', ['$delegate', function ($delegate) {
-          $delegate.showStep = jest.fn();
-          $delegate.hideStep = jest.fn();
-          return $delegate;
-        }]);
+      .config(['TourConfigProvider', function (TourConfigProvider) {
+        TourConfigProvider.set('scrollIntoView', false);
       }]);
     require('../../../app/frontend/src/javascript/controllers/admin/machines');
   });
@@ -32,6 +28,7 @@ describe('admin machines tour targets', () => {
   beforeEach(() => {
     SettingAPI.get.mockResolvedValue({ value: 'true' });
     const injector = angular.injector(['ng', 'adminMachinesTourTest']);
+    injector.get('$templateCache').put('/shared/tour-step-template.html', fs.readFileSync(path.resolve(__dirname, '../../../app/frontend/templates/shared/tour-step-template.html'), 'utf8'));
     scope = injector.get('$rootScope').$new();
     scope.currentUser = { id: 1, role: 'admin', profile_attributes: { tours: [] } };
     scope.isAuthorized = role => Array.isArray(role) ? role.includes(scope.currentUser.role) : scope.currentUser.role === role;
@@ -62,6 +59,7 @@ describe('admin machines tour targets', () => {
     cleanup();
     scope.$destroy();
     template.remove();
+    document.querySelectorAll('.ui-tour-popup').forEach(popup => popup.remove());
   });
 
   const showMachines = machines => {
@@ -104,6 +102,13 @@ describe('admin machines tour targets', () => {
     expect(tour.hasStep('view')).toBe(false);
   });
 
+  test('the directive keeps its element writable so selector-based steps can replace it', () => {
+    for (const element of template[0].querySelectorAll('[tour-step]')) {
+      const step = angular.element(element).scope().tourStep;
+      expect(Object.getOwnPropertyDescriptor(step, 'element').writable).toBe(true);
+    }
+  });
+
   test.each([
     ['empty list', [], ['welcome', 'conclusion']],
     ['bookable machine', [{ id: 4, disabled: false, reservable: true }], ['welcome', 'view', 'reserve', 'conclusion']]
@@ -111,9 +116,12 @@ describe('admin machines tour targets', () => {
     showMachines(machines);
     await tour.start();
     expect(tour.getCurrentStep().stepId).toBe(expectedSteps[0]);
+    await waitFor(() => expect(tour.getCurrentStep().popup[0].style.visibility).toBe('visible'));
     for (const step of expectedSteps.slice(1)) {
       await tour.next();
       expect(tour.getCurrentStep().stepId).toBe(step);
+      expect(tour.getCurrentStep().element[0]).toBe(document.querySelector(tour.getCurrentStep().selector));
+      await waitFor(() => expect(tour.getCurrentStep().popup[0].style.visibility).toBe('visible'));
     }
     await tour.end();
   });
