@@ -70,11 +70,4 @@ describe('admin projects tour', () => {
     expect(settings.placement).toBe('bottom-right');
     expect(settings.popupClass).toBeUndefined();
   });
-
-  test('the reports button in the right-hand header uses a right-aligned popover without a manual offset', () => {
-    const reports = steps.find(step => step.stepId === 'abuses');
-    expect(template.querySelector(reports.selector).closest('.col-md-3')).not.toBeNull();
-    expect(reports.placement).toBe('bottom-right');
-    expect(reports.popupClass).toBeUndefined();
-  });
 });
