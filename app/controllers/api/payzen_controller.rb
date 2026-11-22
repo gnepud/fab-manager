@@ -101,8 +101,11 @@ class API::PayzenController < API::PaymentsController
     order = client.get(params[:order_id], operation_type: 'DEBIT')
 
     cart = shopping_cart
+    attempts = order['answer']['transactions'].reject do |transaction|
+      transaction['status'] == 'UNPAID' && transaction['detailedStatus'] == 'REFUSED'
+    end
 
-    if order['answer']['transactions'].all? { |transaction| transaction['status'] == 'PAID' }
+    if attempts.one? && attempts.first['status'] == 'PAID'
       render on_payment_success(params[:order_id], cart)
     else
       render json: order['answer'], status: :unprocessable_entity
