@@ -76,7 +76,7 @@ fr:
         your_password: "Votre mot de passe"
         password_is_required: "Le mot de passe est requis."
         password_is_too_short: "Le mot de passe est trop court (au moins 12 caractères)"
-        password_is_too_weak: "La sécurité du mot de passe trop faible :"
+        password_is_too_weak: "La sécurité du mot de passe est trop faible :"
         password_is_too_weak_explanations: "12 caractères minimum, au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial"
         type_your_password_again: "Ressaisissez votre mot de passe"
         password_confirmation_is_required: "La confirmation du mot de passe est requise."

@@ -194,7 +194,7 @@ Application.Controllers.controller('ApplicationController', ['$rootScope', '$sco
                 angular.forEach(error.data.errors, function (v, k) {
                   angular.forEach(v, function (err) {
                     $scope.alerts.push({
-                      msg: k + ': ' + err,
+                      msg: k === 'base' ? err : k + ': ' + err,
                       type: 'danger'
                     });
                   });

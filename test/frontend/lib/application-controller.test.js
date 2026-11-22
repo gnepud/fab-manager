@@ -8,6 +8,7 @@ describe('ApplicationController', () => {
   let modal;
   let resolveLogin;
   let rejectLogin;
+  let auth;
 
   beforeAll(() => {
     Application.Controllers = angular.module('applicationControllerTest', []);
@@ -18,6 +19,7 @@ describe('ApplicationController', () => {
     scope = {};
     rootScope = {};
     state = { go: jest.fn() };
+    auth = { login: () => new Promise(() => {}), register: jest.fn() };
     modal = {
       open: jest.fn(() => ({
         result: new Promise((resolve, reject) => {
@@ -34,7 +36,7 @@ describe('ApplicationController', () => {
       $locale: { NUMBER_FORMATS: { CURRENCY_SYM: '$' } },
       Session: {},
       AuthService: { isAuthorized: () => false, isAuthenticated: () => false },
-      Auth: { login: () => new Promise(() => {}) },
+      Auth: auth,
       $uibModal: modal,
       $state: state,
       growl: {},
@@ -56,6 +58,27 @@ describe('ApplicationController', () => {
 
   test('uses the configured EUR symbol for legacy coupons even with an English Angular locale', () => {
     expect(rootScope.currencySymbol).toBe('€');
+  });
+
+  test.each([
+    [{ base: ['Password is too weak: minimum 12 characters'] }, ['Password is too weak: minimum 12 characters']],
+    [{ password: ['is invalid'] }, ['password: is invalid']],
+    [{ base: [] }, []]
+  ])('signup displays base errors without an attribute prefix', async (errors, expected) => {
+    scope.signup();
+    const definition = modal.open.mock.calls[0][0].controller;
+    const signupScope = {};
+    const dependencies = {
+      $scope: signupScope,
+      Group: { query: jest.fn() },
+      CustomAsset: { get: jest.fn() },
+      settingsPromise: {},
+      profileCustomFieldsPromise: []
+    };
+    definition[definition.length - 1](...definition.slice(0, -1).map(name => dependencies[name]));
+    auth.register.mockRejectedValue({ data: { errors } });
+    await signupScope.ok();
+    expect(signupScope.alerts.map(alert => alert.msg)).toEqual(expected);
   });
 
   test.each([

@@ -3,6 +3,23 @@
 require 'test_helper'
 
 class UserTest < ActiveSupport::TestCase
+  test 'password strength is a complete base error in every locale' do
+    %w[de en es es-MX fr it no pt sv zh-CN zu].each do |locale|
+      I18n.with_locale(locale) do
+        user = users(:user2)
+        user.password = 'weakpassword'
+        user.valid?
+
+        label = I18n.t('app.public.common.password_is_too_weak')
+        explanation = I18n.t('app.public.common.password_is_too_weak_explanations')
+        message = "#{label} #{explanation}"
+        assert_equal [message], user.errors.messages[:base], locale
+        assert_includes user.errors.full_messages, message, locale
+        assert_no_match(/[:：]\s*[:：]/, message, locale)
+      end
+    end
+  end
+
   test 'must create wallet and profiles after create user' do
     u = User.create(username: 'user', email: 'userwallet@fabmanager.com', password: 'Testpassword1$', password_confirmation: 'Testpassword1$',
                     profile_attributes: { first_name: 'user', last_name: 'wallet', phone: '0123456789' },
