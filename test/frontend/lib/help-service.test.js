@@ -6,6 +6,7 @@ describe('Help service', () => {
   let state;
   let authorized;
   let openGuide;
+  let tours;
 
   beforeAll(() => {
     Application.Services = angular.module('helpServiceTest', []);
@@ -16,9 +17,11 @@ describe('Help service', () => {
     modal = { open: jest.fn() };
     state = { current: { name: 'app.admin.machines_list' } };
     authorized = { isAuthorized: jest.fn(() => true) };
+    tours = { getTourByName: jest.fn(() => ({ start: jest.fn() })) };
     angular.module('helpServiceDependencies', [])
       .value('$uibModal', modal)
       .value('$state', state)
+      .value('uiTourService', tours)
       .value('AuthService', authorized);
     help = angular.injector(['ng', 'helpServiceDependencies', 'helpServiceTest']).get('Help');
     openGuide = jest.spyOn(window, 'open').mockImplementation(() => {});
@@ -62,6 +65,14 @@ describe('Help service', () => {
   test('opens the guide on pages without a tour', () => {
     state.current.name = 'app.admin.machines_edit';
     help(new KeyboardEvent('keydown', { key: 'F1' }));
+    expect(modal.open).not.toHaveBeenCalled();
+    expect(openGuide).toHaveBeenCalledWith('http://guide-fr.fab.mn', '_blank');
+  });
+
+  test.each(['Settings', 'Machine Categories'])('opens the guide when the machines tour is unregistered on the %s tab', () => {
+    tours.getTourByName.mockReturnValue(undefined);
+    help(new KeyboardEvent('keydown', { key: 'F1' }));
+    expect(tours.getTourByName).toHaveBeenCalledWith('machines');
     expect(modal.open).not.toHaveBeenCalled();
     expect(openGuide).toHaveBeenCalledWith('http://guide-fr.fab.mn', '_blank');
   });
