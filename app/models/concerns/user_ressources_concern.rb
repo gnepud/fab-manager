@@ -19,7 +19,8 @@ module UserRessourcesConcern
 
     def next_training_reservation_by_machine(machine)
       reservations.where(reservable_type: 'Training', reservable_id: machine.trainings.map(&:id))
-                  .includes(:slots)
+                  .includes(slots_reservations: { slot: :availability })
+                  .where(slots_reservations: { canceled_at: nil }, availabilities: { lock: false })
                   .where('slots.start_at>= ?', Time.current)
                   .order('slots.start_at': :asc)
                   .references(:slots)
