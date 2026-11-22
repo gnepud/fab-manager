@@ -19,6 +19,8 @@ class API::OrdersController < API::APIController
 
     @order = ::Orders::OrderService.update_state(@order, current_user, order_params[:state], order_params[:note])
     render :show
+  rescue UpdateOrderStateError
+    render json: [I18n.t('errors.messages.invalid_order_state')], status: :unprocessable_entity
   end
 
   def destroy

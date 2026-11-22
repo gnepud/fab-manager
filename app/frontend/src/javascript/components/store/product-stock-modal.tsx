@@ -32,13 +32,16 @@ export const ProductStockModal: React.FC<ProductStockModalProps> = ({ onSuccess,
 
   const [movement, setMovement] = useState<'in' | 'out'>('in');
 
-  const { handleSubmit, register, control, formState } = useForm<ProductStockMovement>();
+  const { handleSubmit, register, control, formState, setValue } = useForm<ProductStockMovement>();
 
   /**
    * Toggle between adding or removing product from stock
    */
   const toggleMovementType = (evt: React.MouseEvent<HTMLButtonElement, MouseEvent>, type: 'in' | 'out') => {
     evt.preventDefault();
+    if (type !== movement) {
+      setValue('reason', null, { shouldDirty: true, shouldValidate: true });
+    }
     setMovement(type);
   };
 

@@ -444,6 +444,8 @@ zu:
       payzen_card_update_modal:
         update_card: "crwdns29484:0crwdne29484:0"
         validate_button: "crwdns29486:0crwdne29486:0"
+      fab_select:
+        placeholder: "Select..."
       form_multi_select:
         create_label: "crwdns29488:0{VALUE}crwdne29488:0"
       form_checklist:

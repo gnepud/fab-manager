@@ -96,6 +96,7 @@ export const ProductStockForm = <TContext extends object> ({ currentFormValues, 
     setFilters(draft => {
       return {
         ...draft,
+        page: 1,
         reason: evt.value
       };
     });
@@ -107,6 +108,7 @@ export const ProductStockForm = <TContext extends object> ({ currentFormValues, 
     setFilters(draft => {
       return {
         ...draft,
+        page: 1,
         stock_type: evt.value
       };
     });
