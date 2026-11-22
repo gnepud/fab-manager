@@ -31,7 +31,10 @@ class API::ReservationsController < API::APIController
 
   def update
     authorize @reservation
-    if @reservation.update(reservation_params)
+    attributes = reservation_params
+    raise Pundit::NotAuthorizedError unless policy(@reservation).update_attributes?(attributes)
+
+    if @reservation.update(attributes)
       render :show, status: :ok, location: @reservation
     else
       render json: @reservation.errors, status: :unprocessable_entity
@@ -55,6 +58,10 @@ class API::ReservationsController < API::APIController
   end
 
   def reservation_params
+    unless current_user.admin? || current_user.manager?
+      return params.require(:reservation).permit(:message, :reservable_id, slots_reservations_attributes: %i[id slot_id])
+    end
+
     params.require(:reservation).permit(:message, :reservable_id, :reservable_type, :nb_reserve_places,
                                         tickets_attributes: %i[id event_price_category_id booked],
                                         slots_reservations_attributes: %i[id slot_id offered])
