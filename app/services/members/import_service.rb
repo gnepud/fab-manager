@@ -13,6 +13,12 @@ class Members::ImportService
 
           # try to find member based on import.update_field
           user = User.find_by(import.update_field.to_sym => row[import.update_field])
+          errors = birthdate_errors(row)
+          unless errors.empty?
+            log << { user: user&.id, status: user ? 'update' : 'create', result: false }
+            log << errors
+            next
+          end
           params = row_to_params(row, user, password)
           if user
             service = Members::MembersService.new(user)
@@ -35,6 +41,13 @@ class Members::ImportService
     end
 
     private
+
+    def birthdate_errors(row)
+      Date.iso8601(row['birthdate']) if row['birthdate'].present?
+      {}
+    rescue Date::Error
+      { birthdate: ["Invalid birthdate: #{row['birthdate']} (expected YYYY-MM-DD)"] }
+    end
 
     def hashify(row, property, value: row[property], key: property.to_sym)
       res = {}
