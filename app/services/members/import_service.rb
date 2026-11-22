@@ -45,7 +45,7 @@ class Members::ImportService
     def row_to_params(row, user, password)
       res = {}
 
-      res.merge! hashify(row, 'id')
+      res.merge! hashify(row, 'id') unless user
       res.merge! hashify(row, 'username')
       res.merge! hashify(row, 'email')
       res.merge! hashify(row, 'password', value: password)
