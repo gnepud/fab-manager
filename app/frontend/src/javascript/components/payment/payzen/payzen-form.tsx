@@ -127,6 +127,10 @@ export const PayzenForm: React.FC<PayzenFormProps> = ({ onSubmit, onSuccess, onE
    * @see https://docs.lyra.com/fr/rest/V4.0/javascript/features/reference.html#kronerror
    */
   const handleError = (error: unknown) => {
+    if (typeof error === 'string' && error.trim()) {
+      onError(error);
+      return;
+    }
     if (error && typeof error === 'object') {
       const answer = error as Partial<KryptonError> & { result?: Partial<KryptonError> };
       const { errorMessage, detailedErrorMessage } = answer.result ?? answer;

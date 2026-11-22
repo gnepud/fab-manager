@@ -15,10 +15,7 @@ const cart = { customer_id: customer.id } as ShoppingCart;
 
 afterEach(() => jest.restoreAllMocks());
 
-test.each([
-  [{ errorMessage: 'Check the card details', detailedErrorMessage: 'Enter the security code' }, 'Check the card details. Enter the security code'],
-  [null, 'app.shared.payzen_form.unexpected_error']
-])('makes a PayZen validation failure (%j) visible and allows correction', async (result, message) => {
+async function mountPayzenForm () {
   const checkCart = jest.spyOn(PayzenAPI, 'checkCart').mockResolvedValue({ formToken: 'token', orderId: 'order' });
   jest.spyOn(PayzenAPI, 'chargeCreatePayment').mockResolvedValue({ formToken: 'token', orderId: 'order' });
   jest.spyOn(SettingAPI, 'query').mockResolvedValue(new Map());
@@ -35,9 +32,7 @@ test.each([
     validateForm: jest.fn()
   };
   jest.mocked(KRGlue.loadLibrary).mockResolvedValue({ KR: client });
-  client.validateForm
-    .mockRejectedValueOnce({ KR: client, result })
-    .mockResolvedValueOnce({ KR: client, result: null });
+  client.validateForm.mockResolvedValue({ KR: client, result: null });
 
   const onError = jest.fn();
   function Checkout () {
@@ -58,7 +53,15 @@ test.each([
 
   render(<Checkout />);
   await waitFor(() => expect(client.onFormCreated).toHaveBeenCalled());
-  const pay = screen.getByRole('button', { name: 'Pay' });
+  return { checkCart, client, onError, pay: screen.getByRole('button', { name: 'Pay' }) };
+}
+
+test.each([
+  [{ errorMessage: 'Check the card details', detailedErrorMessage: 'Enter the security code' }, 'Check the card details. Enter the security code'],
+  [null, 'app.shared.payzen_form.unexpected_error']
+])('makes a PayZen validation failure (%j) visible and allows correction', async (result, message) => {
+  const { checkCart, client, onError, pay } = await mountPayzenForm();
+  client.validateForm.mockRejectedValueOnce({ KR: client, result });
 
   fireEvent.click(pay);
   await waitFor(() => expect(onError).toHaveBeenCalledWith(message));
@@ -69,4 +72,15 @@ test.each([
   fireEvent.click(pay);
   await waitFor(() => expect(client.submit).toHaveBeenCalledTimes(1));
   expect(checkCart).toHaveBeenCalledTimes(1);
+});
+
+test('keeps the cart validation message and stops payment submission', async () => {
+  const { checkCart, client, onError, pay } = await mountPayzenForm();
+  const message = 'This reservation slot is no longer available.';
+  checkCart.mockRejectedValueOnce(message);
+
+  fireEvent.click(pay);
+  await waitFor(() => expect(onError).toHaveBeenCalledWith(message));
+  expect(pay).toBeEnabled();
+  expect(client.submit).not.toHaveBeenCalled();
 });
