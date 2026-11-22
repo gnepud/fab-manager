@@ -40,7 +40,7 @@ class Orders::OrderService
       when 'refunded'
         ::Orders::OrderRefundedService.new.call(order, current_user)
       else
-        nil
+        raise ::UpdateOrderStateError
       end
 
       # update in elasticsearch (statistics)
