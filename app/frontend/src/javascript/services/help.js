@@ -6,6 +6,7 @@ Application.Services.factory('Help', ['$rootScope', '$uibModal', '$state', 'Auth
       'app.public.home': 'welcome',
       'app.public.machines_list': 'machines',
       'app.public.spaces_list': 'spaces',
+      'app.admin.machines_list': 'machines',
       'app.admin.trainings': 'trainings',
       'app.admin.calendar': 'calendar',
       'app.admin.members': 'members',
