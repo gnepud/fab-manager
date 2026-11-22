@@ -373,4 +373,25 @@ class NotificationsTest < ActionDispatch::IntegrationTest
 
     doc.destroy
   end
+
+  test 'child turning 18 notification shows the eighteenth birthday' do
+    parent = users(:user2)
+    child = Child.create!(user: parent, first_name: 'Arthur', last_name: 'Pendelton', birthday: Date.new(2008, 11, 24))
+    NotificationType.find_or_create_by!(name: 'notify_user_when_child_age_will_be_18') do |type|
+      type.category = 'users_accounts'
+      type.is_configurable = false
+    end
+    NotificationCenter.call(type: 'notify_user_when_child_age_will_be_18', receiver: parent, attached_object: child)
+
+    login_as(parent, scope: :user)
+    get '/api/notifications'
+    assert_response :ok
+
+    notification = json_response(response.body)[:notifications].find do |n|
+      n[:notification_type] == 'notify_user_when_child_age_will_be_18' && n[:attached_object][:id] == child.id
+    end
+    assert_not_nil notification
+    assert_includes notification[:message][:description], I18n.l(Date.new(2026, 11, 24), format: :default)
+    assert_not_includes notification[:message][:description], I18n.l(Date.new(2008, 11, 24), format: :default)
+  end
 end
