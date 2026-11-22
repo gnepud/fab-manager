@@ -21,6 +21,7 @@ describe('admin member subscription changes', () => {
       CSRF: { setMetaTags: jest.fn() },
       memberPromise: {
         id: 1,
+        can_update: true,
         subscription: { id: 2, expired_at: '2026-01-01' },
         subscribed_plan: { id: 4 },
         invoices: [{ id: 1 }],

@@ -59,7 +59,7 @@ class Members::ListService
                                 search: word)
       end
 
-      if current_user.member?
+      if !current_user.privileged?
         # non-admin can only retrieve users with "public profiles"
         members = members.where("users.is_allow_contact = 'true'")
       elsif subscription == 'true'

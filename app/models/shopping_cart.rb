@@ -30,7 +30,7 @@ class ShoppingCart
     @items.map(&:price).each do |price|
       total_amount += price[:amount]
       all_elements = all_elements.merge(price[:elements]) do |_key, old_val, new_val|
-        old_val | new_val
+        old_val.is_a?(Array) ? old_val | new_val : old_val + new_val
       end
     end
 

@@ -62,19 +62,13 @@ class ReservationLimitService
     # @param cart_items [Array<CartItem::BaseItem>]
     # @return [Integer] in seconds
     def reservations_duration(customer, date, reservation, cart_items)
-      daily_reservations_hours = saved_reservations_durations(customer, reservation.reservable, date)
+      cart_duration = cart_items.sum do |item|
+        next 0 unless item.is_a?(CartItem::Reservation) && item != reservation && item.reservable == reservation.reservable
 
-      cart_daily_reservations = cart_items.filter do |item|
-        item.is_a?(CartItem::Reservation) &&
-          item != reservation &&
-          item.reservable == reservation.reservable &&
-          item.cart_item_reservation_slots
-              .includes(:slot)
-              .where("date_trunc('day', slots.start_at) = :date", date: date)
+        item.cart_item_reservation_slots.select { |sr| sr.slot.start_at.to_date == date }.sum { |sr| sr.slot.duration }
       end
 
-      daily_reservations_hours +
-        (cart_daily_reservations.map { |r| r.cart_item_reservation_slots.map { |sr| sr.slot.duration } }.flatten.reduce(:+) || 0)
+      saved_reservations_durations(customer, reservation.reservable, date) + cart_duration
     end
 
     # @param customer [User]
@@ -83,15 +77,13 @@ class ReservationLimitService
     # @param reservation [Reservation]
     # @return [Integer] in seconds
     def saved_reservations_durations(customer, reservable, date, reservation = nil)
-      daily_reservations = customer.reservations
-                                   .includes(slots_reservations: :slot)
-                                   .where(reservable: reservable)
-                                   .where(slots_reservations: { canceled_at: nil })
-                                   .where("date_trunc('day', slots.start_at) = :date", date: date)
+      reservations = customer.reservations.where(reservable: reservable)
+      reservations = reservations.where.not(id: reservation.id) unless reservation.nil?
+      local_day = date.in_time_zone...date.next_day.in_time_zone
 
-      daily_reservations = daily_reservations.where.not(id: reservation.id) unless reservation.nil?
-
-      (daily_reservations.map { |r| r.slots_reservations.map { |sr| sr.slot.duration } }.flatten.reduce(:+) || 0)
+      Slot.joins(:slots_reservations)
+          .where(slots_reservations: { reservation_id: reservations.select(:id), canceled_at: nil }, start_at: local_day)
+          .sum(&:duration)
     end
   end
 end

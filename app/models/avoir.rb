@@ -15,7 +15,9 @@ class Avoir < Invoice
   delegate :order_number, to: :invoice, allow_nil: true
 
   def expire_subscription
-    user.subscription.expire
+    invoice.invoice_items.where(object_type: Subscription.name).find_each do |item|
+      item.object&.expire
+    end
   end
 
   private

@@ -712,6 +712,9 @@ Application.Controllers.controller('EditMemberController', ['$scope', '$state', 
     // The user to edit
     $scope.user = cleanUser(memberPromise);
 
+    $scope.canEditMember = memberPromise.can_update;
+    if (!$scope.canEditMember) return;
+
     // Should the password be modified?
     $scope.password = { change: false };
 

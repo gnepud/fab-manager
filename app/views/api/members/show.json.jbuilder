@@ -3,6 +3,7 @@
 requested_current = (current_user and current_user.id == @member.id)
 
 json.partial! 'api/members/member', member: @member
+json.can_update policy(@member).update?
 unless @restricted_member_show
   json.extract! @member, :uid, :slug, :is_allow_contact, :is_allow_newsletter
 end
