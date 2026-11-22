@@ -12,6 +12,10 @@ zu:
       other: 'crwdns3161:5%{count}crwdne3161:5'
   activerecord:
     attributes:
+      user:
+        reset_password_token: "Password reset link"
+        password: "Password"
+        password_confirmation: "Password confirmation"
       product:
         amount: "crwdns31683:0crwdne31683:0"
         slug: "crwdns31685:0crwdne31685:0"

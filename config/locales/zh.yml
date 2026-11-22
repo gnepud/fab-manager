@@ -12,6 +12,10 @@ zh-CN:
       other: '%{count}周'
   activerecord:
     attributes:
+      user:
+        reset_password_token: "密码重置链接"
+        password: "密码"
+        password_confirmation: "确认密码"
       product:
         amount: "价格"
         slug: "URL"

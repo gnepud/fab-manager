@@ -12,6 +12,10 @@ es-MX:
       other: '%{count} semanas'
   activerecord:
     attributes:
+      user:
+        reset_password_token: "Enlace de restablecimiento de contraseña"
+        password: "Contraseña"
+        password_confirmation: "Confirmación de contraseña"
       product:
         amount: "El precio"
         slug: "URL"
