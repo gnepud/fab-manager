@@ -3,10 +3,10 @@
 # A subscription extended for free, added to the shopping cart
 class CartItem::FreeExtension < CartItem::BaseItem
   belongs_to :customer_profile, class_name: 'InvoicingProfile'
-  belongs_to :subscription, class_name: '::Subscription'
+  belongs_to :subscription
 
   def customer
-    customer_profile.user
+    statistic_profile.user
   end
 
   def start_at

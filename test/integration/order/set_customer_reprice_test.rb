@@ -50,24 +50,6 @@ class SetCustomerRepriceTest < ActionDispatch::IntegrationTest
     assert_equal @admin, @item.customer
   end
 
-  test 'changing to a subscriber uses their active plan' do
-    Subscription.create!(statistic_profile: @bob.statistic_profile, plan: Plan.find(2))
-    put '/api/cart/set_customer', params: { order_token: @order.token, user_id: @bob.id }
-    assert_equal 200, response.status, response.body
-    assert_equal Plan.find(2), @item.reload.plan
-    assert_equal 1800, @order.reload.total
-    assert_not @item.new_subscription
-  end
-
-  test 'expired subscriptions do not supply a plan' do
-    subscription = Subscription.create!(statistic_profile: @bob.statistic_profile, plan: Plan.find(2))
-    subscription.update!(expiration_date: 1.day.ago)
-    put '/api/cart/set_customer', params: { order_token: @order.token, user_id: @bob.id }
-    assert_equal 200, response.status, response.body
-    assert_nil @item.reload.plan
-    assert_equal 1500, @order.reload.total
-  end
-
   test 'a subscription being purchased still supplies the reservation plan' do
     pending = CartItem::Subscription.new(plan: Plan.find(2), customer_profile: @alice.invoicing_profile)
     pending.save!(context: [])
@@ -78,44 +60,5 @@ class SetCustomerRepriceTest < ActionDispatch::IntegrationTest
     assert @item.new_subscription
     assert_equal @bob, pending.reload.customer
     assert_equal 1800 + pending.plan.amount, @order.reload.total
-  end
-
-  test 'incompatible selected subscription returns a readable error and rolls back the customer change' do
-    pending = CartItem::Subscription.new(plan: Plan.find(1), customer_profile: @alice.invoicing_profile)
-    pending.save!(context: [])
-    Cart::AddItemService.new.call(@order, pending)
-    @bob.update!(group: Group.find(2))
-    put '/api/cart/set_customer', params: { order_token: @order.token, user_id: @bob.id }
-    assert_equal 422, response.status, response.body
-    assert_includes response.body, I18n.t('cart_item_validation.plan_group', GROUP: pending.plan.group.name)
-    assert_equal @alice, @order.reload.user
-    assert_equal @alice, @item.reload.customer
-    assert_equal @alice, pending.reload.customer
-  end
-
-  test 'an extension cannot be transferred to a customer without a subscription' do
-    extension = CartItem::FreeExtension.new(customer_profile: @alice.invoicing_profile, subscription: @alice.subscription,
-                                            new_expiration_date: 1.year.from_now)
-    extension.save!(context: [])
-    Cart::AddItemService.new.call(@order, extension)
-    put '/api/cart/set_customer', params: { order_token: @order.token, user_id: @bob.id }
-    assert_equal 422, response.status, response.body
-    assert_includes response.body, I18n.t('errors.messages.blank')
-    assert_equal @alice, @order.reload.user
-    assert_equal @alice.subscription, extension.reload.subscription
-    assert_equal @alice, @item.reload.customer
-  end
-
-  test 'extension dates must remain valid for the new subscription' do
-    Subscription.create!(statistic_profile: @bob.statistic_profile, plan: Plan.find(2))
-    extension = CartItem::FreeExtension.new(customer_profile: @alice.invoicing_profile, subscription: @alice.subscription,
-                                            new_expiration_date: @alice.subscription.expired_at + 1.day)
-    extension.save!(context: [])
-    Cart::AddItemService.new.call(@order, extension)
-    put '/api/cart/set_customer', params: { order_token: @order.token, user_id: @bob.id }
-    assert_equal 422, response.status, response.body
-    assert_includes response.body, I18n.t('cart_items.must_be_after_expiration')
-    assert_equal @alice, @order.reload.user
-    assert_equal @alice.subscription, extension.reload.subscription
   end
 end

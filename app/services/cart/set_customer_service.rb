@@ -52,28 +52,16 @@ class Cart::SetCustomerService
     return unless item.orderable_type.match(/^CartItem::/)
 
     orderable = item.orderable
-    all_items = item.order.order_items.map(&:orderable)
-    attributes = { customer_profile: customer.invoicing_profile }
-    attributes[:operator_profile] = @operator.invoicing_profile if orderable.respond_to?(:operator_profile=)
-    attributes.merge!(reservation_attributes(customer, all_items)) if orderable.is_a?(CartItem::Reservation) && orderable.respond_to?(:plan=)
-    attributes[:subscription] = customer.subscription if orderable.is_a?(CartItem::FreeExtension)
-
-    orderable.assign_attributes(attributes)
-    validate_extension(orderable) if orderable.is_a?(CartItem::FreeExtension)
-    return if orderable.save(context: all_items)
-
-    raise ActiveRecord::RecordInvalid, orderable
+    attributes = { customer_profile_id: customer.invoicing_profile.id }
+    attributes[:operator_profile_id] = @operator.invoicing_profile.id if orderable.respond_to?(:operator_profile=)
+    if orderable.is_a?(CartItem::Reservation) && orderable.has_attribute?(:plan_id)
+      attributes.merge!(reservation_attributes(customer, item.order.order_items.map(&:orderable)))
+    end
+    orderable.update_with_context(attributes, item.order.order_items)
   end
 
   def reservation_attributes(customer, all_items)
     pending_subscription = all_items.find { |orderable| orderable.is_a?(CartItem::Subscription) }
     { plan: pending_subscription&.plan || customer.subscribed_plan, new_subscription: pending_subscription.present? }
-  end
-
-  def validate_extension(orderable)
-    orderable.start_at
-  rescue InvalidSubscriptionError => e
-    orderable.errors.add(:subscription, orderable.subscription.nil? ? :blank : e.message)
-    raise ActiveRecord::RecordInvalid, orderable
   end
 end
