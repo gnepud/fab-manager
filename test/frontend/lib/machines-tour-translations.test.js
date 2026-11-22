@@ -37,7 +37,8 @@ describe('admin machines tour translations', () => {
       }
     }
     const controller = fs.readFileSync(path.resolve(__dirname, '../../../app/frontend/src/javascript/controllers/admin/machines.js'), 'utf8');
-    const keys = [...controller.matchAll(/_t\('(app\.public\.tour\.[^']+)'\)/g)].map(match => match[1]);
+    const template = fs.readFileSync(path.resolve(__dirname, '../../../app/frontend/templates/admin/machines/machines.html'), 'utf8');
+    const keys = [...`${controller}\n${template}`.matchAll(/'(app\.public\.tour\.[^']+)'/g)].map(match => match[1]);
     const locale = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../../config/locales/app.public.en.yml'), 'utf8')).en;
     expect(keys.length).toBeGreaterThan(0);
     for (const key of keys) {
