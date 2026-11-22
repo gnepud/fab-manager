@@ -61,4 +61,16 @@ class SetCustomerRepriceTest < ActionDispatch::IntegrationTest
     assert_equal @bob, pending.reload.customer
     assert_equal 1800 + pending.plan.amount, @order.reload.total
   end
+
+  test 'a customer change rejected by an item keeps the whole cart on the previous customer' do
+    pending = CartItem::Subscription.new(plan: Plan.find(2), customer_profile: @alice.invoicing_profile)
+    pending.save!(context: [])
+    Cart::AddItemService.new.call(@order, pending)
+    @bob.update!(group: Group.where.not(id: pending.plan.group_id).first)
+    put '/api/cart/set_customer', params: { order_token: @order.token, user_id: @bob.id }
+    assert_equal 422, response.status, response.body
+    assert_equal @alice.statistic_profile, @order.reload.statistic_profile
+    assert_equal @alice, pending.reload.customer
+    assert_equal @alice, @item.reload.customer
+  end
 end

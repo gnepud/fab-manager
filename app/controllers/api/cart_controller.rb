@@ -65,6 +65,8 @@ class API::CartController < API::APIController
     customer = User.find(params[:user_id])
     @order = Cart::SetCustomerService.new(current_user).call(@current_order, customer)
     render 'api/orders/show'
+  rescue ActiveRecord::RecordInvalid => e
+    render json: e.record.errors, status: :unprocessable_entity
   end
 
   private

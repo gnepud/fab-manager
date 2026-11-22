@@ -57,7 +57,7 @@ class Cart::SetCustomerService
     if orderable.is_a?(CartItem::Reservation) && orderable.has_attribute?(:plan_id)
       attributes.merge!(reservation_attributes(customer, item.order.order_items.map(&:orderable)))
     end
-    orderable.update_with_context(attributes, item.order.order_items)
+    raise ActiveRecord::RecordInvalid, orderable unless orderable.update_with_context(attributes, item.order.order_items)
   end
 
   def reservation_attributes(customer, all_items)
