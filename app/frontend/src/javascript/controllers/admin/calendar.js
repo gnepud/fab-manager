@@ -377,7 +377,7 @@ Application.Controllers.controller('AdminCalendarController', ['$scope', '$state
         order: 1,
         title: _t('app.admin.tour.calendar.agenda.title'),
         content: _t('app.admin.tour.calendar.agenda.content'),
-        placement: 'right',
+        placement: 'top',
         popupClass: 'width-350'
       });
       if (AuthService.isAuthorized('admin')) {
