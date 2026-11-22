@@ -2,7 +2,9 @@ import angular from 'angular';
 import fs from 'fs';
 import path from 'path';
 import React from 'react';
-import { render, cleanup, waitFor } from '@testing-library/react';
+import { render, cleanup, waitFor, act } from '@testing-library/react';
+import 'angular-ui-bootstrap';
+import { react2angular } from 'react2angular';
 import { Trainings } from '../../../app/frontend/src/javascript/components/trainings/trainings';
 import TrainingAPI from '../../../app/frontend/src/javascript/api/training';
 import MachineAPI from '../../../app/frontend/src/javascript/api/machine';
@@ -15,9 +17,12 @@ describe('admin trainings tour', () => {
   let steps;
   let handlers;
   let template;
+  let compile;
 
   beforeAll(() => {
-    Application.Controllers = angular.module('trainingsTourTest', []);
+    Application.Controllers = angular.module('trainingsTourTest', ['ui.bootstrap'])
+      .filter('translate', () => key => key)
+      .component('trainings', react2angular(Trainings, ['onError', 'onSuccess']));
     require('../../../app/frontend/src/javascript/controllers/admin/trainings');
   });
 
@@ -32,6 +37,7 @@ describe('admin trainings tour', () => {
     render(<Trainings onError={jest.fn()} onSuccess={jest.fn()} />, { container: template.querySelector('trainings') });
     await waitFor(() => expect(TrainingAPI.index).toHaveBeenCalled());
     const injector = angular.injector(['ng', 'trainingsTourTest']);
+    compile = injector.get('$compile');
     scope = injector.get('$rootScope').$new();
     scope.currentUser = { id: 1, profile_attributes: { tours: [] } };
     injector.get('$controller')('TrainingsAdminController', {
@@ -72,5 +78,32 @@ describe('admin trainings tour', () => {
     handlers.stepChanged(steps.find(step => step.stepId === 'tracking'));
     const monitoringTab = template.querySelector('uib-tab.post-tracking');
     expect(scope.tabs.active).toBe(Number(monitoringTab.getAttribute('index')));
+  });
+
+  test('Previous from tracking preserves the filter element used by the tour tether', async () => {
+    cleanup();
+    template.innerHTML = fs.readFileSync(path.resolve(__dirname, '../../../app/frontend/templates/admin/trainings/index.html'), 'utf8');
+    await act(async () => {
+      compile(template)(scope);
+      scope.$digest();
+    });
+    const filter = steps.find(step => step.stepId === 'filter');
+    const target = document.querySelector(filter.selector);
+    expect(target).not.toBeNull();
+
+    await act(async () => {
+      handlers.stepChanged(steps.find(step => step.stepId === 'tracking'));
+      scope.$digest();
+    });
+    expect(scope.tabs.active).toBe(2);
+
+    await act(async () => {
+      handlers.stepChanged(filter);
+      scope.$digest();
+    });
+    expect(scope.tabs.active).toBe(0);
+    expect(document.querySelector(filter.selector)).toBe(target);
+    expect(target.isConnected).toBe(true);
+    expect(target.closest('.tab-pane')).toBe(template.querySelector('.tab-pane.active'));
   });
 });
