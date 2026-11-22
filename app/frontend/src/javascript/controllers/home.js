@@ -107,8 +107,17 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
       // get the tour defined by the ui-tour directive
       const uitour = uiTourService.getTourByName('welcome');
       if (!uitour) return;
+      const createVisibleStep = function (step) {
+        if (!step.orphan) {
+          const target = document.querySelector(step.selector);
+          if (!target) return;
+          const bounds = target.getBoundingClientRect();
+          if (!bounds.width || !bounds.height || ['hidden', 'collapse'].includes(window.getComputedStyle(target).visibility)) return;
+        }
+        uitour.createStep(step);
+      };
       // add the steps
-      uitour.createStep({
+      createVisibleStep({
         selector: 'body',
         stepId: 'welcome',
         order: 0,
@@ -117,7 +126,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
         placement: 'bottom',
         orphan: true
       });
-      uitour.createStep({
+      createVisibleStep({
         selector: '.nav-primary li.home-link',
         stepId: 'home',
         order: 1,
@@ -125,7 +134,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
         content: _t('app.public.tour.welcome.home.content'),
         placement: 'right'
       });
-      uitour.createStep({
+      createVisibleStep({
         selector: '.nav-primary li.public-calendar-link',
         stepId: 'calendar',
         order: 2,
@@ -133,7 +142,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
         content: _t('app.public.tour.welcome.calendar.content'),
         placement: 'right'
       });
-      uitour.createStep({
+      createVisibleStep({
         selector: '.nav-primary li.reserve-machine-link',
         stepId: 'machines',
         order: 3,
@@ -142,7 +151,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
         placement: 'right'
       });
       if ($scope.$root.modules.spaces) {
-        uitour.createStep({
+        createVisibleStep({
           selector: '.nav-primary li.reserve-space-link',
           stepId: 'spaces',
           order: 4,
@@ -151,7 +160,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
           placement: 'right'
         });
       }
-      uitour.createStep({
+      createVisibleStep({
         selector: '.nav-primary li.reserve-training-link',
         stepId: 'trainings',
         order: 5,
@@ -159,7 +168,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
         content: _t('app.public.tour.welcome.trainings.content'),
         placement: 'right'
       });
-      uitour.createStep({
+      createVisibleStep({
         selector: '.nav-primary li.reserve-event-link',
         stepId: 'events',
         order: 6,
@@ -167,7 +176,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
         content: _t('app.public.tour.welcome.events.content'),
         placement: 'right'
       });
-      uitour.createStep({
+      createVisibleStep({
         selector: '.nav-primary li.projects-gallery-link',
         stepId: 'projects',
         order: 7,
@@ -175,7 +184,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
         content: _t('app.public.tour.welcome.projects.content'),
         placement: 'right'
       });
-      uitour.createStep({
+      createVisibleStep({
         selector: '.nav-primary li.plans-link',
         stepId: 'plans',
         order: 8,
@@ -183,7 +192,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
         content: _t('app.public.tour.welcome.plans.content'),
         placement: 'right'
       });
-      uitour.createStep({
+      createVisibleStep({
         selector: '.nav-primary .admin-section',
         stepId: 'admin',
         order: 9,
@@ -191,7 +200,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
         content: _t('app.public.tour.welcome.admin.content'),
         placement: 'right'
       });
-      uitour.createStep({
+      createVisibleStep({
         selector: '.navbar.header li.about-page-link',
         stepId: 'about',
         order: 10,
@@ -200,7 +209,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
         placement: 'bottom',
         popupClass: 'shift-right-40'
       });
-      uitour.createStep({
+      createVisibleStep({
         selector: '.navbar.header li.notification-center-link',
         stepId: 'notifications',
         order: 11,
@@ -208,7 +217,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
         content: _t('app.public.tour.welcome.notifications.content'),
         placement: 'bottom'
       });
-      uitour.createStep({
+      createVisibleStep({
         selector: '.navbar.header li.user-menu-dropdown',
         stepId: 'profile',
         order: 12,
@@ -218,7 +227,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
         popupClass: 'shift-left-80'
       });
       if ($scope.status.news && settingsPromise.home_blogpost) {
-        uitour.createStep({
+        createVisibleStep({
           selector: 'news',
           stepId: 'news',
           order: 13,
@@ -228,7 +237,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
         });
       }
       if ($scope.status.projects) {
-        uitour.createStep({
+        createVisibleStep({
           selector: 'projects',
           stepId: 'last_projects',
           order: 14,
@@ -238,7 +247,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
         });
       }
       if ($scope.status.twitter) {
-        uitour.createStep({
+        createVisibleStep({
           selector: 'twitter',
           stepId: 'last_tweet',
           order: 15,
@@ -248,7 +257,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
         });
       }
       if ($scope.status.members) {
-        uitour.createStep({
+        createVisibleStep({
           selector: 'members',
           stepId: 'last_members',
           order: 16,
@@ -258,7 +267,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
         });
       }
       if ($scope.status.events) {
-        uitour.createStep({
+        createVisibleStep({
           selector: 'events',
           stepId: 'next_events',
           order: 17,
@@ -267,7 +276,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
           placement: 'top'
         });
       }
-      uitour.createStep({
+      createVisibleStep({
         selector: 'body',
         stepId: 'customize',
         order: 18,
@@ -277,7 +286,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
         orphan: 'true'
       });
       if (AuthService.isAuthorized('admin')) {
-        uitour.createStep({
+        createVisibleStep({
           selector: '.app-generator .app-version',
           stepId: 'version',
           order: 19,
@@ -286,7 +295,7 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
           placement: 'top'
         });
       }
-      uitour.createStep({
+      createVisibleStep({
         selector: 'body',
         stepId: 'conclusion',
         order: 20,
