@@ -560,6 +560,7 @@ es:
   order:
     please_contact_FABLAB: "Póngase en contacto con nosotros para obtener instrucciones sobre la retirada de fondos."
   cart_item_validation:
+    locked: "Esta disponibilidad está bloqueada"
     overlapping: "Ya tienes una reserva que se solapa con esta franja horaria"
     slot: "El espacio no existe"
     availability: "La disponibilidad no existe"

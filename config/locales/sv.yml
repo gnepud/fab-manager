@@ -560,6 +560,7 @@ sv:
   order:
     please_contact_FABLAB: "Vänligen kontakta oss för återkallningsinstruktioner."
   cart_item_validation:
+    locked: "Denna tillgänglighet är låst"
     overlapping: "Du har redan en bokning som överlappar denna tid"
     slot: "Platsen finns inte"
     availability: "Tillgängligheten finns inte"

@@ -275,6 +275,11 @@ class CartItem::Reservation < CartItem::BaseItem
       return false
     end
 
+    if availability.lock && !operator.privileged?
+      errors.add(:availability, I18n.t('cart_item_validation.locked'))
+      return false
+    end
+
     if slot.full?
       errors.add(:slot, I18n.t('cart_item_validation.full'))
       return false

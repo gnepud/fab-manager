@@ -560,6 +560,7 @@ it:
   order:
     please_contact_FABLAB: "Vi preghiamo di contattarci per le istruzioni di prelievo."
   cart_item_validation:
+    locked: "Questa disponibilità è bloccata"
     overlapping: "Hai già una prenotazione che si sovrappone a questo slot"
     slot: "Lo slot non esiste"
     availability: "La disponibilità non esiste"
