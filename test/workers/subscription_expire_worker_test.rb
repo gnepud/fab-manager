@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'test_helper'
-require 'minitest/mock'
 
 class SubscriptionExpireWorkerTest < ActiveSupport::TestCase
   include ActionMailer::TestHelper
@@ -33,9 +32,7 @@ class SubscriptionExpireWorkerTest < ActiveSupport::TestCase
                                         notification_type_id: notification_type.id)
 
     assert_emails 1 do
-      CustomAsset.stub(:get_url, '/logo.png') do
-        NotificationsMailer.send_mail_by(notification).deliver_now
-      end
+      NotificationsMailer.send_mail_by(notification).deliver_now
     end
     assert_not_includes ActionMailer::Base.deliveries.last.body.decoded, '#!/dashboard/profile'
   end
@@ -50,9 +47,7 @@ class SubscriptionExpireWorkerTest < ActiveSupport::TestCase
                                .find_by!(notification_types: { name: 'notify_member_subscription_will_expire_in_7_days' })
 
     assert_emails 1 do
-      CustomAsset.stub(:get_url, '/logo.png') do
-        NotificationsMailer.send_mail_by(notification).deliver_now
-      end
+      NotificationsMailer.send_mail_by(notification).deliver_now
     end
 
     mail = ActionMailer::Base.deliveries.last
