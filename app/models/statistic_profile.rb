@@ -30,6 +30,21 @@ class StatisticProfile < ApplicationRecord
 
   validate :check_birthday_in_past
 
+  def grant_training(training)
+    with_training_lock do
+      statistic_profile_trainings.find_or_create_by!(training: training)
+    end
+  end
+
+  def training_ids=(ids)
+    ids = Array(ids).compact_blank.map(&:to_i).uniq
+    if new_record?
+      super(ids)
+    else
+      with_training_lock { super(ids) }
+    end
+  end
+
   def str_gender
     return '' if gender.nil?
 
@@ -46,6 +61,14 @@ class StatisticProfile < ApplicationRecord
   end
 
   private
+
+  def with_training_lock
+    self.class.transaction do
+      self.class.lock.find(id)
+      trainings.reload
+      yield
+    end
+  end
 
   def check_birthday_in_past
     errors.add(:birthday, I18n.t('statistic_profile.birthday_in_past')) if birthday.present? && birthday > Date.current
