@@ -27,6 +27,11 @@ class SetOfferAuthorizationTest < ActionDispatch::IntegrationTest
     assert_refused_offer(true, customer_id: @admin.id)
   end
 
+  test 'admin cannot offer items in a cart without customer' do
+    @order.update!(statistic_profile: nil)
+    assert_refused_offer(true, customer_id: @alice.id)
+  end
+
   test 'member cannot revoke another customers offer with its cart token' do
     member_order
     login_as(@bob, scope: :user)
