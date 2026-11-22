@@ -71,7 +71,7 @@ export const MembersList: React.FC<MembersListProps> = ({ members, onError, onSu
   return (
     <div className="members-list">
       {members.map(member => (
-        <MembersListItem key={member.id} member={member} onError={onError} onSuccess={onSuccess} onDeleteMember={onDeleteMember} onEditChild={editChild} onDeleteChild={handleDeleteChildSuccess} />
+        <MembersListItem key={member.id} member={member} operator={operator} onError={onError} onSuccess={onSuccess} onDeleteMember={onDeleteMember} onEditChild={editChild} onDeleteChild={handleDeleteChildSuccess} />
       ))}
       <ChildModal child={child} isOpen={isOpenChildModal} toggleModal={() => setIsOpenChildModal(false)} onSuccess={handleSaveChildSuccess} onError={onError} supportingDocumentsTypes={supportingDocumentsTypes} operator={operator} />
     </div>
