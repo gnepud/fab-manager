@@ -15,4 +15,20 @@
                  can-propose-packs="canProposePacks()">
   </machines-list>
 
+  <span tour-step="view"
+        tour-step-order="1"
+        tour-step-title="{{ 'app.public.tour.machines.view.title' | translate }}"
+        tour-step-content="{{ 'app.public.tour.machines.view.content' | translate }}"
+        tour-step-placement="top"
+        tour-step-enabled="{{ isAuthorized('admin') && hasMachineTourTarget('.machines-list .show-button') }}"
+        tour-step-options="{ selector: '.machines-list .show-button' }"></span>
+
+  <span tour-step="reserve"
+        tour-step-order="2"
+        tour-step-title="{{ 'app.public.tour.machines.reserve.title' | translate }}"
+        tour-step-content="{{ 'app.public.tour.machines.reserve.content' | translate }}"
+        tour-step-placement="top"
+        tour-step-enabled="{{ isAuthorized(['admin', 'manager']) && hasMachineTourTarget('.machines-list .reserve-button') }}"
+        tour-step-options="{ selector: '.machines-list .reserve-button' }"></span>
+
 </section>

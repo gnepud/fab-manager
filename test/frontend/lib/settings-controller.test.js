@@ -80,6 +80,18 @@ describe('SettingsController upload errors', () => {
     expect(growl.error).not.toHaveBeenCalled();
   });
 
+  test('keeps the login tour mode in sync when the display setting changes', () => {
+    scope.currentUser = { profile_attributes: { tours: ['welcome'] } };
+    scope.allSettings.feature_tour_display = 'session';
+    scope.$digest();
+    expect(Fablab.sessionTourMode).toBe(true);
+    expect(scope.currentUser.profile_attributes.tours).toBe(Fablab.sessionTours);
+
+    scope.allSettings.feature_tour_display = 'manual';
+    scope.$digest();
+    expect(Fablab.sessionTourMode).toBe(false);
+  });
+
   test('accepts closing after opening without an error', () => {
     const value = new Date('2000-01-01T14:00:00');
     scope.windowEnd.value = value;

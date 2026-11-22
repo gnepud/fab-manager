@@ -14,6 +14,7 @@
 'use strict';
 
 import { uploadErrorMessages } from '../lib/upload-error-messages';
+import normalizeCurrentUser from '../lib/current-user';
 
 Application.Controllers.controller('CompleteProfileController', ['$scope', '$rootScope', '$state', '$window', '_t', 'growl', 'CSRF', 'Auth', 'Member', 'settingsPromise', 'activeProviderPromise', 'groupsPromise', 'cguFile', 'memberPromise', 'Session', 'dialogs', 'AuthProvider',
   function ($scope, $rootScope, $state, $window, _t, growl, CSRF, Auth, Member, settingsPromise, activeProviderPromise, groupsPromise, cguFile, memberPromise, Session, dialogs, AuthProvider) {
@@ -99,7 +100,7 @@ Application.Controllers.controller('CompleteProfileController', ['$scope', '$roo
         Auth._currentUser.name = content.name;
         $scope.user = content;
         Auth._currentUser = content;
-        $rootScope.currentUser = content;
+        $rootScope.currentUser = normalizeCurrentUser(content);
         return $state.go('app.public.home');
       }
     };
@@ -124,7 +125,7 @@ Application.Controllers.controller('CompleteProfileController', ['$scope', '$roo
       Member.merge({ id: $rootScope.currentUser.id }, { user: { auth_token: $scope.user.auth_token } }, function (user) {
         $scope.user = user;
         Auth._currentUser = user;
-        $rootScope.currentUser = user;
+        $rootScope.currentUser = normalizeCurrentUser(user);
         $state.go('app.public.home');
       }
       , function (err) {
@@ -229,7 +230,7 @@ Application.Controllers.controller('CompleteProfileController', ['$scope', '$roo
     $scope.onSuccess = function (user) {
       $scope.currentUser = _.cloneDeep(user);
       Auth._currentUser = _.cloneDeep(user);
-      $rootScope.currentUser = _.cloneDeep(user);
+      $rootScope.currentUser = normalizeCurrentUser(_.cloneDeep(user));
       growl.success(_t('app.logged.profile_completion.your_profile_has_been_successfully_updated'));
       $state.go('app.public.home');
     };

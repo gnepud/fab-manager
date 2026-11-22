@@ -257,7 +257,7 @@ class User < ApplicationRecord
   def password_complexity
     return if password.blank? || SecurePassword.secured?(password)
 
-    errors.add I18n.t('app.public.common.password_is_too_weak'), I18n.t('app.public.common.password_is_too_weak_explanations')
+    errors.add :base, "#{I18n.t('app.public.common.password_is_too_weak')} #{I18n.t('app.public.common.password_is_too_weak_explanations')}"
   end
 
   def invalidate_member_exports
