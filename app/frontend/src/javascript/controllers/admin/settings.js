@@ -427,8 +427,7 @@ Application.Controllers.controller('SettingsController', ['$scope', '$rootScope'
         order: 10,
         title: _t('app.admin.tour.settings.reservations.title'),
         content: _t('app.admin.tour.settings.reservations.content'),
-        placement: 'bottom',
-        popupClass: 'shift-left-50'
+        placement: 'bottom-right'
       });
       uitour.createStep({
         selector: 'body',
