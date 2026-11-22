@@ -4,8 +4,8 @@
 */
 'use strict';
 
-Application.Controllers.controller('AdminMachinesController', ['$scope', 'CSRF', 'growl', '$state', '_t', 'AuthService', 'settingsPromise', 'Member', 'uiTourService', 'machinesPromise', 'helpers', '$uiRouter',
-  function ($scope, CSRF, growl, $state, _t, AuthService, settingsPromise, Member, uiTourService, machinesPromise, helpers, $uiRouter) {
+Application.Controllers.controller('AdminMachinesController', ['$scope', 'CSRF', 'growl', '$state', '_t', 'AuthService', 'settingsPromise', 'Member', 'uiTourService', 'helpers', '$uiRouter',
+  function ($scope, CSRF, growl, $state, _t, AuthService, settingsPromise, Member, uiTourService, helpers, $uiRouter) {
     /* PUBLIC SCOPE */
 
     // the following item is used by the UnsavedFormAlert component to detect a page change
@@ -65,6 +65,10 @@ Application.Controllers.controller('AdminMachinesController', ['$scope', 'CSRF',
       return AuthService.isAuthorized(['admin', 'manager']) || !helpers.isUserValidationRequired($scope.settings, 'pack') || (helpers.isUserValidationRequired($scope.settings, 'pack') && helpers.isUserValidated($scope.currentUser));
     };
 
+    $scope.hasMachineTourTarget = function (selector) {
+      return document.querySelector(selector) !== null;
+    };
+
     /**
      * Setup the feature-tour for the machines page. (admins only)
      * This is intended as a contextual help (when pressing F1)
@@ -84,16 +88,6 @@ Application.Controllers.controller('AdminMachinesController', ['$scope', 'CSRF',
             placement: 'bottom',
             orphan: true
           });
-          if (machinesPromise.length > 0) {
-            uitour.createStep({
-              selector: '.machines-list .show-button',
-              stepId: 'view',
-              order: 1,
-              title: _t('app.public.tour.machines.view.title'),
-              content: _t('app.public.tour.machines.view.content'),
-              placement: 'top'
-            });
-          }
         } else {
           uitour.createStep({
             selector: 'body',
@@ -103,16 +97,6 @@ Application.Controllers.controller('AdminMachinesController', ['$scope', 'CSRF',
             content: _t('app.public.tour.machines.welcome_manager.content'),
             placement: 'bottom',
             orphan: true
-          });
-        }
-        if (machinesPromise.length > 0) {
-          uitour.createStep({
-            selector: '.machines-list .reserve-button',
-            stepId: 'reserve',
-            order: 2,
-            title: _t('app.public.tour.machines.reserve.title'),
-            content: _t('app.public.tour.machines.reserve.content'),
-            placement: 'top'
           });
         }
         uitour.createStep({

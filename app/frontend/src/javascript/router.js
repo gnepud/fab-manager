@@ -386,6 +386,7 @@ angular.module('application.router', ['ui.router'])
           }
         },
         resolve: {
+          tourTranslations: ['Translations', function (Translations) { return Translations.query(['app.public.tour']); }],
           machinesPromise: ['Machine', function (Machine) { return Machine.query().$promise; }],
           settingsPromise: ['Setting', function (Setting) { return Setting.query({ names: "['feature_tour_display', 'user_validation_required', 'user_validation_required_list']" }).$promise; }]
         }
