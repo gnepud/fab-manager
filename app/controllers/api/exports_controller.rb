@@ -22,7 +22,7 @@ class API::ExportsController < API::APIController
                 type: mime_type,
                 disposition: 'attachment'
     else
-      render text: I18n.t('errors.messages.export_not_found'), status: :not_found
+      render plain: I18n.t('errors.messages.export_not_found'), status: :not_found
     end
   end
 
