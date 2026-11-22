@@ -275,7 +275,12 @@ class CartItem::Reservation < CartItem::BaseItem
       return false
     end
 
-    if slot.full?
+    if availability.lock && !operator.privileged?
+      errors.add(:availability, I18n.t('cart_item_validation.locked'))
+      return false
+    end
+
+    if slot_full?(reservation_slot)
       errors.add(:slot, I18n.t('cart_item_validation.full'))
       return false
     end
@@ -290,26 +295,31 @@ class CartItem::Reservation < CartItem::BaseItem
       return false
     end
 
-    unless operator.privileged?
-      if reservable_type == "Space"
-        space = reservable
-        slot = reservation_slot.slot
-        if Slots::InterblockingService.new.blocked_slots_for_spaces([space], [slot]).any?
-          errors.add(:slot, I18n.t('cart_item_validation.blocked_by_another_reservation'))
-          return false
-        end
-      end
-
-      if reservable_type == "Machine"
-        machine = reservable
-        slot = reservation_slot.slot
-        if Slots::InterblockingService.new.blocked_slots_for_machines([machine], [slot]).any?
-          errors.add(:slot, I18n.t('cart_item_validation.blocked_by_another_reservation'))
-          return false
-        end
-      end
+    if !operator.privileged? && interblocked?(slot)
+      errors.add(:slot, I18n.t('cart_item_validation.blocked_by_another_reservation'))
+      return false
     end
 
     true
+  end
+
+  def interblocked?(slot)
+    service = Slots::InterblockingService.new
+    case reservable_type
+    when 'Space'
+      service.blocked_slots_for_spaces([reservable], [slot]).any?
+    when 'Machine'
+      service.blocked_slots_for_machines([reservable], [slot]).any?
+    else
+      false
+    end
+  end
+
+  def slot_full?(reservation_slot)
+    slot = reservation_slot.slot
+    return slot.full? unless reservation_slot.persisted? && reservation_slot.slots_reservation_id.nil?
+
+    capacity = slot.availability.available_places_per_slot
+    capacity.present? && slot.reserved_places > capacity
   end
 end

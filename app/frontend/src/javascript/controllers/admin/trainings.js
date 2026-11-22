@@ -400,12 +400,12 @@ Application.Controllers.controller('TrainingsAdminController', ['$scope', '$stat
         placement: 'bottom'
       });
       uitour.createStep({
-        selector: '.trainings-monitoring .filter-trainings',
+        selector: '.trainings-monitoring .trainings-list-tour',
         stepId: 'filter',
         order: 2,
         title: _t('app.admin.tour.trainings.filter.title'),
         content: _t('app.admin.tour.trainings.filter.content'),
-        placement: 'left'
+        placement: 'top'
       });
       uitour.createStep({
         selector: '.trainings-monitoring .post-tracking',
@@ -426,8 +426,8 @@ Application.Controllers.controller('TrainingsAdminController', ['$scope', '$stat
       });
       // on step change, change the active tab if needed
       uitour.on('stepChanged', function (nextStep) {
-        if (nextStep.stepId === 'filter' || nextStep.stepId === 'machines') { $scope.tabs.active = 0; }
-        if (nextStep.stepId === 'tracking') { $scope.tabs.active = 1; }
+        if (nextStep.stepId === 'filter' || nextStep.stepId === 'trainings') { $scope.tabs.active = 0; }
+        if (nextStep.stepId === 'tracking') { $scope.tabs.active = 2; }
       });
       // on tour end, save the status in database
       uitour.on('ended', function () {
