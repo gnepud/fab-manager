@@ -333,8 +333,7 @@ Application.Controllers.controller('AdminProjectsController', ['$scope', '$state
         order: 1,
         title: _t('app.admin.tour.projects.abuses.title'),
         content: _t('app.admin.tour.projects.abuses.content'),
-        placement: 'bottom',
-        popupClass: 'shift-left-40'
+        placement: 'bottom-right'
       });
       uitour.createStep({
         selector: '[ui-tour="projects"] .settings-tab',
