@@ -52,7 +52,7 @@ function extractHumanReadableMessage (error: string|Error): string {
     // iterate through all the keys to build the message
     for (const key in error) {
       if (Object.prototype.hasOwnProperty.call(error, key)) {
-        if (!ParsingLib.isInteger(key)) {
+        if (key !== 'base' && !ParsingLib.isInteger(key)) {
           message += `${key} : `;
         }
         if (error[key] instanceof Array) {

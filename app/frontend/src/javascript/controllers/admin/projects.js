@@ -337,13 +337,12 @@ Application.Controllers.controller('AdminProjectsController', ['$scope', '$state
         popupClass: 'shift-left-40'
       });
       uitour.createStep({
-        selector: '.projects .settings-tab',
+        selector: '[ui-tour="projects"] .settings-tab',
         stepId: 'settings',
         order: 2,
         title: _t('app.admin.tour.projects.settings.title'),
         content: _t('app.admin.tour.projects.settings.content'),
-        placement: 'bottom',
-        popupClass: 'shift-left-50'
+        placement: 'bottom-right'
       });
       uitour.createStep({
         selector: 'body',
@@ -356,7 +355,7 @@ Application.Controllers.controller('AdminProjectsController', ['$scope', '$state
       });
       // on step change, change the active tab if needed
       uitour.on('stepChanged', function (nextStep) {
-        if (nextStep.stepId === 'settings') { $scope.tabs.active = 3; }
+        if (nextStep.stepId === 'settings') { $scope.tabs.active = 6; }
       });
       // on tour end, save the status in database
       uitour.on('ended', function () {
