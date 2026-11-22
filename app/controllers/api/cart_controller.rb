@@ -43,7 +43,8 @@ class API::CartController < API::APIController
   end
 
   def set_offer
-    authorize CartContext.new(params[:customer_id], cart_params[:is_offered])
+    authorize @current_order, :create_item?, policy_class: CartPolicy
+    authorize CartContext.new(@current_order.statistic_profile&.user_id, cart_params[:is_offered])
     @order = Cart::SetOfferService.new.call(@current_order, orderable, cart_params[:is_offered])
     render 'api/orders/show'
   end
