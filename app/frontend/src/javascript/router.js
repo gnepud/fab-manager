@@ -1044,7 +1044,12 @@ angular.module('application.router', ['ui.router'])
           managersPromise: ['User', function (User) { return User.query({ role: 'manager' }).$promise; }],
           groupsPromise: ['Group', function (Group) { return Group.query().$promise; }],
           tagsPromise: ['Tag', function (Tag) { return Tag.query().$promise; }],
-          authProvidersPromise: ['AuthProvider', function (AuthProvider) { return AuthProvider.query().$promise; }],
+          authProvidersPromise: ['AuthProvider', 'currentUser', function (AuthProvider, currentUser) {
+            if (currentUser && currentUser.role === 'admin') {
+              return AuthProvider.query().$promise;
+            }
+            return [];
+          }],
           settingsPromise: ['Setting', function (Setting) { return Setting.query({ names: "['feature_tour_display', 'user_validation_required']" }).$promise; }]
         }
       })
