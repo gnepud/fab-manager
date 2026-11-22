@@ -1,5 +1,6 @@
 import { FormEvent, FunctionComponent, useEffect, useRef, useState } from 'react';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import KRGlue from '@lyracom/embedded-form-glue';
 import { GatewayFormProps } from '../abstract-payment-modal';
 import SettingAPI from '../../../api/setting';
@@ -25,6 +26,7 @@ interface PayzenFormProps extends GatewayFormProps {
  * The form validation button must be created elsewhere, using the attribute form={formId}.
  */
 export const PayzenForm: React.FC<PayzenFormProps> = ({ onSubmit, onSuccess, onError, children, className, paymentSchedule, updateCard = false, cart, customer, formId, order }) => {
+  const { t } = useTranslation('shared');
   const PayZenKR = useRef<KryptonClient>(null);
   const [loadingClass, setLoadingClass] = useState<'hidden' | 'loader' | 'loader-overlay'>('loader');
 
@@ -43,9 +45,9 @@ export const PayzenForm: React.FC<PayzenFormProps> = ({ onSubmit, onSuccess, onE
           .then(({ KR }) => KR.onFormReady(handleFormReady))
           .then(({ KR }) => KR.onFormCreated(handleFormCreated))
           .then(({ KR }) => { PayZenKR.current = KR; })
-          .catch(error => onError(error));
-      }).catch(error => onError(error));
-    });
+          .catch(handleError);
+      }).catch(handleError);
+    }).catch(handleError);
   }, [cart, paymentSchedule, customer, order]);
 
   /**
@@ -80,7 +82,7 @@ export const PayzenForm: React.FC<PayzenFormProps> = ({ onSubmit, onSuccess, onE
             PayZenKR.current.removeForms().then(() => {
               onSuccess(confirmation);
             });
-          }).catch(e => onError(e));
+          }).catch(handleError);
         } else {
           const error = `${transaction?.errorMessage}. ${transaction?.detailedErrorMessage || ''}`;
           onError(error || event.clientAnswer.orderStatus);
@@ -121,12 +123,24 @@ export const PayzenForm: React.FC<PayzenFormProps> = ({ onSubmit, onSuccess, onE
   };
 
   /**
-   * Callback triggered when the PayZen payment was refused
+   * PayZen validation rejects with an SDK response wrapping the error in result.
    * @see https://docs.lyra.com/fr/rest/V4.0/javascript/features/reference.html#kronerror
    */
-  const handleError = (answer: KryptonError) => {
-    const message = `${answer.errorMessage}. ${answer.detailedErrorMessage ? answer.detailedErrorMessage : ''}`;
-    onError(message);
+  const handleError = (error: unknown) => {
+    if (typeof error === 'string' && error.trim()) {
+      onError(error);
+      return;
+    }
+    if (error && typeof error === 'object') {
+      const answer = error as Partial<KryptonError> & { result?: Partial<KryptonError> };
+      const { errorMessage, detailedErrorMessage } = answer.result ?? answer;
+      const message = [errorMessage, detailedErrorMessage].filter(text => typeof text === 'string' && text.trim()).join('. ');
+      if (message) {
+        onError(message);
+        return;
+      }
+    }
+    onError(t('app.shared.payzen_form.unexpected_error'));
   };
 
   /**
@@ -139,17 +153,18 @@ export const PayzenForm: React.FC<PayzenFormProps> = ({ onSubmit, onSuccess, onE
 
     try {
       const { result } = await PayZenKR.current.validateForm();
-      if (result === null) {
-        if (!order && !updateCard) {
-          await PayzenAPI.checkCart(cart, customer);
-        }
-        await PayZenKR.current.onSubmit(onPaid);
-        await PayZenKR.current.onError(handleError);
-        await PayZenKR.current.submit();
+      if (result !== null) {
+        handleError(result);
+        return;
       }
+      if (!order && !updateCard) {
+        await PayzenAPI.checkCart(cart, customer);
+      }
+      await PayZenKR.current.onSubmit(onPaid);
+      await PayZenKR.current.onError(handleError);
+      await PayZenKR.current.submit();
     } catch (err) {
-      // catch api errors
-      onError(err);
+      handleError(err);
     }
   };
 

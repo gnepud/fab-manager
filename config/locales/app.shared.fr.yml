@@ -441,6 +441,8 @@ fr:
       stripe_card_update_modal:
         update_card: "Mettre à jour la carte"
         validate_button: "Valider la nouvelle carte"
+      payzen_form:
+        unexpected_error: "Une erreur est survenue. Veuillez réessayer."
       payzen_card_update_modal:
         update_card: "Mettre à jour la carte"
         validate_button: "Valider la nouvelle carte"
