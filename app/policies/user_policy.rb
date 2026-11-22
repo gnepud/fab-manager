@@ -24,7 +24,11 @@ class UserPolicy < ApplicationPolicy
   end
 
   def update?
-    user.admin? || user.manager? || (user.id == record.id)
+    user.admin? || (user.id == record.id) || (user.manager? && !record.privileged?)
+  end
+
+  def validate?
+    user.admin? || (user.manager? && ((user.id == record.id) || !record.privileged?))
   end
 
   def destroy?
@@ -37,7 +41,7 @@ class UserPolicy < ApplicationPolicy
     end
   end
 
-  %w[list index create_member validate].each do |action|
+  %w[list index create_member].each do |action|
     define_method "#{action}?" do
       user.admin? || user.manager?
     end

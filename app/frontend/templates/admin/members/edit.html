@@ -1,4 +1,5 @@
-<div>
+<p class="alert alert-danger" ng-if="!canEditMember" translate>{{ 'app.public.machines_show.unauthorized_operation' }}</p>
+<div ng-if="canEditMember">
 
   <section class="heading b-b">
     <div class="row no-gutter">
