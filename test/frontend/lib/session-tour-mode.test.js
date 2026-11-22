@@ -1,12 +1,16 @@
 import angular from 'angular';
+import '@uirouter/angularjs';
 
 describe('current user tour history', () => {
   let scope;
   let rootScope;
   let session;
+  let injector;
 
   beforeAll(() => {
-    Application.Controllers = angular.module('sessionTourModeTest', []);
+    Application.Controllers = angular.module('sessionTourModeTest', [])
+      .value('$rootElement', angular.element(document.body));
+    require('../../../app/frontend/src/javascript/router');
     require('../../../app/frontend/src/javascript/controllers/application');
     angular.isUndefinedOrNull = value => angular.isUndefined(value) || value === null;
   });
@@ -16,7 +20,7 @@ describe('current user tour history', () => {
   beforeEach(() => {
     Fablab.sessionTours = [];
     Fablab.sessionTourMode = true;
-    const injector = angular.injector(['ng', 'sessionTourModeTest']);
+    injector = angular.injector(['ng', 'sessionTourModeTest', 'application.router']);
     scope = injector.get('$rootScope').$new();
     rootScope = { checkNotificationsIsInit: true };
     session = { create: jest.fn() };
@@ -72,5 +76,34 @@ describe('current user tour history', () => {
   test('ignores an absent user', () => {
     scope.setCurrentUser(null);
     expect(session.create).not.toHaveBeenCalled();
+  });
+
+  describe.each(['app.admin', 'app.logged'])('%s route entry', name => {
+    const enter = async (user) => {
+      const state = injector.get('$state').get(name);
+      const currentUser = await injector.invoke(state.resolve.currentUser, null, {
+        Auth: { currentUser: () => Promise.resolve(user) }
+      });
+      injector.invoke(state.onEnter, null, { currentUser, $rootScope: rootScope });
+    };
+
+    test.each([[[]], [['calendar']]])('publishes session history instead of database history: %j', async (tours) => {
+      Fablab.sessionTours = tours;
+      await enter({ id: 1, role: 'admin', profile_attributes: { tours: ['welcome', 'machines', 'settings'] } });
+      expect(rootScope.currentUser.profile_attributes.tours).toBe(Fablab.sessionTours);
+      expect(rootScope.currentUser.profile_attributes.tours).not.toContain('settings');
+    });
+
+    test('preserves database history outside session mode', async () => {
+      Fablab.sessionTourMode = false;
+      const tours = ['settings'];
+      await enter({ id: 1, role: 'admin', profile_attributes: { tours } });
+      expect(rootScope.currentUser.profile_attributes.tours).toBe(tours);
+    });
+
+    test('accepts an absent user', async () => {
+      await enter(null);
+      expect(rootScope.currentUser).toBeNull();
+    });
   });
 });

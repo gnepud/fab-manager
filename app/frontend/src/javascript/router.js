@@ -1,3 +1,5 @@
+import normalizeCurrentUser from './lib/current-user';
+
 angular.module('application.router', ['ui.router'])
   .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
     $locationProvider.hashPrefix('!');
@@ -69,7 +71,7 @@ angular.module('application.router', ['ui.router'])
           loggedTranslations: ['Translations', function (Translations) { return Translations.query(['app.logged']).$promise; }]
         },
         onEnter: ['$state', '$timeout', 'currentUser', '$rootScope', function ($state, $timeout, currentUser, $rootScope) {
-          $rootScope.currentUser = currentUser;
+          $rootScope.currentUser = normalizeCurrentUser(currentUser);
         }]
       })
       .state('app.admin', {
@@ -82,7 +84,7 @@ angular.module('application.router', ['ui.router'])
           adminTranslations: ['Translations', function (Translations) { return Translations.query(['app.admin']).$promise; }]
         },
         onEnter: ['$state', '$timeout', 'currentUser', '$rootScope', function ($state, $timeout, currentUser, $rootScope) {
-          $rootScope.currentUser = currentUser;
+          $rootScope.currentUser = normalizeCurrentUser(currentUser);
         }]
       })
 

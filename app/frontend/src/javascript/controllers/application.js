@@ -1,5 +1,6 @@
 
 import FormatLib from '../lib/format';
+import normalizeCurrentUser from '../lib/current-user';
 
 Application.Controllers.controller('ApplicationController', ['$rootScope', '$scope', '$transitions', '$window', '$locale', '$timeout', 'Session', 'AuthService', 'Auth', '$uibModal', '$state', 'growl', 'Notification', '$interval', 'Setting', '_t', 'Version', 'Help', '$cookies',
   function ($rootScope, $scope, $transitions, $window, $locale, $timeout, Session, AuthService, Auth, $uibModal, $state, growl, Notification, $interval, Setting, _t, Version, Help, $cookies) {
@@ -24,8 +25,7 @@ Application.Controllers.controller('ApplicationController', ['$rootScope', '$sco
      */
     $scope.setCurrentUser = function (user) {
       if (!angular.isUndefinedOrNull(user)) {
-        if (Fablab.sessionTourMode) user.profile_attributes.tours = Fablab.sessionTours;
-        $rootScope.currentUser = user;
+        $rootScope.currentUser = normalizeCurrentUser(user);
         Session.create(user);
         getNotifications();
         // Fab-manager's app-version
