@@ -67,4 +67,68 @@ class InvoicesTest < ActionDispatch::IntegrationTest
     # Check footprint
     assert avoir.check_footprint
   end
+
+  test 'refunding an earlier subscription invoice expires only that subscription' do
+    subscription = Subscription.find(2)
+    renewal = subscription.dup
+    renewal.save!
+    renewal.update!(expiration_date: 2.months.from_now)
+    invoice = subscription.original_invoice
+    renewal_invoice = invoice.dup
+    renewal_invoice.invoice_items.build(amount: invoice.total, object: renewal, main: true)
+    renewal_invoice.save!
+
+    assert_equal renewal, subscription.user.subscription
+
+    post '/api/invoices', params: { avoir: {
+      payment_method: 'cash',
+      invoice_id: invoice.id,
+      invoice_items_ids: invoice.invoice_items.ids,
+      subscription_to_expire: true
+    } }.to_json, headers: default_headers
+
+    assert_equal 201, response.status, response.body
+    assert subscription.reload.expired?, 'the refunded subscription should expire'
+    assert_not renewal.reload.expired?, 'the renewal must remain active'
+    assert_nil renewal.canceled_at
+  end
+
+  test 'refunding a scheduled subscription invoice expires the invoiced subscription' do
+    customer = User.find_by!(username: 'jdupond')
+    subscription = Subscription.create!(plan: plans(:plan_schedulable), statistic_profile: customer.statistic_profile)
+    schedule = PaymentScheduleService.new.create([subscription], 113_600, customer, operator: @admin, payment_method: 'cash')
+    schedule.save!
+    installment = schedule.ordered_items.second
+    PaymentScheduleService.new.generate_invoice(installment, payment_method: 'cash')
+    invoice = installment.reload.invoice
+    renewal = subscription.dup
+    renewal.save!
+
+    post '/api/invoices', params: { avoir: {
+      payment_method: 'cash',
+      invoice_id: invoice.id,
+      invoice_items_ids: invoice.invoice_items.ids,
+      subscription_to_expire: true
+    } }.to_json, headers: default_headers
+
+    assert_equal 201, response.status, response.body
+    assert subscription.reload.expired?
+    assert_not renewal.reload.expired?
+  end
+
+  test 'refund without a subscription does not expire the current subscription' do
+    invoice = Invoice.find(4)
+    subscription = Subscription.find(3)
+    subscription.update!(expiration_date: 1.month.from_now)
+
+    post '/api/invoices', params: { avoir: {
+      payment_method: 'cash',
+      invoice_id: invoice.id,
+      invoice_items_ids: invoice.invoice_items.ids,
+      subscription_to_expire: true
+    } }.to_json, headers: default_headers
+
+    assert_equal 201, response.status, response.body
+    assert_not subscription.reload.expired?
+  end
 end
