@@ -13,7 +13,7 @@ class MembersImportWorker
 
     res = Members::ImportService.import(import)
 
-    import.results = res.to_yaml(canonical: true)
+    import.results = res.to_yaml
     import.save!
 
     NotificationCenter.call type: :notify_admin_import_complete,
