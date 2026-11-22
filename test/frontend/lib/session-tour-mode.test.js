@@ -6,6 +6,7 @@ describe('current user tour history', () => {
   let rootScope;
   let session;
   let injector;
+  let auth;
 
   beforeAll(() => {
     Application.Controllers = angular.module('sessionTourModeTest', [])
@@ -23,7 +24,8 @@ describe('current user tour history', () => {
     injector = angular.injector(['ng', 'sessionTourModeTest', 'application.router']);
     scope = injector.get('$rootScope').$new();
     rootScope = { checkNotificationsIsInit: true };
-    session = { create: jest.fn() };
+    session = { create: jest.fn(), destroy: jest.fn() };
+    auth = { login: () => new Promise(() => {}), logout: jest.fn().mockResolvedValue() };
     injector.get('$controller')('ApplicationController', {
       $rootScope: rootScope,
       $scope: scope,
@@ -31,16 +33,16 @@ describe('current user tour history', () => {
       $locale: { NUMBER_FORMATS: { CURRENCY_SYM: '$' } },
       Session: session,
       AuthService: {},
-      Auth: { login: () => new Promise(() => {}) },
+      Auth: auth,
       $uibModal: {},
-      $state: {},
+      $state: { go: jest.fn() },
       growl: {},
       Notification: {},
       Setting: { query: jest.fn() },
       _t: key => key,
       Version: { get: jest.fn() },
       Help: jest.fn(),
-      $cookies: {}
+      $cookies: { remove: jest.fn() }
     });
   });
 
@@ -76,6 +78,36 @@ describe('current user tour history', () => {
   test('ignores an absent user', () => {
     scope.setCurrentUser(null);
     expect(session.create).not.toHaveBeenCalled();
+  });
+
+  test.each([[[]], [['settings']]])('starts a new user with empty history after logout with completed tours: %j', async tours => {
+    scope.setCurrentUser({ id: 1, role: 'admin', profile_attributes: { tours: [] } });
+    Fablab.sessionTours.push(...tours);
+    expect(rootScope.currentUser.profile_attributes.tours).toEqual(tours);
+
+    await scope.logout({ preventDefault: jest.fn() });
+    expect(rootScope.currentUser).toBeNull();
+    scope.setCurrentUser({ id: 2, role: 'admin', profile_attributes: { tours: ['welcome', 'settings'] } });
+
+    expect(Fablab.sessionTours).toEqual([]);
+    expect(rootScope.currentUser.id).toBe(2);
+    expect(rootScope.currentUser.profile_attributes.tours).toBe(Fablab.sessionTours);
+  });
+
+  test('preserves the current user and session history when logout fails', async () => {
+    const user = { id: 1, role: 'admin', profile_attributes: { tours: [] } };
+    scope.setCurrentUser(user);
+    Fablab.sessionTours.push('settings');
+    const error = new Error('Logout failed');
+    auth.logout.mockRejectedValueOnce(error);
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    await scope.logout({ preventDefault: jest.fn() });
+
+    expect(rootScope.currentUser).toBe(user);
+    expect(Fablab.sessionTours).toEqual(['settings']);
+    expect(session.destroy).not.toHaveBeenCalled();
+    expect(console.error).toHaveBeenCalledWith(`An error occurred logging out: ${error}`);
   });
 
   describe.each(['app.admin', 'app.logged'])('%s route entry', name => {

@@ -56,6 +56,7 @@ Application.Controllers.controller('ApplicationController', ['$rootScope', '$sco
       e.preventDefault();
       return Auth.logout().then(function () {
         Session.destroy();
+        Fablab.sessionTours = [];
         $rootScope.currentUser = null;
         $rootScope.toCheckNotifications = false;
         $scope.notifications = {
