@@ -342,8 +342,7 @@ Application.Controllers.controller('AdminProjectsController', ['$scope', '$state
         order: 2,
         title: _t('app.admin.tour.projects.settings.title'),
         content: _t('app.admin.tour.projects.settings.content'),
-        placement: 'bottom',
-        popupClass: 'shift-left-50'
+        placement: 'bottom-right'
       });
       uitour.createStep({
         selector: 'body',

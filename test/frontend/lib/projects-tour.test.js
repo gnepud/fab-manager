@@ -64,4 +64,10 @@ describe('admin projects tour', () => {
     handlers.stepChanged(steps.find(step => step.stepId === 'settings'));
     expect(scope.tabs.active).toBe(Number(template.querySelector('uib-tab.settings-tab').getAttribute('index')));
   });
+
+  test('the rightmost settings tab uses a right-aligned popover without a manual offset', () => {
+    const settings = steps.find(step => step.stepId === 'settings');
+    expect(settings.placement).toBe('bottom-right');
+    expect(settings.popupClass).toBeUndefined();
+  });
 });
