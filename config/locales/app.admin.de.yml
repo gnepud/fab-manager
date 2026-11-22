@@ -2137,7 +2137,7 @@ de:
         failed_to_remove: "Ein Fehler ist aufgetreten, der Bericht konnte nicht gelöscht werden"
       local_payment_form:
         about_to_cash: "You're about to confirm the cashing by an external payment mean. Please do not click on the button below until you have fully cashed the requested payment."
-        about_to_confirm: "You're about to confirm your {ITEM, select, subscription{subscription} reservation{reservation} other{order}}."
+        about_to_confirm: "Du bist dabei, {ITEM, select, subscription{dein Abonnement} reservation{deine Reservierung} prepaid_pack{dein vorausbezahltes Paket} other{deine Bestellung}} zu bestätigen."
         payment_method: "Payment method"
         method_card: "Online by card"
         method_check: "By check"

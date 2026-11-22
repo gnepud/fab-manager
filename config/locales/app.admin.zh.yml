@@ -2137,7 +2137,7 @@ zh-CN:
         failed_to_remove: "删除举报时出错，无法完成操作"
       local_payment_form:
         about_to_cash: "您即将确认通过外部支付手段收款。在完全收取所请求的付款之前，请不要点击下面的按钮。"
-        about_to_confirm: "您即将确认您的{ITEM, select, subscription{订阅} reservation{预订} other{订单}}。"
+        about_to_confirm: "您即将确认您的{ITEM, select, subscription{订阅} reservation{预订} prepaid_pack{预付套餐} other{订单}}。"
         payment_method: "支付方式"
         method_card: "在线支付（银行卡）"
         method_check: "支票支付"
