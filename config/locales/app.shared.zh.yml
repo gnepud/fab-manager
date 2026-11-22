@@ -441,6 +441,8 @@ zh-CN:
       stripe_card_update_modal:
         update_card: "更新卡片"
         validate_button: "验证新卡片"
+      payzen_form:
+        unexpected_error: "发生错误，请重试。"
       payzen_card_update_modal:
         update_card: "更新卡片"
         validate_button: "验证新卡片"
