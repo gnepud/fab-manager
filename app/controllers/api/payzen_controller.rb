@@ -74,6 +74,7 @@ class API::PayzenController < API::PaymentsController
 
   def update_token
     schedule = PaymentSchedule.find(params[:payment_schedule_id])
+    authorize schedule, :update_card?
     token = schedule.gateway_payment_mean
     @id = schedule.gateway_order.id
     @result = PayZen::Token.new.update(token.id,
