@@ -1738,6 +1738,7 @@ pt:
         reservations_parameters: "Parâmetros das reservas"
         confine_the_booking_agenda: "Confine a agenda de reserva"
         opening_time: "Horário de abertura"
+        invalid_booking_window: "A hora de abertura deve ser anterior à hora de fechamento."
         closing_time: "Horário de fechamento"
         max_visibility: "Visibilidade máxima (em meses)"
         visibility_for_yearly_members: "Para inscrições atuais de pelo menos 1 ano"

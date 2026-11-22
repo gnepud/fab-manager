@@ -36,7 +36,7 @@ class API::SettingsController < API::APIController
 
         db_setting = Setting.find_or_initialize_by(name: setting[:name])
         if SettingService.update_allowed?(db_setting)
-          error = SettingService.check_before_update(setting)
+          error = SettingService.check_before_update(setting, settings: params[:settings])
           if error
             db_setting.errors.add(:-, "#{I18n.t("settings.#{setting[:name]}")}: #{error}")
           elsif db_setting.value != setting[:value] && SettingService.save_and_update(db_setting, setting[:value], current_user)

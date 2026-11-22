@@ -579,6 +579,7 @@ zu:
     select_user: "crwdns37211:0crwdne37211:0"
   settings:
     locked_setting: "crwdns21632:0crwdne21632:0"
+    invalid_booking_window: "The opening time must be before the closing time."
     about_title: "crwdns21634:0crwdne21634:0"
     about_body: "crwdns21636:0crwdne21636:0"
     about_contacts: "crwdns21638:0crwdne21638:0"

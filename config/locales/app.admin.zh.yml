@@ -1738,6 +1738,7 @@ zh-CN:
         reservations_parameters: "预订参数"
         confine_the_booking_agenda: "限制预订日程"
         opening_time: "开放时间"
+        invalid_booking_window: "开放时间必须早于关闭时间。"
         closing_time: "关闭时间"
         max_visibility: "最大可见性（以月为单位）"
         visibility_for_yearly_members: "对于当前正在运行的至少一年的订阅"

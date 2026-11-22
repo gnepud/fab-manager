@@ -1738,6 +1738,7 @@ fr:
         reservations_parameters: "Paramètres des réservations"
         confine_the_booking_agenda: "Borner l'agenda de réservation"
         opening_time: "Heure d'ouverture"
+        invalid_booking_window: "L'heure d'ouverture doit précéder l'heure de fermeture."
         closing_time: "Heure de fermeture"
         max_visibility: "Visibilité maximum (en mois)"
         visibility_for_yearly_members: "Pour les abonnements en cours d'au moins 1 an"

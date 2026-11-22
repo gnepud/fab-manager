@@ -1738,6 +1738,7 @@ zu:
         reservations_parameters: "crwdns26436:0crwdne26436:0"
         confine_the_booking_agenda: "crwdns26438:0crwdne26438:0"
         opening_time: "crwdns26440:0crwdne26440:0"
+        invalid_booking_window: "The opening time must be before the closing time."
         closing_time: "crwdns26442:0crwdne26442:0"
         max_visibility: "crwdns26444:0crwdne26444:0"
         visibility_for_yearly_members: "crwdns26446:0crwdne26446:0"

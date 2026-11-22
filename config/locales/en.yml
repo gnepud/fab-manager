@@ -581,6 +581,7 @@ en:
     select_user: "Please select a user before continuing"
   settings:
     locked_setting: "the setting is locked."
+    invalid_booking_window: "The opening time must be before the closing time."
     about_title: "\"About\" page title"
     about_body: "\"About\" page content"
     about_contacts: "\"About\" page contacts"
