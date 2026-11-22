@@ -295,7 +295,7 @@ class PaymentScheduleService
     total = invoice.invoice_items.map(&:amount).map(&:to_i).reduce(:+)
 
     if !coupon.nil? && ((coupon.validity_per_user == 'once' && payment_schedule_item.first?) || coupon.validity_per_user == 'forever')
-      total = CouponService.new.apply(total, coupon, user.id)
+      total = CouponService.new.apply(total, coupon, user.id, check_status: false)
       invoice.coupon_id = coupon.id
     end
 

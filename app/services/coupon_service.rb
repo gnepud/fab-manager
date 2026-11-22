@@ -10,9 +10,10 @@ class CouponService
   # @param total {Number} invoice total, before any coupon is applied
   # @param coupon {String|Coupon} Coupon's code OR Coupon object
   # @param user_id {Number} user's id against the coupon will be tested for usability
+  # @param check_status [Boolean] whether to check usability before applying the coupon
   # @return {Number}
   ##
-  def apply(total, coupon = nil, user_id = nil)
+  def apply(total, coupon = nil, user_id = nil, check_status: true)
     price = total
 
     coupon_object = if coupon.instance_of? Coupon
@@ -25,7 +26,7 @@ class CouponService
 
     return price if coupon_object.nil?
 
-    if coupon_object.status(user_id, total) == 'active'
+    if !check_status || coupon_object.status(user_id, total) == 'active'
       case coupon_object.type
       when 'percent_off'
         price -= (Rational(price * coupon_object.percent_off) / Rational(100.0)).to_f.ceil
