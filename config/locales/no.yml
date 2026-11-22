@@ -12,6 +12,10 @@
       other: '%{count} weeks'
   activerecord:
     attributes:
+      user:
+        reset_password_token: "Lenke for tilbakestilling av passord"
+        password: "Passord"
+        password_confirmation: "Passordbekreftelse"
       product:
         amount: "The price"
         slug: "URL"
@@ -50,6 +54,7 @@
       product_in_use: "This product have already been ordered"
       slug_already_used: "is already used"
       birthday_less_than_18_years_ago: "Birthday must be under 18 years ago"
+      gateway_authentication_failed: "Kortet ditt kunne ikke autentiseres. Prøv igjen eller bruk et annet kort."
   coupon:
     code_format_error: "only caps letters, numbers, and dashes are allowed"
   apipie:
@@ -72,6 +77,7 @@
     deleted_user: "Deleted user"
   #members management
   members:
+    unable_to_change_group_disabled: "Det er ikke tillatt å endre gruppe"
     cannot_change_sso_password: "Passord kan ikke endres for SSO-kontoer"
     unable_to_change_the_group_while_a_subscription_is_running: "Kan ikke endre gruppen mens et abonnement kjører"
     please_input_the_authentication_code_sent_to_the_address: "Skriv inn autentiseringskoden sendt til e-postadressen %{EMAIL}"
@@ -560,6 +566,7 @@
   order:
     please_contact_FABLAB: "Please contact us for withdrawal instructions."
   cart_item_validation:
+    locked: "Denne tilgjengeligheten er låst"
     overlapping: "Du har allerede en reservasjon som overlapper dette tidsrommet"
     slot: "The slot doesn't exist"
     availability: "The availaility doesn't exist"

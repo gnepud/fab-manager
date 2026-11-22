@@ -19,6 +19,6 @@ class CreditPolicy < ApplicationPolicy
   end
 
   def user_resource?
-    record.id == user.id || user.admin?
+    UserPolicy.new(user, record).update?
   end
 end

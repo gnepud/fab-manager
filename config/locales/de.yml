@@ -12,6 +12,10 @@ de:
       other: '%{count} Wochen'
   activerecord:
     attributes:
+      user:
+        reset_password_token: "Link zum Zurücksetzen des Passworts"
+        password: "Passwort"
+        password_confirmation: "Passwortbestätigung"
       product:
         amount: "Der Preis"
         slug: "Link"
@@ -50,6 +54,7 @@ de:
       product_in_use: "Dieses Produkt wurde bereits bestellt"
       slug_already_used: "wird bereits verwendet"
       birthday_less_than_18_years_ago: "Geburtstag muss unter 18 Jahre zurückliegen"
+      gateway_authentication_failed: "Ihre Karte konnte nicht authentifiziert werden. Bitte versuchen Sie es erneut oder verwenden Sie eine andere Karte."
   coupon:
     code_format_error: "nur Großbuchstaben, Zahlen und Bindestriche sind erlaubt"
   apipie:
@@ -72,6 +77,7 @@ de:
     deleted_user: "Gelöschte Benutzer"
   #members management
   members:
+    unable_to_change_group_disabled: "Ein Gruppenwechsel ist nicht erlaubt"
     cannot_change_sso_password: "Das Passwort kann für SSO-Konten nicht geändert werden"
     unable_to_change_the_group_while_a_subscription_is_running: "Die Gruppe kann während eines Abonnements nicht geändert werden"
     please_input_the_authentication_code_sent_to_the_address: "Bitte geben Sie den Authentifizierungscode ein, der an die E-Mail-Adresse %{EMAIL} gesendet wurde"
@@ -560,6 +566,7 @@ de:
   order:
     please_contact_FABLAB: "Bitte setzen Sie sich mit uns in Verbindung, um Anweisungen für den Widerruf zu erhalten."
   cart_item_validation:
+    locked: "Diese Verfügbarkeit ist gesperrt"
     overlapping: "Sie haben bereits eine Buchung, die sich mit diesem Zeitfenster überschneidet"
     slot: "Der Slot existiert nicht"
     availability: "Die Verfügbarkeit existiert nicht"

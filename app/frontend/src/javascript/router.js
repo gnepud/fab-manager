@@ -1,3 +1,5 @@
+import normalizeCurrentUser from './lib/current-user';
+
 angular.module('application.router', ['ui.router'])
   .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
     $locationProvider.hashPrefix('!');
@@ -69,7 +71,7 @@ angular.module('application.router', ['ui.router'])
           loggedTranslations: ['Translations', function (Translations) { return Translations.query(['app.logged']).$promise; }]
         },
         onEnter: ['$state', '$timeout', 'currentUser', '$rootScope', function ($state, $timeout, currentUser, $rootScope) {
-          $rootScope.currentUser = currentUser;
+          $rootScope.currentUser = normalizeCurrentUser(currentUser);
         }]
       })
       .state('app.admin', {
@@ -82,7 +84,7 @@ angular.module('application.router', ['ui.router'])
           adminTranslations: ['Translations', function (Translations) { return Translations.query(['app.admin']).$promise; }]
         },
         onEnter: ['$state', '$timeout', 'currentUser', '$rootScope', function ($state, $timeout, currentUser, $rootScope) {
-          $rootScope.currentUser = currentUser;
+          $rootScope.currentUser = normalizeCurrentUser(currentUser);
         }]
       })
 
@@ -386,6 +388,7 @@ angular.module('application.router', ['ui.router'])
           }
         },
         resolve: {
+          tourTranslations: ['Translations', function (Translations) { return Translations.query(['app.public.tour']); }],
           machinesPromise: ['Machine', function (Machine) { return Machine.query().$promise; }],
           settingsPromise: ['Setting', function (Setting) { return Setting.query({ names: "['feature_tour_display', 'user_validation_required', 'user_validation_required_list']" }).$promise; }]
         }
@@ -1044,7 +1047,12 @@ angular.module('application.router', ['ui.router'])
           managersPromise: ['User', function (User) { return User.query({ role: 'manager' }).$promise; }],
           groupsPromise: ['Group', function (Group) { return Group.query().$promise; }],
           tagsPromise: ['Tag', function (Tag) { return Tag.query().$promise; }],
-          authProvidersPromise: ['AuthProvider', function (AuthProvider) { return AuthProvider.query().$promise; }],
+          authProvidersPromise: ['AuthProvider', 'currentUser', function (AuthProvider, currentUser) {
+            if (currentUser && currentUser.role === 'admin') {
+              return AuthProvider.query().$promise;
+            }
+            return [];
+          }],
           settingsPromise: ['Setting', function (Setting) { return Setting.query({ names: "['feature_tour_display', 'user_validation_required']" }).$promise; }]
         }
       })

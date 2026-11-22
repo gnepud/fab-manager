@@ -1,5 +1,6 @@
 
 import FormatLib from '../lib/format';
+import normalizeCurrentUser from '../lib/current-user';
 
 Application.Controllers.controller('ApplicationController', ['$rootScope', '$scope', '$transitions', '$window', '$locale', '$timeout', 'Session', 'AuthService', 'Auth', '$uibModal', '$state', 'growl', 'Notification', '$interval', 'Setting', '_t', 'Version', 'Help', '$cookies',
   function ($rootScope, $scope, $transitions, $window, $locale, $timeout, Session, AuthService, Auth, $uibModal, $state, growl, Notification, $interval, Setting, _t, Version, Help, $cookies) {
@@ -24,7 +25,7 @@ Application.Controllers.controller('ApplicationController', ['$rootScope', '$sco
      */
     $scope.setCurrentUser = function (user) {
       if (!angular.isUndefinedOrNull(user)) {
-        $rootScope.currentUser = user;
+        $rootScope.currentUser = normalizeCurrentUser(user);
         Session.create(user);
         getNotifications();
         // Fab-manager's app-version
@@ -55,6 +56,7 @@ Application.Controllers.controller('ApplicationController', ['$rootScope', '$sco
       e.preventDefault();
       return Auth.logout().then(function () {
         Session.destroy();
+        Fablab.sessionTours = [];
         $rootScope.currentUser = null;
         $rootScope.toCheckNotifications = false;
         $scope.notifications = {
@@ -192,7 +194,7 @@ Application.Controllers.controller('ApplicationController', ['$rootScope', '$sco
                 angular.forEach(error.data.errors, function (v, k) {
                   angular.forEach(v, function (err) {
                     $scope.alerts.push({
-                      msg: k + ': ' + err,
+                      msg: k === 'base' ? err : k + ': ' + err,
                       type: 'danger'
                     });
                   });
@@ -240,12 +242,10 @@ Application.Controllers.controller('ApplicationController', ['$rootScope', '$sco
             return $http.put('/users/password.json', { user: $scope.user }).then(function () {
               $uibModalInstance.close();
             }).catch(function (data) {
-              angular.forEach(data.data.errors, function (v, k) {
-                angular.forEach(v, function (err) {
-                  $scope.alerts.push({
-                    msg: k + ': ' + err,
-                    type: 'danger'
-                  });
+              angular.forEach(data.data.errors, function (err) {
+                $scope.alerts.push({
+                  msg: err,
+                  type: 'danger'
                 });
               });
             });

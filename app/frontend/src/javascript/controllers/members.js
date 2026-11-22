@@ -14,6 +14,7 @@
 'use strict';
 
 import { uploadErrorMessages } from '../lib/upload-error-messages';
+import normalizeCurrentUser from '../lib/current-user';
 
 /**
  * Controller used in the members listing page
@@ -201,7 +202,7 @@ Application.Controllers.controller('EditProfileController', ['$scope', '$rootSco
         Auth._currentUser.name = content.name;
         $scope.currentUser = content;
         Auth._currentUser = content;
-        $rootScope.currentUser = content;
+        $rootScope.currentUser = normalizeCurrentUser(content);
         return $state.go('app.public.home');
       }
     };
@@ -302,7 +303,7 @@ Application.Controllers.controller('EditProfileController', ['$scope', '$rootSco
     $scope.onSuccess = function (user) {
       $scope.currentUser = _.cloneDeep(user);
       Auth._currentUser = _.cloneDeep(user);
-      $rootScope.currentUser = _.cloneDeep(user);
+      $rootScope.currentUser = normalizeCurrentUser(_.cloneDeep(user));
       growl.success(_t('app.logged.dashboard.settings.your_profile_has_been_successfully_updated'));
     };
 

@@ -15,7 +15,8 @@ class Trainings::AuthorizationService
               .find_each do |spt|
         NotificationCenter.call type: 'notify_member_training_authorization_expired',
                                 receiver: spt.statistic_profile.user,
-                                attached_object: spt.training
+                                attached_object: spt.training,
+                                meta_data: { authorization_created_at: spt.created_at.iso8601(6) }
         spt.destroy!
       end
     end

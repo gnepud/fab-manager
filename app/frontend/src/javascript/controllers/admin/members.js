@@ -1264,7 +1264,8 @@ Application.Controllers.controller('NewAdminController', ['$state', '$scope', 'A
           return $state.go('app.admin.members');
         }
         , function (error) {
-          growl.error(_t('app.admin.admins_new.failed_to_create_admin') + JSON.stringify(error.data ? error.data : error));
+          const messages = uploadErrorMessages(error.data);
+          growl.error([_t('app.admin.admins_new.failed_to_create_admin'), ...(Array.isArray(messages) ? messages : [])].join(' '));
           console.error(error);
         }
       );
@@ -1344,7 +1345,8 @@ Application.Controllers.controller('NewManagerController', ['$state', '$scope', 
           return $state.go('app.admin.members');
         }
         , function (error) {
-          growl.error(_t('app.admin.manager_new.failed_to_create_manager') + JSON.stringify(error.data ? error.data : error));
+          const messages = uploadErrorMessages(error.data);
+          growl.error([_t('app.admin.manager_new.failed_to_create_manager'), ...(Array.isArray(messages) ? messages : [])].join(' '));
           console.error(error);
         }
       );
