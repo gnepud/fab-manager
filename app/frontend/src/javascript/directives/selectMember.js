@@ -21,6 +21,9 @@ Application.Directives.directive('selectMember', ['Diacritics', 'Member', functi
         const asciiName = Diacritics.remove(nameLookup);
 
         const q = { query: asciiName };
+        if (attributes.booking === 'true') {
+          q.booking = true;
+        }
         if (attributes.subscription) {
           q.subscription = attributes.subscription;
         }

@@ -9,6 +9,7 @@ class API::CheckoutController < API::APIController
   before_action :authenticate_user!
   before_action :current_order
   before_action :ensure_order
+  include API::PaymentCustomerConcern
 
   def payment
     authorize @current_order, policy_class: CheckoutPolicy
