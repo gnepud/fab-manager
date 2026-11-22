@@ -54,6 +54,7 @@ es-MX:
       product_in_use: "Este producto ya ha sido pedido"
       slug_already_used: "ya está en uso"
       birthday_less_than_18_years_ago: "El cumpleaños debe ser menor de 18 años"
+      gateway_authentication_failed: "No se pudo autenticar su tarjeta. Inténtelo de nuevo o utilice otra tarjeta."
   coupon:
     code_format_error: "sólo se permiten letras de mayúsculas, números y guiones"
   apipie:
@@ -76,6 +77,7 @@ es-MX:
     deleted_user: "Usuario eliminado"
   #members management
   members:
+    unable_to_change_group_disabled: "No se permite cambiar de grupo"
     cannot_change_sso_password: "La contraseña no se puede cambiar para las cuentas SSO"
     unable_to_change_the_group_while_a_subscription_is_running: "No se puede cambiar de grupo mientras haya una suscripción en curso"
     please_input_the_authentication_code_sent_to_the_address: "Por favor Ingrese el código de autenticación enviado a la dirección de correo electrónico %{EMAIL}"
