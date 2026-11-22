@@ -50,6 +50,7 @@ zh-CN:
       product_in_use: "此产品已被订购"
       slug_already_used: "已被使用"
       birthday_less_than_18_years_ago: "生日必须在18年前"
+      gateway_authentication_failed: "您的银行卡未能通过身份验证。请重试或使用其他银行卡。"
   coupon:
     code_format_error: "只允许大写字母、数字和破折号"
   apipie:
@@ -72,6 +73,7 @@ zh-CN:
     deleted_user: "已删除用户"
   #members management
   members:
+    unable_to_change_group_disabled: "不允许更改组"
     cannot_change_sso_password: "SSO 账户无法更改本地密码"
     unable_to_change_the_group_while_a_subscription_is_running: "订阅运行时无法更改组"
     please_input_the_authentication_code_sent_to_the_address: "请输入发送到电子邮件地址%{EMAIL}的认证码"
