@@ -5,6 +5,8 @@
 class ProductStockMovement < ApplicationRecord
   belongs_to :product
 
+  attr_accessor :input_quantity
+
   ALL_STOCK_TYPES = %w[internal external].freeze
   enum :stock_type, ALL_STOCK_TYPES.zip(ALL_STOCK_TYPES).to_h
 
@@ -18,4 +20,6 @@ class ProductStockMovement < ApplicationRecord
 
   validates :reason, presence: true
   validates :reason, inclusion: { in: ALL_REASONS }
+  validates :quantity, numericality: { only_integer: true, other_than: 0 }
+  validates :input_quantity, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
 end

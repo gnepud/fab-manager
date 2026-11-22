@@ -12,6 +12,10 @@ it:
       other: '%{count} settimane'
   activerecord:
     attributes:
+      user:
+        reset_password_token: "Link per reimpostare la password"
+        password: "Password"
+        password_confirmation: "Conferma della password"
       product:
         amount: "Il prezzo"
         slug: "URL"
@@ -50,6 +54,7 @@ it:
       product_in_use: "Questo prodotto è già stato ordinato"
       slug_already_used: "e' già in uso"
       birthday_less_than_18_years_ago: "Birthday must be under 18 years ago"
+      gateway_authentication_failed: "Impossibile autenticare la carta. Riprova o utilizza un'altra carta."
   coupon:
     code_format_error: "solo lettere, numeri e trattini sono consentiti"
   apipie:
@@ -72,6 +77,7 @@ it:
     deleted_user: "Utente eliminato"
   #members management
   members:
+    unable_to_change_group_disabled: "Non è consentito cambiare gruppo"
     cannot_change_sso_password: "La password non può essere modificata per gli account SSO"
     unable_to_change_the_group_while_a_subscription_is_running: "Impossibile cambiare il gruppo mentre è in esecuzione una sottoscrizione"
     please_input_the_authentication_code_sent_to_the_address: "Inserisci il codice di autenticazione inviato all'indirizzo email %{EMAIL}"

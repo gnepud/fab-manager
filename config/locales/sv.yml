@@ -12,6 +12,10 @@ sv:
       other: '%{count} veckor'
   activerecord:
     attributes:
+      user:
+        reset_password_token: "Länk för återställning av lösenord"
+        password: "Lösenord"
+        password_confirmation: "Lösenordsbekräftelse"
       product:
         amount: "Priset"
         slug: "URL"
@@ -50,6 +54,7 @@ sv:
       product_in_use: "Denna produkt har redan beställts"
       slug_already_used: "används redan"
       birthday_less_than_18_years_ago: "Födelsedag måste vara mindre än 18 år sedan"
+      gateway_authentication_failed: "Ditt kort kunde inte autentiseras. Försök igen eller använd ett annat kort."
   coupon:
     code_format_error: "bara stora bokstäver, siffror och bindestreck är tillåtna"
   apipie:
@@ -72,6 +77,7 @@ sv:
     deleted_user: "Raderad användare"
   #members management
   members:
+    unable_to_change_group_disabled: "Det är inte tillåtet att byta grupp"
     cannot_change_sso_password: "Lösenordet kan inte ändras för SSO-konton"
     unable_to_change_the_group_while_a_subscription_is_running: "Det går inte att ändra gruppen medan en prenumeration är aktiv"
     please_input_the_authentication_code_sent_to_the_address: "Ange autentiseringskoden som skickats till e-postadressen %{EMAIL}"

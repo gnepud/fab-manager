@@ -12,6 +12,10 @@ fr:
       other: '%{count} semaines'
   activerecord:
     attributes:
+      user:
+        reset_password_token: "Lien de réinitialisation du mot de passe"
+        password: "Mot de passe"
+        password_confirmation: "Confirmation du mot de passe"
       product:
         amount: "Le Prix"
         slug: "URL"
@@ -50,6 +54,7 @@ fr:
       gateway_authentication_failed: "Votre carte n'a pas pu être authentifiée. Veuillez réessayer ou utiliser une autre carte."
       product_in_use: "Ce produit a déjà été commandé"
       invalid_category_hierarchy: "Les catégories sont limitées à deux niveaux : choisissez un parent sans parent et n'attribuez pas de parent à une catégorie ayant des enfants ni à elle-même."
+      invalid_order_state: "Impossible de modifier le statut de cette commande depuis son statut actuel."
       slug_already_used: "est déjà utilisée"
       birthday_less_than_18_years_ago: "L'age doit être inférieur à 18 ans"
   coupon:

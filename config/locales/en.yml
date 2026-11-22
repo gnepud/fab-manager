@@ -12,6 +12,10 @@ en:
       other: '%{count} weeks'
   activerecord:
     attributes:
+      user:
+        reset_password_token: "Password reset link"
+        password: "Password"
+        password_confirmation: "Password confirmation"
       product:
         amount: "The price"
         slug: "URL"
@@ -50,6 +54,7 @@ en:
       gateway_authentication_failed: "Your card could not be authenticated. Please try again or use another card."
       product_in_use: "This product have already been ordered"
       invalid_category_hierarchy: "Categories can have only two levels: choose a root parent, and do not assign a parent to a category with children or to itself."
+      invalid_order_state: "This order cannot be updated from its current state."
       slug_already_used: "is already used"
       birthday_less_than_18_years_ago: "Birthday must be under 18 years ago"
   coupon:
