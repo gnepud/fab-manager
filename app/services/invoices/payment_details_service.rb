@@ -75,7 +75,7 @@ class Invoices::PaymentDetailsService
     def build_avoir_details(invoice, total)
       details = "#{I18n.t('invoices.refund_on_DATE', **{ DATE: I18n.l(invoice.avoir_date.to_date) })} "
       case invoice.payment_method
-      when 'stripe'
+      when 'card', 'stripe'
         details += I18n.t('invoices.by_card_online_payment')
       when 'cheque'
         details += I18n.t('invoices.by_cheque')
