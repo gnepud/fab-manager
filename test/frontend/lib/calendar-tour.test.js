@@ -1,10 +1,14 @@
 import angular from 'angular';
 import moment from 'moment';
 import $ from 'jquery';
+import 'fullcalendar';
+import fs from 'fs';
+import path from 'path';
 
 describe('admin calendar tour', () => {
   let scope;
   let steps;
+  let template;
 
   beforeAll(() => {
     Application.Controllers = angular.module('calendarTourTest', []);
@@ -19,6 +23,10 @@ describe('admin calendar tour', () => {
   });
 
   beforeEach(() => {
+    template = document.createElement('div');
+    template.innerHTML = fs.readFileSync(path.resolve(__dirname, '../../../app/frontend/templates/admin/calendar/calendar.html'), 'utf8');
+    document.body.appendChild(template);
+    $(template.querySelector('[ui-calendar]')).fullCalendar({ defaultView: 'agendaWeek', height: 'auto' });
     const injector = angular.injector(['ng', 'calendarTourTest']);
     scope = injector.get('$rootScope').$new();
     steps = [];
@@ -53,12 +61,22 @@ describe('admin calendar tour', () => {
     scope.setupCalendarTour();
   });
 
-  afterEach(() => scope.$destroy());
+  afterEach(() => {
+    $(template.querySelector('[ui-calendar]')).fullCalendar('destroy');
+    template.remove();
+    scope.$destroy();
+  });
 
-  test('places the full-width agenda tooltip above the calendar, not outside its right edge', () => {
-    expect(steps.find(step => step.stepId === 'agenda')).toMatchObject({
-      selector: '.admin-calendar .fc-view-container',
-      placement: 'top'
+  test('anchors the agenda tooltip below the compact calendar toolbar, outside calendar-local styles', () => {
+    const agenda = steps.find(step => step.stepId === 'agenda');
+    expect(agenda).toMatchObject({
+      selector: '.admin-calendar .fc-toolbar',
+      placement: 'bottom',
+      appendToBody: true
     });
+    const target = template.querySelector(agenda.selector);
+    expect(target).not.toBeNull();
+    expect(target.querySelector('.fc-view-container')).toBeNull();
+    expect(target.querySelector('.fc-today-button')).not.toBeNull();
   });
 });

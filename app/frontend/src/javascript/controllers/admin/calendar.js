@@ -372,12 +372,13 @@ Application.Controllers.controller('AdminCalendarController', ['$scope', '$state
         orphan: true
       });
       uitour.createStep({
-        selector: '.admin-calendar .fc-view-container',
+        selector: '.admin-calendar .fc-toolbar',
         stepId: 'agenda',
         order: 1,
         title: _t('app.admin.tour.calendar.agenda.title'),
         content: _t('app.admin.tour.calendar.agenda.content'),
-        placement: 'top',
+        placement: 'bottom',
+        appendToBody: true,
         popupClass: 'width-350'
       });
       if (AuthService.isAuthorized('admin')) {
