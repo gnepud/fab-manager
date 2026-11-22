@@ -82,6 +82,9 @@ export const ShowOrder: React.FC<ShowOrderProps> = ({ orderId, currentUser, onSu
    */
   const handleActionSuccess = (data: Order, message: string) => {
     setOrder(data);
+    OrderAPI.withdrawalInstructions(data)
+      .then(setWithdrawalInstructions)
+      .catch(onError);
     onSuccess(message);
   };
 

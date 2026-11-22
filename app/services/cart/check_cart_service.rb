@@ -32,7 +32,8 @@ class Cart::CheckCartService
   end
 
   def check_cart_item(item, order)
-    item.valid?(order.order_items)
-    item.errors.to_a
+    cart_item = item.orderable
+    cart_item.valid?(order.order_items.map(&:orderable))
+    cart_item.errors.to_a
   end
 end

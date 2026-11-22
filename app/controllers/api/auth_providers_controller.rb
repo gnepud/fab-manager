@@ -7,6 +7,7 @@ class API::AuthProvidersController < API::APIController
   before_action :set_provider, only: %i[show update destroy]
 
   def index
+    authorize AuthProvider
     @providers = policy_scope(AuthProvider)
   end
 

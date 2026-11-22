@@ -47,7 +47,7 @@ class ProductService
         quantity = ProductStockMovement::OUTGOING_REASONS.include?(movement[:reason]) ? -movement[:quantity].to_i : movement[:quantity].to_i
         remaining_stock[movement[:stock_type].to_sym] += quantity
         {
-          stock_type: movement[:stock_type], reason: movement[:reason], quantity: quantity,
+          stock_type: movement[:stock_type], reason: movement[:reason], quantity: quantity, input_quantity: movement[:quantity],
           remaining_stock: remaining_stock[movement[:stock_type].to_sym], date: Time.current, order_item_id: movement[:order_item_id]
         }
       end || {}
