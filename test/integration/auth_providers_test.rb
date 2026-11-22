@@ -110,6 +110,24 @@ class AuthProvidersTest < ActionDispatch::IntegrationTest
     assert_equal AuthProvider.count, res.length
   end
 
+  test 'member cannot list authentication providers' do
+    login_as(users(:user2), scope: :user)
+
+    get '/api/auth_providers'
+
+    assert_response :forbidden
+  end
+
+  test 'manager cannot list authentication providers' do
+    manager = users(:user5)
+    manager.add_role :manager
+    login_as(manager, scope: :user)
+
+    get '/api/auth_providers'
+
+    assert_response :forbidden
+  end
+
   test 'show an authentication provider' do
     provider = AuthProvider.first
     get "/api/auth_providers/#{provider.id}"
