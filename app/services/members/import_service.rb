@@ -28,7 +28,7 @@ class Members::ImportService
         rescue StandardError => e
           handle_error(log, e)
         end
-      rescue ArgumentError => e
+      rescue ArgumentError, CSV::MalformedCSVError => e
         handle_error(log, e)
       end
       log
@@ -71,6 +71,8 @@ class Members::ImportService
       return unless row['group']
 
       Group.friendly.find(row['group'])&.id
+    rescue ActiveRecord::RecordNotFound
+      raise ActiveRecord::RecordNotFound, "Unknown group: #{row['group']}"
     end
 
     def tag_ids(row)
@@ -179,11 +181,11 @@ class Members::ImportService
       row['password'] = '********' if row['password']
       password
     end
-  end
 
-  def handle_error(log, error)
-    log << error.to_s
-    Rails.logger.error error
-    Rails.logger.debug error.backtrace
+    def handle_error(log, error)
+      log << error.to_s
+      Rails.logger.error error
+      Rails.logger.debug error.backtrace
+    end
   end
 end
