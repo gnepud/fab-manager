@@ -134,37 +134,27 @@ const PacksSummary: React.FC<PacksSummaryProps> = ({ item, itemType, customer, o
 
   // prevent component rendering if no customer selected
   if (_.isEmpty(customer)) return <div />;
-  // prevent component rendering if ths customer have no packs and there are no packs available
-  if (totalHours() === 0 && packs?.length === 0) return <div/>;
-  // render remaining hours and a warning if customer has not any subscription if admin active pack only for subscription option
-  if (totalHours() > 0) {
-    return (
-      <div className="packs-summary">
-        <h3>{t('app.logged.packs_summary.prepaid_hours')}</h3>
-        <div className="content">
-          <span className="remaining-hours">
-            {t('app.logged.packs_summary.remaining_HOURS', { HOURS: totalHours(), ITEM: itemType })}
-            {isPackOnlyForSubscription && !customer.subscribed_plan &&
-              <FabAlert level="warning">
-                {t('app.logged.packs_summary.unable_to_use_pack_for_subsription_is_expired')}
-              </FabAlert>
-            }
-          </span>
-        </div>
-      </div>
-    );
-  }
-  // prevent component rendering buy pack button if customer has not any subscription if admin active pack only for subscription option
-  if (isPackOnlyForSubscription && !customer.subscribed_plan) return <div/>;
+
+  const remainingHours = totalHours();
+  const canBuyPacks = !isPackOnlyForSubscription || Boolean(customer.subscribed_plan);
+
+  if (remainingHours === 0 && packs?.length === 0) return <div/>;
+  if (remainingHours <= 0 && !canBuyPacks) return <div/>;
 
   return (
     <div className="packs-summary">
       <h3>{t('app.logged.packs_summary.prepaid_hours')}</h3>
       <div className="content">
         <span className="remaining-hours">
-          {totalHours() === 0 && t('app.logged.packs_summary.no_hours', { ITEM: itemType })}
+          {remainingHours > 0 && t('app.logged.packs_summary.remaining_HOURS', { HOURS: remainingHours, ITEM: itemType })}
+          {remainingHours === 0 && t('app.logged.packs_summary.no_hours', { ITEM: itemType })}
+          {remainingHours > 0 && !canBuyPacks &&
+            <FabAlert level="warning">
+              {t('app.logged.packs_summary.unable_to_use_pack_for_subsription_is_expired')}
+            </FabAlert>
+          }
         </span>
-        {shouldDisplayButton() && <div className="button-wrapper">
+        {canBuyPacks && shouldDisplayButton() && <div className="button-wrapper">
           <FabButton className="buy-button" onClick={togglePacksModal} icon={<i className="fa fa-shopping-cart"/>}>
             {t('app.logged.packs_summary.buy_a_new_pack')}
           </FabButton>
