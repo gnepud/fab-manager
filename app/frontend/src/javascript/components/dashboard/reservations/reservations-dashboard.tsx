@@ -9,6 +9,7 @@ import { CreditsPanel } from './credits-panel';
 import { useTranslation } from 'react-i18next';
 import { PrepaidPacksPanel } from './prepaid-packs-panel';
 import { User } from '../../../models/user';
+import { Loader } from '../../base/loader';
 
 declare const Application: IApplication;
 
@@ -48,4 +49,12 @@ const ReservationsDashboard: React.FC<ReservationsDashboardProps> = ({ onError, 
   );
 };
 
-Application.Components.component('reservationsDashboard', react2angular(ReservationsDashboard, ['onError', 'user', 'currentUser']));
+const ReservationsDashboardWrapper: React.FC<ReservationsDashboardProps> = (props) => {
+  return (
+    <Loader>
+      <ReservationsDashboard {...props} />
+    </Loader>
+  );
+};
+
+Application.Components.component('reservationsDashboard', react2angular(ReservationsDashboardWrapper, ['onError', 'user', 'currentUser']));
