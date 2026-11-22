@@ -61,6 +61,17 @@ angular.module('application', ['ngCookies', 'ngResource', 'ngSanitize', 'ui.rout
       $translateProvider.preferredLanguage(Fablab.locale);
       // End the tour when the user clicks the forward or back buttons of the browser
       TourConfigProvider.enableNavigationInterceptors();
+      TourConfigProvider.set('appendToBody', true);
+      $provide.decorator('Tether', ['$delegate', function (Tether) {
+        return class ViewportTether extends Tether {
+          constructor (options) {
+            super({
+              ...options,
+              constraints: [...(options.constraints || []), { to: 'window', pin: true }]
+            });
+          }
+        };
+      }]);
 
       $sceDelegateProvider.resourceUrlWhitelist(['self']);
     }]).run(['$rootScope', '$transitions', '$log', 'Auth', 'amMoment', '$state', 'editableOptions',
