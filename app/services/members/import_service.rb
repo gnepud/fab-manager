@@ -43,10 +43,10 @@ class Members::ImportService
     private
 
     def birthdate_errors(row)
-      Date.iso8601(row['birthdate']) if row['birthdate'].present?
-      {}
-    rescue Date::Error
-      { birthdate: ["Invalid birthdate: #{row['birthdate']} (expected YYYY-MM-DD)"] }
+      return {} if row['birthdate'].blank?
+      return {} if StatisticProfile.type_for_attribute('birthday').cast(row['birthdate'])
+
+      { birthdate: ["Invalid birthdate: #{row['birthdate']}"] }
     end
 
     def hashify(row, property, value: row[property], key: property.to_sym)

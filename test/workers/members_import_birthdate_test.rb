@@ -10,8 +10,8 @@ class MembersImportBirthdateTest < ActiveSupport::TestCase
     @member.profile.update!(phone: '0123456789')
   end
 
-  test 'invalid dates fail updates without changing the member' do
-    ['not-a-date', '2023-02-29'].each do |birthdate|
+  ['not-a-date', '2023-02-29'].each do |birthdate|
+    test "#{birthdate} fails updates without changing the member" do
       with_results("id;birthdate;phone\n#{@member.id};#{birthdate};0987654321\n") do |results|
         assert_equal false, results[1][:result]
         assert_equal 'update', results[1][:status]
@@ -19,6 +19,13 @@ class MembersImportBirthdateTest < ActiveSupport::TestCase
         assert_equal Date.new(1980, 1, 1), @member.statistic_profile.reload.birthday
         assert_equal '0123456789', @member.profile.reload.phone
       end
+    end
+  end
+
+  test 'accepts non-ISO dates supported by the birthday attribute' do
+    with_results("id;birthdate\n#{@member.id};31/12/1990\n") do |results|
+      assert_equal true, results[1][:result]
+      assert_equal Date.new(1990, 12, 31), @member.statistic_profile.reload.birthday
     end
   end
 
