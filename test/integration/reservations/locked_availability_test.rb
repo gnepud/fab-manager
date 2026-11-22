@@ -13,7 +13,7 @@ class Reservations::LockedAvailabilityTest < ActionDispatch::IntegrationTest
                                          spaces: [@space], lock: true)
     @slot = @availability.slots.create!(start_at: start_at, end_at: start_at + 1.hour)
     Slots::PlacesCacheService.refresh(@slot)
-    Price.where(priceable: @space).update_all(amount: 0)
+    Price.where(priceable: @space).find_each { |price| price.update!(amount: 0) }
     login_as(@member, scope: :user)
   end
 
