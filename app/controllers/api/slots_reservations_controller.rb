@@ -10,7 +10,7 @@ class API::SlotsReservationsController < API::APIController
 
   def update
     authorize @slot_reservation
-    if @slot_reservation.update(slot_params)
+    if SlotsReservations::MoveService.new(@slot_reservation, current_user).move(slot_params[:slot_id])
       Subscriptions::ExtensionAfterReservation.new(@slot_reservation.reservation).extend_subscription_if_eligible
       render :show, status: :ok, location: @slot_reservation
     else
