@@ -32,7 +32,7 @@ class PayZen::Charge < PayZen::Client
          contrib: contrib,
          customer: customer,
          transactionOptions: {
-           cardOptions: { retry: 0 }
+           cardOptions: { retry: 1 }
          })
   end
 
