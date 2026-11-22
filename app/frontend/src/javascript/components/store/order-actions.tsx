@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import Select from 'react-select';
+import { FabSelect as Select } from '../base/fab-select';
 import { FabModal } from '../base/fab-modal';
 import OrderAPI from '../../api/order';
 import { Order } from '../../models/order';

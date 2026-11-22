@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState } from 'react';
-import Select from 'react-select';
+import { FabSelect as Select } from '../base/fab-select';
 import { PencilSimple } from 'phosphor-react';
 import { useFieldArray, UseFormRegister } from 'react-hook-form';
 import { Control, FormState, UseFormSetValue } from 'react-hook-form/dist/types/form';

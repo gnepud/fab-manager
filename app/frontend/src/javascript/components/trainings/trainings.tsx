@@ -5,7 +5,7 @@ import { react2angular } from 'react2angular';
 import { ErrorBoundary } from '../base/error-boundary';
 import { useTranslation } from 'react-i18next';
 import { FabButton } from '../base/fab-button';
-import Select from 'react-select';
+import { FabSelect as Select } from '../base/fab-select';
 import { SelectOption } from '../../models/select';
 import { CalendarBlank } from 'phosphor-react';
 import { useEffect, useState } from 'react';

@@ -8,6 +8,7 @@ import { FieldPath } from 'react-hook-form/dist/types/path';
 import { FormControlledComponent } from '../../models/form-component';
 import { AbstractFormItem, AbstractFormItemProps } from './abstract-form-item';
 import { useTranslation } from 'react-i18next';
+import { useSelectPlaceholder } from '../base/fab-select';
 import { Controller, FieldPathValue, Path } from 'react-hook-form';
 import { UnpackNestedValue } from 'react-hook-form/dist/types/form';
 
@@ -38,6 +39,7 @@ type selectOption<TOptionValue> = { value: TOptionValue, label: string, select?:
  */
 export const FormMultiSelect = <TFieldValues extends FieldValues, TContext extends object, TOptionValue>({ id, label, tooltip, className, control, placeholder, options, valuesDefault, error, rules, disabled, onChange, formState, warning, loadOptions, creatable, selectKey }: FormSelectProps<TFieldValues, TContext, TOptionValue>) => {
   const { t } = useTranslation('shared');
+  const translatedPlaceholder = useSelectPlaceholder(placeholder);
 
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [allOptions, setAllOptions] = useState<Array<selectOption<TOptionValue>>>(options || []);
@@ -122,7 +124,7 @@ export const FormMultiSelect = <TFieldValues extends FieldValues, TContext exten
                       ref,
                       key: selectKey,
                       value: getCurrentValues(value),
-                      placeholder,
+                      placeholder: translatedPlaceholder,
                       isDisabled,
                       isMulti: true,
                       onChange: val => onChangeCb(val?.map(c => c.value), rhfOnChange),

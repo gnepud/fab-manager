@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { react2angular } from 'react2angular';
-import Select from 'react-select';
+import { FabSelect as Select } from '../../base/fab-select';
 import { useTranslation } from 'react-i18next';
 import StatusAPI from '../../../api/status';
 import { IApplication } from '../../../models/application';

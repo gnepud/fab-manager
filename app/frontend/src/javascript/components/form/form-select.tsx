@@ -8,6 +8,7 @@ import { FieldPathValue, UnpackNestedValue } from 'react-hook-form/dist/types';
 import { FormControlledComponent } from '../../models/form-component';
 import { AbstractFormItem, AbstractFormItemProps } from './abstract-form-item';
 import { SelectOption } from '../../models/select';
+import { useSelectPlaceholder } from '../base/fab-select';
 
 type FormSelectProps<TFieldValues, TContext extends object, TOptionValue, TOptionLabel> = FormControlledComponent<TFieldValues, TContext> & AbstractFormItemProps<TFieldValues> & {
   options: Array<SelectOption<TOptionValue, TOptionLabel>>,
@@ -22,6 +23,7 @@ type FormSelectProps<TFieldValues, TContext extends object, TOptionValue, TOptio
  * This component is a wrapper for react-select to use with react-hook-form
  */
 export const FormSelect = <TFieldValues extends FieldValues, TContext extends object, TOptionValue, TOptionLabel>({ id, label, tooltip, className, control, placeholder, options, valueDefault, error, warning, rules, disabled = false, onChange, clearable = false, formState, creatable = false }: FormSelectProps<TFieldValues, TContext, TOptionValue, TOptionLabel>) => {
+  const translatedPlaceholder = useSelectPlaceholder(placeholder);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
 
   useEffect(() => {
@@ -63,7 +65,7 @@ export const FormSelect = <TFieldValues extends FieldValues, TContext extends ob
                                       onChangeCb(val?.value);
                                       onChange(val?.value);
                                     }}
-                                    placeholder={placeholder}
+                                    placeholder={translatedPlaceholder}
                                     isDisabled={isDisabled}
                                     isClearable={clearable}
                                     options={options}
