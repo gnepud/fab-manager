@@ -35,6 +35,15 @@ class CartItem::EventReservation < CartItem::Reservation
     'Event'
   end
 
+  def valid?(all_items = [])
+    unless total_tickets.positive?
+      errors.add(:reservation, I18n.t('errors.messages.greater_than', count: 0))
+      return false
+    end
+
+    super
+  end
+
   def price
     amount = reservable.amount * normal_tickets
     is_privileged = operator.privileged? && operator.id != customer.id
