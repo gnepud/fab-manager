@@ -54,6 +54,7 @@ interface AbstractPaymentModalProps {
   title?: string,
   preventCgv?: boolean,
   preventScheduleInfo?: boolean,
+  showCloseButton?: boolean,
   modalSize?: ModalSize,
 }
 
@@ -65,7 +66,7 @@ declare const GTM: GoogleTagManager;
  * This component must not be called directly but must be extended for each implemented payment gateway.
  * @see https://reactjs.org/docs/composition-vs-inheritance.html
  */
-export const AbstractPaymentModal: React.FC<AbstractPaymentModalProps> = ({ isOpen, toggleModal, afterSuccess, onError, cart, updateCart, currentUser, schedule, customer, logoFooter, GatewayForm, formId, className, formClassName, title, preventCgv, preventScheduleInfo, modalSize, order }) => {
+export const AbstractPaymentModal: React.FC<AbstractPaymentModalProps> = ({ isOpen, toggleModal, afterSuccess, onError, cart, updateCart, currentUser, schedule, customer, logoFooter, GatewayForm, formId, className, formClassName, title, preventCgv, preventScheduleInfo, showCloseButton, modalSize, order }) => {
   // customer's wallet
   const [wallet, setWallet] = useState<Wallet>(null);
   // server-computed price with all details
@@ -214,7 +215,7 @@ export const AbstractPaymentModal: React.FC<AbstractPaymentModalProps> = ({ isOp
       isOpen={isOpen}
       toggleModal={toggleModal}
       width={modalSize}
-      closeButton={false}
+      closeButton={showCloseButton && !submitState}
       customFooter={logoFooter}
       className={`payment-modal ${className || ''}`}>
       {ready && <div>
