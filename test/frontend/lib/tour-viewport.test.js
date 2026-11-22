@@ -211,9 +211,66 @@ describe('application-wide tour viewport constraints', () => {
     expect(centre()).toBeCloseTo(620);
   });
 
-  test('real tour popups use body attachment and the constrained Tether', async () => {
+  test.each([
+    ['application defaults', {}, true],
+    ['master local attachment', { appendToBody: false }, true],
+    ['disabled auto-scroll', { scrollIntoView: false }, false]
+  ])('shows a below-fold target in content-main: %s', async (_name, options, shouldScroll) => {
     const scope = injector.get('$rootScope').$new();
-    const element = angular.element('<div ui-tour="viewport"></div>');
+    const content = document.createElement('section');
+    content.id = 'content-main';
+    content.style.cssText = 'position: relative; overflow: auto; height: 400px';
+    let scrollTop = 0;
+    Object.defineProperty(content, 'scrollTop', {
+      get: () => scrollTop,
+      set: value => { scrollTop = Math.max(0, Math.min(1200, value)); }
+    });
+    const attachment = options.appendToBody === undefined ? '' : `ui-tour-append-to-body="${options.appendToBody}"`;
+    const element = angular.element(`<div ui-tour="scroll" ui-tour-scroll-into-view="${options.scrollIntoView !== false}" ${attachment} ui-tour-scroll-parent-id="content-main" style="position: relative; overflow: hidden"></div>`);
+    content.appendChild(element[0]);
+    element[0].appendChild(target);
+    document.body.appendChild(content);
+    jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
+      if (this === content) return rect(0, 60, 1280, 400);
+      if (this === element[0]) return rect(0, 60 - scrollTop, 1280, 1600);
+      if (this === target) return rect(1220, 1060 - scrollTop, 40, 30);
+      if (this.classList.contains('ui-tour-popup')) {
+        return rect(0, this.parentNode === document.body ? 0 : 1090 - scrollTop, 414, 200);
+      }
+      return rect(0, 0, 0, 0);
+    });
+    injector.get('$compile')(element)(scope);
+    scope.$digest();
+    const tour = injector.get('uiTourService').getTourByName('scroll');
+    const step = tour.createStep({ selector: '.viewport-target', stepId: 'below-fold', content: 'Below-fold target', placement: 'bottom' });
+    expect(target.getBoundingClientRect().top).toBeGreaterThan(content.getBoundingClientRect().bottom);
+    try {
+      expect(tour.config('scrollIntoView')).toBe(options.scrollIntoView !== false);
+      await tour.start();
+      await waitFor(() => expect(step.tether).toBeDefined());
+      expect(step.popup[0].parentNode).toBe(document.body);
+      expect(step.tether.scrollParents).toContain(content);
+      if (shouldScroll) {
+        await waitFor(() => {
+          expect(target.getBoundingClientRect().top).toBeGreaterThanOrEqual(content.getBoundingClientRect().top);
+          expect(target.getBoundingClientRect().bottom).toBeLessThanOrEqual(content.getBoundingClientRect().bottom);
+          expect(document.activeElement).toBe(step.popup[0]);
+        }, { timeout: 2000, onTimeout: error => error });
+      } else {
+        expect(content.scrollTop).toBe(0);
+      }
+    } finally {
+      await tour.end();
+      if (step.tether) step.tether.destroy();
+      if (step.popup) step.popup.remove();
+      scope.$destroy();
+      content.remove();
+    }
+  });
+
+  test('Tether moves popups out of clipping ancestors after their initial local attachment', async () => {
+    const scope = injector.get('$rootScope').$new();
+    const element = angular.element('<div ui-tour="viewport" style="position: relative; overflow: hidden"></div>');
     document.body.appendChild(element[0]);
     element[0].appendChild(target);
     injector.get('$compile')(element)(scope);
@@ -222,9 +279,9 @@ describe('application-wide tour viewport constraints', () => {
     const step = tour.createStep({ selector: '.viewport-target', stepId: 'target', content: 'Tour content', placement: 'bottom' });
     try {
       await tour.start();
-      expect(injector.get('TourConfig').get('appendToBody')).toBe(true);
-      expect(step.popup[0].parentNode).toBe(document.body);
+      expect(injector.get('TourConfig').get('appendToBody')).toBe(false);
       await waitFor(() => expect(step.tether).toBeDefined());
+      expect(step.popup[0].parentNode).toBe(document.body);
       expect(step.tether.options.constraints).toContainEqual({ to: [0, 0, 1280, 841], pin: true });
     } finally {
       await tour.end();
