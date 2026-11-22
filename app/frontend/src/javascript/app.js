@@ -69,6 +69,29 @@ angular.module('application', ['ngCookies', 'ngResource', 'ngSanitize', 'ui.rout
               ...options,
               constraints: [...(options.constraints || []), { to: 'window', pin: true }]
             });
+            const updateArrow = () => Promise.resolve().then(() => this.positionArrow());
+            this.on('repositioned', updateArrow);
+            this.on('update', updateArrow);
+            this.positionArrow();
+          }
+
+          positionArrow () {
+            const arrow = this.element.querySelector('.arrow');
+            if (!arrow) return;
+            for (const side of ['left', 'right', 'top', 'bottom']) arrow.style[side] = '';
+            if (!this.element.classList.contains(this.options.pinnedClass || this.getClass('pinned'))) return;
+            const horizontal = this.element.classList.contains('top') || this.element.classList.contains('bottom');
+            const element = this.element.getBoundingClientRect();
+            const target = this.target.getBoundingClientRect();
+            const size = horizontal ? this.element.clientWidth : this.element.clientHeight;
+            if (!size) return;
+            const arrowBounds = arrow.getBoundingClientRect();
+            const padding = Math.min((horizontal ? arrowBounds.width : arrowBounds.height) / 2, size / 2);
+            const offset = horizontal
+              ? target.left + target.width / 2 - element.left - this.element.clientLeft
+              : target.top + target.height / 2 - element.top - this.element.clientTop;
+            arrow.style[horizontal ? 'left' : 'top'] = `${Math.max(padding, Math.min(size - padding, offset))}px`;
+            arrow.style[horizontal ? 'right' : 'bottom'] = 'auto';
           }
         };
       }]);

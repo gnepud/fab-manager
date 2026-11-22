@@ -103,6 +103,79 @@ describe('application-wide tour viewport constraints', () => {
     expect(y + 200).toBeLessThanOrEqual(841);
   });
 
+  const arrowFixture = (placement, bounds) => {
+    const horizontal = ['top', 'bottom'].includes(placement);
+    popup.classList.add(placement);
+    const arrow = document.createElement('div');
+    arrow.className = 'arrow';
+    popup.appendChild(arrow);
+    Object.defineProperties(popup, {
+      clientLeft: { value: 1 },
+      clientTop: { value: 1 },
+      clientWidth: { value: 412 },
+      clientHeight: { value: 198 }
+    });
+    jest.spyOn(target, 'getBoundingClientRect').mockImplementation(() => bounds);
+    jest.spyOn(popup, 'getBoundingClientRect').mockImplementation(() => rect(parseFloat(popup.style.left) || 0, parseFloat(popup.style.top) || 0, 414, 200));
+    jest.spyOn(arrow, 'getBoundingClientRect').mockReturnValue(rect(0, 0, horizontal ? 22 : 11, horizontal ? 11 : 22));
+    const positions = {
+      bottom: ['top center', 'bottom center'],
+      top: ['bottom center', 'top center'],
+      left: ['middle right', 'middle left'],
+      right: ['middle left', 'middle right']
+    };
+    const [attachment, targetAttachment] = positions[placement];
+    const Tether = injector.get('Tether');
+    tether = new Tether({ element: popup, target, attachment, targetAttachment, optimizations: { gpu: false } });
+    return {
+      arrow,
+      centre: () => {
+        const offset = parseFloat(arrow.style[horizontal ? 'left' : 'top']);
+        const origin = horizontal ? popup.getBoundingClientRect().left + popup.clientLeft : popup.getBoundingClientRect().top + popup.clientTop;
+        return origin + (Number.isFinite(offset) ? offset : (horizontal ? popup.clientWidth : popup.clientHeight) / 2);
+      }
+    };
+  };
+
+  test.each([
+    ['bottom', rect(1122.5, 190, 40, 30), 1142.5],
+    ['top', rect(1122.5, 400, 40, 30), 1142.5],
+    ['left', rect(600, 800, 40, 30), 815],
+    ['right', rect(600, 800, 40, 30), 815]
+  ])('the pinned %s popup arrow points at the target centre', (placement, bounds, expected) => {
+    const { centre } = arrowFixture(placement, bounds);
+    expect(popup.classList.contains('tether-pinned')).toBe(true);
+    expect(centre()).toBeCloseTo(expected);
+  });
+
+  test.each([
+    ['bottom', rect(-80, 190, 40, 30), 12],
+    ['bottom', rect(1400, 190, 40, 30), 1268],
+    ['right', rect(600, -80, 40, 30), 12],
+    ['right', rect(600, 900, 40, 30), 829]
+  ])('clamps the %s arrow inside the box for target %j', (placement, bounds, expected) => {
+    const { centre } = arrowFixture(placement, bounds);
+    expect(centre()).toBeCloseTo(expected);
+  });
+
+  test('updates the arrow when the target moves but the pinned box stays still, then resets when unpinned', async () => {
+    const bounds = rect(1122.5, 190, 40, 30);
+    const { arrow, centre } = arrowFixture('bottom', bounds);
+    expect(centre()).toBeCloseTo(1142.5);
+    const left = popup.style.left;
+    Object.assign(bounds, rect(1150, 190, 40, 30));
+    tether.position();
+    await Promise.resolve();
+    expect(popup.style.left).toBe(left);
+    expect(centre()).toBeCloseTo(1170);
+    Object.assign(bounds, rect(600, 190, 40, 30));
+    tether.position();
+    await Promise.resolve();
+    expect(popup.classList.contains('tether-pinned')).toBe(false);
+    for (const side of ['left', 'right', 'top', 'bottom']) expect(arrow.style[side]).toBe('');
+    expect(centre()).toBeCloseTo(620);
+  });
+
   test('real tour popups use body attachment and the constrained Tether', async () => {
     const scope = injector.get('$rootScope').$new();
     const element = angular.element('<div ui-tour="viewport"></div>');
