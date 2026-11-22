@@ -52,13 +52,10 @@ describe('application-wide tour viewport constraints', () => {
     style = document.createElement('style');
     style.textContent = sass.compileString(fs.readFileSync(path.resolve(__dirname, '../../../app/frontend/src/stylesheets/modules/tour.scss'), 'utf8')).css;
     document.head.appendChild(style);
-    Object.defineProperty(document.documentElement, 'clientWidth', { configurable: true, value: 1280 });
-    Object.defineProperty(document.documentElement, 'clientHeight', { configurable: true, value: 841 });
-    window.innerWidth = 1280;
-    window.innerHeight = 841;
   });
 
   beforeEach(() => {
+    setViewport(1280, 841, 1280, 841);
     injector = angular.injector(['ng', 'tourViewportTest']);
     popup = document.createElement('div');
     popup.className = 'ui-tour-popup popover';
@@ -78,6 +75,44 @@ describe('application-wide tour viewport constraints', () => {
   afterAll(() => { style?.remove(); });
 
   const rect = (left, top, width, height) => ({ left, top, width, height, right: left + width, bottom: top + height });
+  const setViewport = (width, height, clientWidth, clientHeight, scrollX = 0, scrollY = 0) => {
+    Object.defineProperty(document.documentElement, 'clientWidth', { configurable: true, value: clientWidth });
+    Object.defineProperty(document.documentElement, 'clientHeight', { configurable: true, value: clientHeight });
+    Object.assign(window, { innerWidth: width, innerHeight: height, pageXOffset: scrollX, pageYOffset: scrollY });
+  };
+
+  const gutterFixture = () => {
+    jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
+      if (this === target) return rect(350, 790, 20, 30);
+      if (this === popup) return rect(0, 0, 375, 200);
+      if (this.hasAttribute('data-tether-id')) return rect(-window.pageXOffset, -window.pageYOffset, 0, 0);
+      return rect(0, 0, 0, 0);
+    });
+    const Tether = injector.get('Tether');
+    tether = new Tether({ element: popup, target, attachment: 'top center', targetAttachment: 'bottom center', optimizations: { gpu: false } });
+  };
+
+  test.each([[0, 0], [120, 240]])('excludes scrollbar gutters at page scroll %s,%s', (scrollX, scrollY) => {
+    setViewport(390, 844, 375, 829, scrollX, scrollY);
+    gutterFixture();
+    expect(popup.style.position).toBe('absolute');
+    const left = parseFloat(popup.style.left) - scrollX;
+    const top = parseFloat(popup.style.top) - scrollY;
+    expect(left).toBeCloseTo(0);
+    expect(left + 375).toBeLessThanOrEqual(document.documentElement.clientWidth);
+    expect(top).toBeCloseTo(629);
+    expect(top + 200).toBeLessThanOrEqual(document.documentElement.clientHeight);
+  });
+
+  test('recomputes viewport bounds on reposition after resizing and scrolling', () => {
+    gutterFixture();
+    setViewport(390, 844, 375, 829, 120, 240);
+    tether.position();
+    expect(tether.options.constraints).toContainEqual({ to: [120, 240, 495, 1069], pin: true });
+    setViewport(430, 880, 415, 865, 80, 160);
+    tether.position();
+    expect(tether.options.constraints).toContainEqual({ to: [80, 160, 495, 1025], pin: true });
+  });
 
   test.each([
     ['settings Reservations', 1080, 190, 160, 'top center', 'bottom center', 'shift-left-50'],
@@ -190,7 +225,7 @@ describe('application-wide tour viewport constraints', () => {
       expect(injector.get('TourConfig').get('appendToBody')).toBe(true);
       expect(step.popup[0].parentNode).toBe(document.body);
       await waitFor(() => expect(step.tether).toBeDefined());
-      expect(step.tether.options.constraints).toContainEqual({ to: 'window', pin: true });
+      expect(step.tether.options.constraints).toContainEqual({ to: [0, 0, 1280, 841], pin: true });
     } finally {
       await tour.end();
       if (step.tether) step.tether.destroy();

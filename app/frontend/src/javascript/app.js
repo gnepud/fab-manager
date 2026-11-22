@@ -75,6 +75,14 @@ angular.module('application', ['ngCookies', 'ngResource', 'ngSanitize', 'ui.rout
             this.positionArrow();
           }
 
+          position (flushChanges = true) {
+            const viewport = this.options.constraints[this.options.constraints.length - 1];
+            const { pageXOffset: left, pageYOffset: top } = window;
+            const { clientWidth, clientHeight } = document.documentElement;
+            viewport.to = [left, top, left + clientWidth, top + clientHeight];
+            return super.position(flushChanges);
+          }
+
           positionArrow () {
             const arrow = this.element.querySelector('.arrow');
             if (!arrow) return;
