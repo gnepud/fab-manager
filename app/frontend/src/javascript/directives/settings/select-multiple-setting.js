@@ -7,7 +7,6 @@ Application.Directives.directive('selectMultipleSetting', ['Setting', 'growl', '
         label: '@',
         settings: '=',
         classes: '@',
-        required: '<',
         titleNew: '@',
         descriptionNew: '@',
         beforeAdd: '='
