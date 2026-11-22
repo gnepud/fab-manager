@@ -21,6 +21,7 @@ export interface IFablab {
   d3DateFormat: string,
   uibDateFormat: string,
   maxSupportingDocumentFileSize: number,
+  sessionTourMode: boolean,
   sessionTours: Array<string>,
   translations: {
     app: {

@@ -24,6 +24,7 @@ Application.Controllers.controller('ApplicationController', ['$rootScope', '$sco
      */
     $scope.setCurrentUser = function (user) {
       if (!angular.isUndefinedOrNull(user)) {
+        if (Fablab.sessionTourMode) user.profile_attributes.tours = Fablab.sessionTours;
         $rootScope.currentUser = user;
         Session.create(user);
         getNotifications();

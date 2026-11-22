@@ -607,6 +607,7 @@ Application.Controllers.controller('SettingsController', ['$scope', '$rootScope'
 
       // use the tours list, based on the selected value
       $scope.$watch('allSettings.feature_tour_display', function (newValue, oldValue, scope) {
+        Fablab.sessionTourMode = newValue === 'session';
         if (newValue === oldValue) return;
 
         if (newValue === 'session') {
