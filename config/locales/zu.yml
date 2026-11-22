@@ -566,6 +566,7 @@ zu:
   order:
     please_contact_FABLAB: "crwdns31721:0crwdne31721:0"
   cart_item_validation:
+    locked: "This availability is locked"
     overlapping: "You already have a reservation that overlaps this slot"
     slot: "crwdns36267:0crwdne36267:0"
     availability: "crwdns36269:0crwdne36269:0"

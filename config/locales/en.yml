@@ -568,6 +568,7 @@ en:
   order:
     please_contact_FABLAB: "Please contact us for withdrawal instructions."
   cart_item_validation:
+    locked: "This availability is locked"
     overlapping: "You already have a reservation that overlaps this slot"
     slot: "The slot doesn't exist"
     availability: "The availaility doesn't exist"

@@ -566,6 +566,7 @@ zh-CN:
   order:
     please_contact_FABLAB: "请联系我们获取退款说明。"
   cart_item_validation:
+    locked: "该可预约时段已锁定"
     overlapping: "您已有与此时段重叠的预约"
     slot: "该时段不存在"
     availability: "该可用性不存在"
