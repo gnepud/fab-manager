@@ -2,6 +2,8 @@
 
 # A generic reservation added to the shopping cart
 class CartItem::Reservation < CartItem::BaseItem
+  include ReservationOverlapConcern
+
   self.table_name = 'cart_item_reservations'
 
   MINUTES_PER_HOUR = 60.0
@@ -73,6 +75,11 @@ class CartItem::Reservation < CartItem::BaseItem
 
     cart_item_reservation_slots.each do |sr|
       return false unless validate_slot_reservation(sr, pending_subscription, errors)
+    end
+
+    if overlapping_reservations?(all_items)
+      errors.add(:slot, I18n.t('cart_item_validation.overlapping'))
+      return false
     end
 
     true

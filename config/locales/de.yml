@@ -560,6 +560,7 @@ de:
   order:
     please_contact_FABLAB: "Bitte setzen Sie sich mit uns in Verbindung, um Anweisungen für den Widerruf zu erhalten."
   cart_item_validation:
+    overlapping: "Sie haben bereits eine Buchung, die sich mit diesem Zeitfenster überschneidet"
     slot: "Der Slot existiert nicht"
     availability: "Die Verfügbarkeit existiert nicht"
     full: "Der Slot ist bereits vollständig reserviert"
