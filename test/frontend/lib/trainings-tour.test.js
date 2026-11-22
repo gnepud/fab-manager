@@ -80,7 +80,7 @@ describe('admin trainings tour', () => {
     expect(scope.tabs.active).toBe(Number(monitoringTab.getAttribute('index')));
   });
 
-  test('Previous from tracking preserves the filter element used by the tour tether', async () => {
+  test('Previous preserves the tour target while remounting and refreshing the trainings list', async () => {
     cleanup();
     template.innerHTML = fs.readFileSync(path.resolve(__dirname, '../../../app/frontend/templates/admin/trainings/index.html'), 'utf8');
     await act(async () => {
@@ -89,6 +89,8 @@ describe('admin trainings tour', () => {
     });
     const filter = steps.find(step => step.stepId === 'filter');
     const target = document.querySelector(filter.selector);
+    const originalFilter = document.querySelector('.trainings-monitoring .filter');
+    const originalRequests = TrainingAPI.index.mock.calls.length;
     expect(target).not.toBeNull();
 
     await act(async () => {
@@ -96,6 +98,8 @@ describe('admin trainings tour', () => {
       scope.$digest();
     });
     expect(scope.tabs.active).toBe(2);
+    expect(originalFilter.isConnected).toBe(false);
+    expect(target.isConnected).toBe(true);
 
     await act(async () => {
       handlers.stepChanged(filter);
@@ -105,5 +109,7 @@ describe('admin trainings tour', () => {
     expect(document.querySelector(filter.selector)).toBe(target);
     expect(target.isConnected).toBe(true);
     expect(target.closest('.tab-pane')).toBe(template.querySelector('.tab-pane.active'));
+    expect(document.querySelector('.trainings-monitoring .filter')).not.toBe(originalFilter);
+    expect(TrainingAPI.index.mock.calls.length).toBeGreaterThan(originalRequests);
   });
 });

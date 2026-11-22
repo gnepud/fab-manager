@@ -29,7 +29,9 @@
           <trainings-settings on-error="onError" on-success="onSuccess" ui-router="uiRouter"></trainings-settings>
         </uib-tab>
         <uib-tab heading="{{ 'app.admin.trainings.all_trainings' | translate }}" index="0" class="manage-trainings">
-          <trainings on-error="onError" on-success="onSuccess"></trainings>
+          <div class="trainings-list-tour">
+            <trainings on-error="onError" on-success="onSuccess" ng-if="tabs.active == 0"></trainings>
+          </div>
         </uib-tab>
 
         <uib-tab heading="{{ 'app.admin.trainings.trainings_monitoring' | translate }}" class="post-tracking" index="2">

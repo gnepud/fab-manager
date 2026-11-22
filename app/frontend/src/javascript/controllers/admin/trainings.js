@@ -400,12 +400,12 @@ Application.Controllers.controller('TrainingsAdminController', ['$scope', '$stat
         placement: 'bottom'
       });
       uitour.createStep({
-        selector: '.trainings-monitoring .filter',
+        selector: '.trainings-monitoring .trainings-list-tour',
         stepId: 'filter',
         order: 2,
         title: _t('app.admin.tour.trainings.filter.title'),
         content: _t('app.admin.tour.trainings.filter.content'),
-        placement: 'left'
+        placement: 'top'
       });
       uitour.createStep({
         selector: '.trainings-monitoring .post-tracking',
