@@ -65,15 +65,18 @@ class Accounting::VatExportService
     rows
   end
 
+  # Credit notes (Avoir) give back the VAT collected on the refunded items, so their VAT is deducted
   def compute_vat_totals(invoices)
-    vat_total = []
+    vat_totals = Hash.new(0)
     service = VatHistoryService.new
     invoices.each do |i|
       Rails.logger.info "processing invoice #{i.id}..." unless Rails.env.test?
-      vat_total.push service.invoice_vat(i)
+      sign = i.is_a?(Avoir) ? -1 : 1
+      service.invoice_vat(i).each_value do |group|
+        vat_totals[group[:vat_rate]] += sign * group[:total_vat]
+      end
     end
-
-    vat_total.map(&:values).flatten.group_by { |tot| tot[:vat_rate] }.transform_values { |v| v.pluck(:total_vat).reduce(:+) }
+    vat_totals
   end
 
   # Generate a row of the export, filling the configured columns with the provided values
