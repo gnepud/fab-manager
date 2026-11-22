@@ -82,9 +82,12 @@
           <fab-user-avatar ng-model="project.author.user_avatar" avatar-class="thumb-50"></fab-user-avatar>
         </div>
         <div>
-          <a ng-show="project.author_id" class="text-sm font-sbold project-author" ui-sref="app.logged.members_show({id: project.author.slug})">
+          <a ng-if="project.author_id && project.author.can_view_profile" class="text-sm font-sbold project-author" ui-sref="app.logged.members_show({id: project.author.slug})">
             <i> {{ 'app.public.projects_show.by_name' | translate:{NAME:project.author.first_name} }}</i>
           </a>
+          <span ng-if="project.author_id && !project.author.can_view_profile" class="text-sm font-sbold project-author">
+            <i> {{ 'app.public.projects_show.by_name' | translate:{NAME:project.author.first_name} }}</i>
+          </span>
           <span ng-hide="project.author_id" class="text-sm font-sbold text-gray" translate>{{ 'app.public.projects_show.deleted_user' }}</span>
         </div>
         <small class="text-xs m-b"><i>{{ 'app.public.projects_show.posted_on_' | translate }} {{project.created_at | amDateFormat: 'LL'}}</i></small>
@@ -146,7 +149,7 @@
         </div>
 
           <ul class="widget-content list-group list-group-lg no-bg auto">
-            <li class="list-group-item no-b clearfix block-link" ng-repeat="collaborator in project.project_users" ui-sref="app.logged.members_show({id: collaborator.slug})">
+            <li class="list-group-item no-b clearfix block-link" ng-repeat-start="collaborator in project.project_users" ng-if="collaborator.can_view_profile" ui-sref="app.logged.members_show({id: collaborator.slug})">
               <span class="pull-left thumb-sm avatar m-r">
                 <fab-user-avatar ng-model="collaborator.user_avatar" avatar-class="thumb-38"></fab-user-avatar>
 
@@ -157,6 +160,17 @@
                 <small class="text-muted clear text-ellipsis text-c">{{collaborator.username}}</small>
               </span>
 
+            </li>
+            <li class="list-group-item no-b clearfix" ng-repeat-end ng-if="!collaborator.can_view_profile">
+              <span class="pull-left thumb-sm avatar m-r">
+                <fab-user-avatar ng-model="collaborator.user_avatar" avatar-class="thumb-38"></fab-user-avatar>
+
+                <i class="on b-white bottom" ng-if="collaborator.is_valid"></i>
+                <i class="off b-white bottom" ng-if="!collaborator.is_valid"></i>
+              </span>
+              <span class="clear"><span>{{collaborator.full_name}}</span>
+                <small class="text-muted clear text-ellipsis text-c">{{collaborator.username}}</small>
+              </span>
             </li>
           </ul>
       </section>

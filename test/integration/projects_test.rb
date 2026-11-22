@@ -15,6 +15,58 @@ class ProjectsTest < ActionDispatch::IntegrationTest
     assert_equal "text/markdown", response.content_type
   end
 
+  test 'project profile links follow member show authorization' do
+    project = projects(:project_1)
+    author = project.author.user
+    collaborator = User.find(2)
+    viewer = User.find(3)
+    project.project_users.create!(user: collaborator, is_valid: true)
+
+    [false, true].each do |public_profile|
+      author.update!(is_allow_contact: public_profile)
+      collaborator.update!(is_allow_contact: public_profile)
+
+      [viewer, author, collaborator, @admin].each do |user|
+        login_as(user, scope: :user)
+        get "/api/projects/#{project.slug}"
+        assert_response :success
+        body = json_response(response.body)
+        assert_equal UserPolicy.new(user, author).show?, body[:author][:can_view_profile]
+        assert_equal UserPolicy.new(user, collaborator).show?, body[:project_users].first[:can_view_profile]
+      end
+    end
+
+    viewer.roles << Role.find_or_create_by!(name: 'manager')
+    author.update!(is_allow_contact: false)
+    collaborator.update!(is_allow_contact: false)
+    login_as(viewer, scope: :user)
+    get "/api/projects/#{project.slug}"
+    assert_response :success
+    body = json_response(response.body)
+    assert_equal true, body[:author][:can_view_profile]
+    assert_equal true, body[:project_users].first[:can_view_profile]
+
+    logout
+    get "/api/projects/#{project.slug}"
+    assert_response :success
+    body = json_response(response.body)
+    assert_equal false, body[:author][:can_view_profile]
+    assert_equal false, body[:project_users].first[:can_view_profile]
+  end
+
+  test 'project without an author account or collaborators has no profile links' do
+    project = projects(:project_1)
+    project.author.update_column(:user_id, nil)
+
+    get "/api/projects/#{project.slug}"
+
+    assert_response :success
+    body = json_response(response.body)
+    assert_nil body[:author_id]
+    assert_equal false, body[:author][:can_view_profile]
+    assert_empty body[:project_users]
+  end
+
   test 'author can update and delete a project by its slug' do
     project = Project.create!(
       name: 'Slug Addressed Project',
