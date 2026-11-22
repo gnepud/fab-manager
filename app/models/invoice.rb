@@ -93,6 +93,7 @@ class Invoice < PaymentDocument
     end
     # handle coupon
     avoir.total = CouponService.apply_on_refund(avoir.total, avoir.coupon, paid_items, refund_items)
+    avoir.wallet_amount = avoir.payment_method == 'wallet' ? avoir.total : 0
     avoir
   end
 
