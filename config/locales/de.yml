@@ -77,6 +77,7 @@ de:
     deleted_user: "Gelöschte Benutzer"
   #members management
   members:
+    deletion_blocked: "Dieses Konto kann nicht gelöscht werden: Es hat zukünftige Buchungen oder ein aktives Abonnement."
     unable_to_change_group_disabled: "Ein Gruppenwechsel ist nicht erlaubt"
     cannot_change_sso_password: "Das Passwort kann für SSO-Konten nicht geändert werden"
     unable_to_change_the_group_while_a_subscription_is_running: "Die Gruppe kann während eines Abonnements nicht geändert werden"

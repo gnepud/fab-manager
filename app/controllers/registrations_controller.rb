@@ -2,6 +2,25 @@
 
 # Handling a new user registration through the sign-up modal
 class RegistrationsController < Devise::RegistrationsController
+  def destroy
+    unless resource.destroy
+      respond_to do |format|
+        format.json { render json: resource.errors.full_messages, status: :unprocessable_entity }
+        format.html do
+          redirect_to root_path(anchor: '!/dashboard/settings'), alert: resource.errors.full_messages.to_sentence, status: :see_other
+        end
+      end
+      return
+    end
+
+    Devise.sign_out_all_scopes ? sign_out : sign_out(resource_name)
+    set_flash_message! :notice, :destroyed
+    yield resource if block_given?
+    respond_with_navigational(resource) do
+      redirect_to after_sign_out_path_for(resource_name), status: Devise.responder.redirect_status
+    end
+  end
+
   # POST /users.json
   def create
     # Is public registration allowed?
