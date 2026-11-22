@@ -566,8 +566,7 @@ Application.Controllers.controller('AdminMembersController', ['$scope', '$sce', 
           order: 10,
           title: _t('app.admin.tour.members.sso.title'),
           content: _t('app.admin.tour.members.sso.content'),
-          placement: 'bottom',
-          popupClass: 'shift-left-50'
+          placement: 'bottom-right'
         });
       }
       uitour.createStep({
