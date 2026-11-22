@@ -59,10 +59,10 @@ class WalletService
     avoir.subscription_to_expire = false
     avoir.invoicing_profile_id = wallet_transaction.wallet.user.invoicing_profile.id
     avoir.statistic_profile_id = wallet_transaction.wallet.user.statistic_profile.id
-    avoir.total = wallet_transaction.amount * 100.0
+    avoir.total = wallet_transaction.read_attribute(:amount)
 
     ii = InvoiceItem.new
-    ii.amount = wallet_transaction.amount * 100.0
+    ii.amount = wallet_transaction.read_attribute(:amount)
     ii.description = I18n.t('invoices.wallet_credit')
     ii.object = wallet_transaction
     ii.main = true

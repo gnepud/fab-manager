@@ -14,14 +14,11 @@ module Statistics::Concerns::ComputeConcern
         next if ii.object_type == 'Subscription'
 
         ca = if invoice.is_a?(Avoir)
-               ca - ii.amount.to_i
+               ca - ii.amount_after_coupon
              else
-               ca + ii.amount.to_i
+               ca + ii.amount_after_coupon
              end
       end
-      # subtract coupon discount from invoices and refunds
-      cs = CouponService.new
-      ca = cs.ventilate(cs.invoice_total_no_coupon(invoice), ca, invoice.coupon) unless invoice.coupon_id.nil?
       # divide the result by 100 to convert from centimes to monetary unit
       ca.zero? ? ca : ca / 100.0
     end
@@ -29,11 +26,8 @@ module Statistics::Concerns::ComputeConcern
     def calcul_avoir_ca(invoice)
       ca = 0
       invoice.invoice_items.each do |ii|
-        ca -= ii.amount.to_i
+        ca -= ii.amount_after_coupon
       end
-      # subtract coupon discount from the refund
-      cs = CouponService.new
-      ca = cs.ventilate(cs.invoice_total_no_coupon(invoice), ca, invoice.coupon) unless invoice.coupon_id.nil?
       ca.zero? ? ca : ca / 100.0
     end
   end

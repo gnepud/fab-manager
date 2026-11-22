@@ -34,7 +34,7 @@ class Trainings::AutoCancelService
                                   meta_data: { auto_refund: auto_refund && !sr.offered? }
 
           SlotsReservationsService.cancel(sr)
-          refund_after_cancel(sr.reservation) if auto_refund && !sr.offered?
+          refund_after_cancel(sr) if auto_refund && !sr.offered?
         end
       end
     end
@@ -72,9 +72,11 @@ class Trainings::AutoCancelService
 
     private
 
-    # @param reservation [Reservation]
-    def refund_after_cancel(reservation)
-      invoice_item = reservation.invoice_items.joins(:invoice).where(invoices: { type: nil }).first
+    # @param slot_reservation [SlotsReservation]
+    def refund_after_cancel(slot_reservation)
+      reservation = slot_reservation.reservation
+      position = reservation.slots_reservations.order(:id).pluck(:id).index(slot_reservation.id)
+      invoice_item = reservation.invoice_items.joins(:invoice).where(invoices: { type: nil }).order(:id)[position]
       amount = (invoice_item&.amount_after_coupon || 0) / 100.00
       return if amount.zero?
 

@@ -54,4 +54,33 @@ class CouponServiceTest < ActiveSupport::TestCase
     total = CouponService.new.ventilate(1000, 500, coupon)
     assert_equal 350, total
   end
+
+  test 'invoice ventilation reconciles fractional percentage discounts with the stored total' do
+    invoice = Invoice.new(total: 2, coupon: coupons(:two))
+    3.times { invoice.invoice_items.build(amount: 1) }
+
+    assert_equal [1, 0, 1], CouponService.new.ventilate_invoice(invoice).values
+  end
+
+  test 'invoice ventilation leaves undiscounted amounts unchanged' do
+    invoice = Invoice.new(total: 4000)
+    [2500, 0, 1500].each { |amount| invoice.invoice_items.build(amount: amount) }
+
+    assert_equal [2500, 0, 1500], CouponService.new.ventilate_invoice(invoice).values
+  end
+
+  test 'invoice ventilation handles empty and zero-valued invoices' do
+    invoice = Invoice.new(total: 0, coupon: coupons(:two))
+    assert_empty CouponService.new.ventilate_invoice(invoice)
+
+    invoice.invoice_items.build(amount: 0)
+    assert_equal [0], CouponService.new.ventilate_invoice(invoice).values
+  end
+
+  test 'invoice ventilation handles a fully discounted invoice' do
+    invoice = Invoice.new(total: 0, coupon: coupons(:internal))
+    [2500, 1500].each { |amount| invoice.invoice_items.build(amount: amount) }
+
+    assert_equal [0, 0], CouponService.new.ventilate_invoice(invoice).values
+  end
 end
