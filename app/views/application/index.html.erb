@@ -69,6 +69,7 @@
       Fablab.maxSupportingDocumentFileSize = <%= ENV.fetch('MAX_SUPPORTING_DOCUMENT_FILE_SIZE' ,5.megabytes.to_i) %>;
 
       // feature tour (used when feature_tour_display = session)
+      Fablab.sessionTourMode = <%= Setting.get('feature_tour_display') == 'session' %>;
       Fablab.sessionTours = [];
   </script>
 

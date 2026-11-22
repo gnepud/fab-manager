@@ -1,11 +1,12 @@
 'use strict';
 
-Application.Services.factory('Help', ['$rootScope', '$uibModal', '$state', 'AuthService',
-  function ($rootScope, $uibModal, $state, AuthService) {
+Application.Services.factory('Help', ['$rootScope', '$uibModal', '$state', 'AuthService', 'uiTourService',
+  function ($rootScope, $uibModal, $state, AuthService, uiTourService) {
     const TOURS = {
       'app.public.home': 'welcome',
       'app.public.machines_list': 'machines',
       'app.public.spaces_list': 'spaces',
+      'app.admin.machines_list': 'machines',
       'app.admin.trainings': 'trainings',
       'app.admin.calendar': 'calendar',
       'app.admin.members': 'members',
@@ -27,7 +28,7 @@ Application.Services.factory('Help', ['$rootScope', '$uibModal', '$state', 'Auth
         const tourName = TOURS[$state.current.name];
 
         // if no tour, just open the guide
-        if (tourName === undefined) {
+        if (tourName === undefined || !uiTourService.getTourByName(tourName)) {
           return window.open('http://guide-fr.fab.mn', '_blank');
         }
 

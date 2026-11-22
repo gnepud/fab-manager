@@ -13,6 +13,7 @@
 'use strict';
 
 import { uploadErrorMessages } from '../../lib/upload-error-messages';
+import normalizeCurrentUser from '../../lib/current-user';
 
 Application.Controllers.controller('SettingsController', ['$scope', '$rootScope', '$filter', '$uibModal', 'dialogs', 'Setting', 'growl', 'settingsPromise', 'privacyDraftsPromise', 'cgvFile', 'cguFile', 'logoFile', 'logoBlackFile', 'faviconFile', 'profileImageFile', 'reservationContextsPromise', 'reservationContextApplicableOnValuesPromise', 'CSRF', '_t', 'Member', 'uiTourService', 'ReservationContext',
   function ($scope, $rootScope, $filter, $uibModal, dialogs, Setting, growl, settingsPromise, privacyDraftsPromise, cgvFile, cguFile, logoFile, logoBlackFile, faviconFile, profileImageFile, reservationContextsPromise, reservationContextApplicableOnValuesPromise, CSRF, _t, Member, uiTourService, ReservationContext) {
@@ -607,10 +608,11 @@ Application.Controllers.controller('SettingsController', ['$scope', '$rootScope'
 
       // use the tours list, based on the selected value
       $scope.$watch('allSettings.feature_tour_display', function (newValue, oldValue, scope) {
+        Fablab.sessionTourMode = newValue === 'session';
         if (newValue === oldValue) return;
 
         if (newValue === 'session') {
-          $scope.currentUser.profile_attributes.tours = Fablab.sessionTours;
+          normalizeCurrentUser($scope.currentUser);
         } else if (newValue === 'once') {
           Member.get({ id: $scope.currentUser.id }, function (user) {
             $scope.currentUser.profile_attributes.tours = user.profile_attributes.tours;
