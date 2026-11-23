@@ -368,9 +368,9 @@ Application.Controllers.controller('AdminEventsController', ['$scope', '$state',
       });
       // on step change, change the active tab if needed
       uitour.on('stepChanged', function (nextStep) {
-        if (nextStep.stepId === 'list' || nextStep.stepId === 'filter') { $scope.tabs.active = 0; }
-        if (nextStep.stepId === 'categories' || nextStep.stepId === 'ages') { $scope.tabs.active = 1; }
-        if (nextStep.stepId === 'prices') { $scope.tabs.active = 2; }
+        if (nextStep.stepId === 'list' || nextStep.stepId === 'filter') { $scope.tabs.active = 1; }
+        if (nextStep.stepId === 'categories' || nextStep.stepId === 'themes' || nextStep.stepId === 'ages') { $scope.tabs.active = 2; }
+        if (nextStep.stepId === 'prices') { $scope.tabs.active = 3; }
       });
       // on tour end, save the status in database
       uitour.on('ended', function () {
