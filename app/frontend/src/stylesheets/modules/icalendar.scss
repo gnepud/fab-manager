@@ -22,3 +22,8 @@
   border-left: 3px solid;
   border-radius: 3px;
 }
+
+// Keep FullCalendar's timed-event tint from changing the contrast of imported events.
+.fc-event.external-calendar-event > .fc-bg {
+  display: none;
+}

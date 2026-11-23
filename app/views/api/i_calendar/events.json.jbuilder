@@ -6,6 +6,7 @@ background = icalendar_event_background_override(calendar) if calendar
 
 json.array!(events) do |event|
   json.id event.uid
+  json.className 'external-calendar-event'
   json.title calendar.text_hidden ? '' : event.summary
   json.start event.dtstart.iso8601
   json.end event.dtend.iso8601

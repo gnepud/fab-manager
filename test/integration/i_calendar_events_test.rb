@@ -41,6 +41,15 @@ class ICalendarEventsTest < ActionDispatch::IntegrationTest
     assert_equal 'black', public_event[:backgroundColor]
   end
 
+  test 'marks imported events to render their fill without the timed event overlay' do
+    @calendar.update!(color: '#fff', text_color: '#777')
+
+    event = public_event
+
+    assert_equal 'black', event[:backgroundColor]
+    assert_equal 'external-calendar-event', event[:className]
+  end
+
   private
 
   def public_event
