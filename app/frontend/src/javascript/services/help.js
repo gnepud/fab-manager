@@ -26,13 +26,16 @@ Application.Services.factory('Help', ['$rootScope', '$uibModal', '$state', 'Auth
         e.preventDefault();
         // retrieve the tour name, based on the current location
         const tourName = TOURS[$state.current.name];
+        const tour = tourName === undefined ? undefined : uiTourService.getTourByName(tourName);
 
         // if no tour, just open the guide
-        if (tourName === undefined || !uiTourService.getTourByName(tourName)) {
+        if (!tour) {
           return window.open('http://guide-fr.fab.mn', '_blank');
         }
 
-        $uibModal.open({
+        if (tour.getStatus() === tour.Status.ON) return;
+
+        const modal = $uibModal.open({
           animation: true,
           templateUrl: '/shared/help_modal.html',
           resolve: {
@@ -42,7 +45,7 @@ Application.Services.factory('Help', ['$rootScope', '$uibModal', '$state', 'Auth
           // start the tour and hide the modal
             $scope.onTour = function () {
               const tour = uiTourService.getTourByName(tourName);
-              if (tour) { tour.start(); }
+              if (tour && tour.getStatus() !== tour.Status.ON) { tour.start(); }
 
               $uibModalInstance.close('tour');
             };
@@ -53,6 +56,17 @@ Application.Services.factory('Help', ['$rootScope', '$uibModal', '$state', 'Auth
             };
           }]
         });
+
+        const closeForActiveTour = () => { modal.close('tour-active'); };
+        const removeTourListener = () => { tour.off('started', closeForActiveTour); };
+        modal.opened.then(() => {
+          if (tour.getStatus() === tour.Status.ON) {
+            closeForActiveTour();
+          } else {
+            tour.on('started', closeForActiveTour);
+          }
+        }, angular.noop);
+        modal.result.then(removeTourListener, removeTourListener);
       }
     };
   }]);

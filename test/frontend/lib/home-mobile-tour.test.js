@@ -49,6 +49,15 @@ describe('Welcome tour visibility', () => {
       .value('$state', { current: { name: 'app.public.home' } })
       .value('AuthService', { isAuthorized: authorized });
     injector = angular.injector(['ng', 'homeMobileTourDependencies', 'homeMobileTourTest']);
+    const $q = injector.get('$q');
+    modal.open.mockImplementation(() => {
+      const result = $q.defer();
+      return {
+        opened: $q.resolve(true),
+        result: result.promise,
+        close: jest.fn(value => result.resolve(value))
+      };
+    });
     scope = injector.get('$rootScope').$new();
     scope.$root.modules = { publicAgenda: true, machines: true, trainings: true, spaces: true, plans: true };
     scope.currentUser = { id: 1, role: 'admin', profile_attributes: { tours: [] } };
@@ -107,7 +116,7 @@ describe('Welcome tour visibility', () => {
     const modalScope = {};
     injector.invoke(options.controller, null, {
       $scope: modalScope,
-      $uibModalInstance: { close: jest.fn() },
+      $uibModalInstance: modal.open.mock.results[0].value,
       tourName: options.resolve.tourName()
     });
     modalScope.onTour();
