@@ -5,5 +5,5 @@ json.array!(@events) do |event|
   json.title event.i_calendar.text_hidden ? '' : event.summary
   json.start event.dtstart.iso8601
   json.end event.dtend.iso8601
-  json.backgroundColor 'white'
+  json.backgroundColor event.i_calendar.color.presence || 'white'
 end
