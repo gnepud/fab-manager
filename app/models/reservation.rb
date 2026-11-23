@@ -83,6 +83,11 @@ class Reservation < ApplicationRecord
                  .first
   end
 
+  # Slots of this reservation that were not canceled, ordered by start date
+  def active_slots
+    slots.where(slots_reservations: { canceled_at: nil }).order(:start_at)
+  end
+
   # Group all slots related to this reservation by dates and by continuous time ranges
   def grouped_slots
     slots_by_date = slots.group_by { |slot| slot[:start_at].to_date }.transform_values { |slots| slots.sort_by { |slot| slot[:start_at] } }

@@ -55,6 +55,14 @@ class NotificationsMailer < BaseMailer
          template_name: 'notify_member_create_reservation')
   end
 
+  def notify_member_reservation_reminder
+    return if @attached_object.active_slots.empty?
+
+    mail(to: @recipient.email,
+         subject: t('notifications_mailer.notify_member_reservation_reminder.subject'),
+         template_name: 'notify_member_reservation_reminder')
+  end
+
   private
 
   def deliver_notification
