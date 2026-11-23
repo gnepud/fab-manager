@@ -3,12 +3,13 @@
 # helpers for managing slots reservations (reservations for a time unit)
 class SlotsReservationsService
   class << self
-    def cancel(slot_reservation)
+    def cancel(slot_reservation, canceled_by: nil)
       canceled = false
       slot_reservation.with_lock do
         next if slot_reservation.canceled_at.present?
 
         # first we mark ths slot reservation as cancelled in DB, to free a ticket
+        slot_reservation.canceled_by = canceled_by
         slot_reservation.update!(canceled_at: Time.current)
         canceled = true
       end

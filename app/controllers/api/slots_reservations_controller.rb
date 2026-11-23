@@ -20,7 +20,7 @@ class API::SlotsReservationsController < API::APIController
 
   def cancel
     authorize @slot_reservation
-    if SlotsReservationsService.cancel(@slot_reservation)
+    if SlotsReservationsService.cancel(@slot_reservation, canceled_by: current_user)
       # renders cancel.json.jbuilder
     else
       render json: { error: 'Reservation already canceled' }, status: :unprocessable_entity

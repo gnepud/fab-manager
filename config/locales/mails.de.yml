@@ -198,6 +198,8 @@ de:
       subject: "Eine Reservierung wurde storniert"
       body:
         member_cancelled: "Benutzer %{NAME} hat seine Reservierung storniert"
+        reservation_cancelled_by: "%{ACTOR} hat die Reservierung von %{NAME} storniert."
+        reservation_cancelled: "Die Reservierung von %{NAME} wurde storniert."
         item_details: "%{START} - %{END}, in Bezug auf %{RESERVABLE}"
         generate_refund: "Vergessen Sie nicht, eine Gutschrift oder eine Rückerstattung für diese Stornierung zu buchen."
     notify_admin_when_user_is_imported:

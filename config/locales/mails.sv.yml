@@ -198,6 +198,8 @@ sv:
       subject: "En bokning har avbokats"
       body:
         member_cancelled: "Användare %{NAME} har avbokat sin bokning"
+        reservation_cancelled_by: "%{ACTOR} har avbokat %{NAME}s bokning."
+        reservation_cancelled: "%{NAME}s bokning har avbokats."
         item_details: "%{START} - %{END}, om %{RESERVABLE}"
         generate_refund: "Glöm inte att generera en kreditfaktura eller en återbetalning för denna avbokning."
     notify_admin_when_user_is_imported:

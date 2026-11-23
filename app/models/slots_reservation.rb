@@ -3,6 +3,8 @@
 # SlotsReservation is the relation table between a Slot and a Reservation.
 # It holds detailed data about a Reservation for the attached Slot.
 class SlotsReservation < ApplicationRecord
+  attr_accessor :canceled_by
+
   belongs_to :slot
   belongs_to :reservation
   has_one :cart_item_reservation_slot, class_name: 'CartItem::ReservationSlot', dependent: :nullify
@@ -91,11 +93,18 @@ class SlotsReservation < ApplicationRecord
   end
 
   def notify_member_and_admin_slot_is_canceled
+    meta_data = {
+      canceled_by_id: canceled_by&.id,
+      canceled_by_name: canceled_by&.profile&.full_name,
+      canceled_by_member: canceled_by.present? && canceled_by == reservation.user
+    }
     NotificationCenter.call type: 'notify_member_slot_is_canceled',
                             receiver: reservation.user,
-                            attached_object: self
+                            attached_object: self,
+                            meta_data: meta_data
     NotificationCenter.call type: 'notify_admin_slot_is_canceled',
                             receiver: User.admins_and_managers,
-                            attached_object: self
+                            attached_object: self,
+                            meta_data: meta_data
   end
 end

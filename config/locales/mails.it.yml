@@ -198,6 +198,8 @@ it:
       subject: "Una prenotazione è stata annullata"
       body:
         member_cancelled: "L'utente %{NAME} ha annullato la sua prenotazione"
+        reservation_cancelled_by: "%{ACTOR} ha annullato la prenotazione di %{NAME}."
+        reservation_cancelled: "La prenotazione di %{NAME} è stata annullata."
         item_details: "%{START} - %{END}, relativo a %{RESERVABLE}"
         generate_refund: "Non dimenticare di generare una nota di credito o un rimborso per questa cancellazione."
     notify_admin_when_user_is_imported:

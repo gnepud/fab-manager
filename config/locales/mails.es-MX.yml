@@ -198,6 +198,8 @@ es-MX:
       subject: "Una reserva ha sido cancelada"
       body:
         member_cancelled: "El usuario %{NAME} ha cancelado una reserva"
+        reservation_cancelled_by: "%{ACTOR} ha cancelado la reserva de %{NAME}."
+        reservation_cancelled: "La reserva de %{NAME} ha sido cancelada."
         item_details: "%{START} - %{END}, referido a %{RESERVABLE}"
         generate_refund: "No olvide generar una nota de crédito o un reembolso por esta cancelación."
     notify_admin_when_user_is_imported:

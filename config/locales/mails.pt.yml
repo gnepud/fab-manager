@@ -198,6 +198,8 @@ pt:
       subject: "Uma reserva foi cancelada"
       body:
         member_cancelled: "O usuário %{NAME} cancelou sua reserva"
+        reservation_cancelled_by: "%{ACTOR} cancelou a reserva de %{NAME}."
+        reservation_cancelled: "A reserva de %{NAME} foi cancelada."
         item_details: "%{START} - %{END}, sobre %{RESERVABLE}"
         generate_refund: "Não se esqueça de gerar uma nota de crédito ou um reembolso para este cancelamento."
     notify_admin_when_user_is_imported:
