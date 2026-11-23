@@ -45,9 +45,9 @@ Application.Controllers.controller('HomeController', ['$scope', '$transition$', 
       // We set the home page content, with the directives replacing the placeholders
       $scope.homeContent = insertDirectives(settingsPromise.home_content);
 
-      // for admins, setup the tour on login
+      // for admins and managers, setup the tour on login
       $scope.$watch('currentUser', function (newValue, oldValue) {
-        if (!oldValue && newValue && newValue.role === 'admin') {
+        if (!oldValue && newValue && AuthService.isAuthorized(['admin', 'manager'])) {
           const uitour = uiTourService.getTourByName('welcome');
           if (!uitour.hasStep()) {
             setupWelcomeTour();
