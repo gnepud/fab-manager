@@ -107,6 +107,7 @@ angular.module('application.router', ['ui.router'])
           }
         },
         resolve: {
+          tourTranslations: ['Translations', function (Translations) { return Translations.query(['app.public.tour']); }],
           settingsPromise: ['Setting', function (Setting) { return Setting.query({ names: "['home_content', 'home_blogpost', 'spaces_module', 'feature_tour_display']" }).$promise; }]
         }
       })
@@ -374,6 +375,7 @@ angular.module('application.router', ['ui.router'])
           }
         },
         resolve: {
+          tourTranslations: ['Translations', function (Translations) { return Translations.query(['app.public.tour']); }],
           machinesPromise: ['Machine', function (Machine) { return Machine.query().$promise; }],
           settingsPromise: ['Setting', function (Setting) { return Setting.query({ names: "['feature_tour_display', 'user_validation_required', 'user_validation_required_list']" }).$promise; }]
         }
@@ -466,6 +468,7 @@ angular.module('application.router', ['ui.router'])
           }
         },
         resolve: {
+          tourTranslations: ['Translations', function (Translations) { return Translations.query(['app.public.tour']); }],
           spacesPromise: ['Space', function (Space) { return Space.query().$promise; }],
           settingsPromise: ['Setting', function (Setting) { return Setting.query({ names: "['feature_tour_display']" }).$promise; }]
         }
@@ -723,6 +726,7 @@ angular.module('application.router', ['ui.router'])
           }
         },
         resolve: {
+          tourTranslations: ['Translations', function (Translations) { return Translations.query(['app.admin.tour']); }],
           bookingWindowStart: ['Setting', function (Setting) { return Setting.get({ name: 'booking_window_start' }).$promise; }],
           bookingWindowEnd: ['Setting', function (Setting) { return Setting.get({ name: 'booking_window_end' }).$promise; }],
           machinesPromise: ['Machine', function (Machine) { return Machine.query().$promise; }],
@@ -757,6 +761,7 @@ angular.module('application.router', ['ui.router'])
           }
         },
         resolve: {
+          tourTranslations: ['Translations', function (Translations) { return Translations.query(['app.admin.tour']); }],
           componentsPromise: ['Component', function (Component) { return Component.query().$promise; }],
           licencesPromise: ['Licence', function (Licence) { return Licence.query().$promise; }],
           themesPromise: ['Theme', function (Theme) { return Theme.query().$promise; }],
@@ -795,6 +800,7 @@ angular.module('application.router', ['ui.router'])
           }
         },
         resolve: {
+          tourTranslations: ['Translations', function (Translations) { return Translations.query(['app.admin.tour']); }],
           trainingsPromise: ['Training', function (Training) { return Training.query().$promise; }],
           machinesPromise: ['Machine', function (Machine) { return Machine.query().$promise; }],
           settingsPromise: ['Setting', function (Setting) { return Setting.query({ names: "['feature_tour_display', 'machines_module']" }).$promise; }]
@@ -833,6 +839,7 @@ angular.module('application.router', ['ui.router'])
           }
         },
         resolve: {
+          tourTranslations: ['Translations', function (Translations) { return Translations.query(['app.admin.tour']); }],
           eventsPromise: ['Event', function (Event) { return Event.query({ page: 1 }).$promise; }],
           categoriesPromise: ['Category', function (Category) { return Category.query().$promise; }],
           themesPromise: ['EventTheme', function (EventTheme) { return EventTheme.query().$promise; }],
@@ -886,6 +893,7 @@ angular.module('application.router', ['ui.router'])
           }
         },
         resolve: {
+          tourTranslations: ['Translations', function (Translations) { return Translations.query(['app.admin.tour']); }],
           plans: ['Plan', function (Plan) { return Plan.query().$promise; }],
           groups: ['Group', function (Group) { return Group.query().$promise; }],
           trainingsPricingsPromise: ['TrainingsPricing', function (TrainingsPricing) { return TrainingsPricing.query().$promise; }],
@@ -995,6 +1003,7 @@ angular.module('application.router', ['ui.router'])
           }
         },
         resolve: {
+          tourTranslations: ['Translations', function (Translations) { return Translations.query(['app.admin.tour']); }],
           settings: ['Setting', function (Setting) {
             return Setting.query({
               names: "['invoice_legals', 'invoice_text', 'invoice_VAT-rate', 'invoice_VAT-rate_Machine', " +
@@ -1041,6 +1050,7 @@ angular.module('application.router', ['ui.router'])
           }
         },
         resolve: {
+          tourTranslations: ['Translations', function (Translations) { return Translations.query(['app.admin.tour']); }],
           membersPromise: ['Member', function (Member) { return Member.list({ query: { search: '', order_by: 'id', page: 1, size: 20 } }).$promise; }],
           adminsPromise: ['Admin', function (Admin) { return Admin.query().$promise; }],
           partnersPromise: ['User', function (User) { return User.query({ role: 'partner' }).$promise; }],
@@ -1171,6 +1181,7 @@ angular.module('application.router', ['ui.router'])
           }
         },
         resolve: {
+          tourTranslations: ['Translations', function (Translations) { return Translations.query(['app.admin.tour']); }],
           membersPromise: ['Member', function (Member) { return Member.mapping().$promise; }],
           statisticsPromise: ['Statistics', function (Statistics) { return Statistics.query().$promise; }],
           settingsPromise: ['Setting', function (Setting) { return Setting.query({ names: "['feature_tour_display', 'reservation_context_feature']" }).$promise; }],
@@ -1199,6 +1210,7 @@ angular.module('application.router', ['ui.router'])
           }
         },
         resolve: {
+          tourTranslations: ['Translations', function (Translations) { return Translations.query(['app.admin.tour']); }],
           settingsPromise: ['Setting', function (Setting) {
             return Setting.query({
               names: "['twitter_name', 'about_title', 'about_body', 'tracking_id', 'facebook_app_id', 'email_from', " +
@@ -1324,6 +1336,7 @@ angular.module('application.router', ['ui.router'])
           }
         },
         resolve: {
+          tourTranslations: ['Translations', function (Translations) { return Translations.query(['app.admin.tour']); }],
           clientsPromise: ['OpenAPIClient', function (OpenAPIClient) { return OpenAPIClient.query().$promise; }],
           settingsPromise: ['Setting', function (Setting) { return Setting.query({ names: "['feature_tour_display']" }).$promise; }]
         }
