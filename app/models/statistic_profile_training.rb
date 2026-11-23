@@ -7,6 +7,8 @@ class StatisticProfileTraining < ApplicationRecord
   belongs_to :statistic_profile
   belongs_to :training
 
+  validates :training_id, uniqueness: { scope: :statistic_profile_id }
+
   after_commit :notify_user_training_valid, on: :create
 
   private

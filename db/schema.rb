@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_11_21_210000) do
+ActiveRecord::Schema[7.0].define(version: 2026_11_22_224000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_trgm"
@@ -1232,6 +1232,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_11_21_210000) do
     t.integer "training_id"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.index ["statistic_profile_id", "training_id"], name: "index_statistic_profile_trainings_on_profile_and_training", unique: true
     t.index ["statistic_profile_id"], name: "index_statistic_profile_trainings_on_statistic_profile_id"
     t.index ["training_id"], name: "index_statistic_profile_trainings_on_training_id"
   end

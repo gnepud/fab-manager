@@ -32,7 +32,7 @@ class API::TrainingsController < API::APIController
     if params[:training][:users].present?
       members = User.where(id: valid_training_params[:users])
       members.each do |m|
-        m.trainings << @training
+        m.statistic_profile.grant_training(@training)
       end
 
       head :no_content

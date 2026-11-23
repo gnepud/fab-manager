@@ -7634,6 +7634,13 @@ CREATE INDEX index_statistic_profile_prepaid_packs_on_statistic_profile_id ON pu
 
 
 --
+-- Name: index_statistic_profile_trainings_on_profile_and_training; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_statistic_profile_trainings_on_profile_and_training ON public.statistic_profile_trainings USING btree (statistic_profile_id, training_id);
+
+
+--
 -- Name: index_statistic_profile_trainings_on_statistic_profile_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -9380,5 +9387,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20250424164457'),
 ('20250819143916'),
 ('20250904090534'),
-('20261121210000');
+('20261121210000'),
+('20261122224000');
 
