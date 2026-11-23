@@ -6,4 +6,8 @@ class BookingUser < ApplicationRecord
   belongs_to :reservation
   belongs_to :booked, polymorphic: true
   belongs_to :event_price_category
+
+  def name
+    self[:name] || I18n.t('availabilities.deleted_user')
+  end
 end

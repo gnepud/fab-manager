@@ -78,21 +78,14 @@ class Invoice < PaymentDocument
     avoir.invoice_id = id
     avoir.avoir_date = Time.current
     avoir.total = 0
-    # refunds of invoices with cash coupons: we need to ventilate coupons on paid items
-    paid_items = 0
-    refund_items = 0
     invoice_items.each do |ii|
-      paid_items += 1 unless ii.amount.zero?
       next unless attrs[:invoice_items_ids].include? ii.id # list of items to refund (partial refunds)
       raise StandardError if ii.invoice_item # cannot refund an item that was already refunded
 
-      refund_items += 1 unless ii.amount.zero?
       avoir_ii = avoir.invoice_items.build(ii.dup.attributes)
       avoir_ii.invoice_item_id = ii.id
-      avoir.total += avoir_ii.amount
+      avoir.total += ii.amount_after_coupon
     end
-    # handle coupon
-    avoir.total = CouponService.apply_on_refund(avoir.total, avoir.coupon, paid_items, refund_items)
     avoir.wallet_amount = avoir.payment_method == 'wallet' ? avoir.total : 0
     avoir
   end

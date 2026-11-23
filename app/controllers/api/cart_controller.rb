@@ -43,7 +43,8 @@ class API::CartController < API::APIController
   end
 
   def set_offer
-    authorize CartContext.new(params[:customer_id], cart_params[:is_offered])
+    authorize @current_order, :create_item?, policy_class: CartPolicy
+    authorize CartContext.new(@current_order.statistic_profile&.user_id, cart_params[:is_offered])
     @order = Cart::SetOfferService.new.call(@current_order, orderable, cart_params[:is_offered])
     render 'api/orders/show'
   end
@@ -65,6 +66,8 @@ class API::CartController < API::APIController
     customer = User.find(params[:user_id])
     @order = Cart::SetCustomerService.new(current_user).call(@current_order, customer)
     render 'api/orders/show'
+  rescue ActiveRecord::RecordInvalid => e
+    render json: e.record.errors, status: :unprocessable_entity
   end
 
   private

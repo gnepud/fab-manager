@@ -88,7 +88,7 @@ module SingleSignOnConcern
         User.transaction do
           # remove the temporary account
           logger.debug 'removing the temporary user'
-          sso_user.destroy
+          sso_user.destroy!
           # finally, save the new details
           logger.debug 'saving the updated user'
           save!
@@ -96,6 +96,8 @@ module SingleSignOnConcern
       rescue ActiveRecord::RecordInvalid => e
         logger.error "error while merging user #{sso_user.id} into #{id}: #{e.message}"
         raise e
+      rescue ActiveRecord::RecordNotDestroyed
+        false
       end
     end
   end

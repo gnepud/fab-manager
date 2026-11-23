@@ -15,6 +15,7 @@
 
 import { uploadErrorMessages } from '../lib/upload-error-messages';
 import normalizeCurrentUser from '../lib/current-user';
+import { deletionErrorMessage } from '../lib/deletion-error-message';
 
 /**
  * Controller used in the members listing page
@@ -237,7 +238,7 @@ Application.Controllers.controller('EditProfileController', ['$scope', '$rootSco
 
         , function (error) {
           console.log(error);
-          return growl.error(_t('app.logged.dashboard.settings.an_error_occured_preventing_your_account_from_being_deleted'));
+          return growl.error(deletionErrorMessage(error, _t('app.logged.dashboard.settings.an_error_occured_preventing_your_account_from_being_deleted')));
         })
       );
 

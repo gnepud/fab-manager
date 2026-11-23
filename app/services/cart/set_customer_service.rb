@@ -51,9 +51,17 @@ class Cart::SetCustomerService
   def update_item_user(item, customer)
     return unless item.orderable_type.match(/^CartItem::/)
 
-    item.orderable.update_with_context({
-                                         customer_profile_id: customer.invoicing_profile.id,
-                                         operator_profile_id: @operator.invoicing_profile.id
-                                       }, item.order.order_items)
+    orderable = item.orderable
+    attributes = { customer_profile_id: customer.invoicing_profile.id }
+    attributes[:operator_profile_id] = @operator.invoicing_profile.id if orderable.respond_to?(:operator_profile=)
+    if orderable.is_a?(CartItem::Reservation) && orderable.has_attribute?(:plan_id)
+      attributes.merge!(reservation_attributes(customer, item.order.order_items.map(&:orderable)))
+    end
+    raise ActiveRecord::RecordInvalid, orderable unless orderable.update_with_context(attributes, item.order.order_items)
+  end
+
+  def reservation_attributes(customer, all_items)
+    pending_subscription = all_items.find { |orderable| orderable.is_a?(CartItem::Subscription) }
+    { plan: pending_subscription&.plan || customer.subscribed_plan, new_subscription: pending_subscription.present? }
   end
 end

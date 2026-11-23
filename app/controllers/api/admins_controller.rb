@@ -24,8 +24,11 @@ class API::AdminsController < API::APIController
   def destroy
     @admin = User.admins.find(params[:id])
     if current_user.admin? && @admin != current_user
-      @admin.destroy
-      head :no_content
+      if @admin.destroy
+        head :no_content
+      else
+        render json: @admin.errors.full_messages, status: :unprocessable_entity
+      end
     else
       head :unauthorized
     end

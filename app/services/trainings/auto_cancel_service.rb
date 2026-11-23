@@ -34,7 +34,7 @@ class Trainings::AutoCancelService
                                   meta_data: { auto_refund: auto_refund && !sr.offered? }
 
           SlotsReservationsService.cancel(sr)
-          refund_after_cancel(sr.reservation) if auto_refund && !sr.offered?
+          refund_after_cancel(sr) if auto_refund && !sr.offered?
         end
       end
     end
@@ -72,10 +72,21 @@ class Trainings::AutoCancelService
 
     private
 
-    # @param reservation [Reservation]
-    def refund_after_cancel(reservation)
-      invoice_item = reservation.invoice_items.joins(:invoice).where(invoices: { type: nil }).first
-      amount = (invoice_item&.amount_after_coupon || 0) / 100.00
+    # @param slot_reservation [SlotsReservation]
+    def refund_after_cancel(slot_reservation)
+      reservation = slot_reservation.reservation
+      slot_reservations = reservation.slots_reservations.order(:id)
+      invoice_items = reservation.invoice_items.joins(:invoice).where(invoices: { type: nil }).order(:id).to_a
+      slot_reservations = slot_reservations.where(offered: [false, nil]) if invoice_items.one?
+      slot_ids = slot_reservations.pluck(:id)
+      position = slot_ids.index(slot_reservation.id)
+      amount = if invoice_items.one?
+                 share, remainder = invoice_items.first.amount_after_coupon.divmod(slot_ids.length)
+                 share + (position < remainder ? 1 : 0)
+               else
+                 invoice_items[position]&.amount_after_coupon || 0
+               end
+      amount /= 100.00
       return if amount.zero?
 
       service = WalletService.new(user: reservation.user, wallet: reservation.user.wallet)

@@ -77,6 +77,7 @@ zu:
     deleted_user: "crwdns22460:0crwdne22460:0"
   #members management
   members:
+    deletion_blocked: "This account cannot be deleted because it has future bookings or an active subscription."
     unable_to_change_group_disabled: "Changing group is not allowed"
     cannot_change_sso_password: "Password cannot be changed for SSO accounts"
     unable_to_change_the_group_while_a_subscription_is_running: "crwdns3275:0crwdne3275:0"

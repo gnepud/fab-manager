@@ -16,6 +16,7 @@
 'use strict';
 
 import { uploadErrorMessages } from '../../lib/upload-error-messages';
+import { deletionErrorMessage } from '../../lib/deletion-error-message';
 
 /* COMMON CODE */
 
@@ -295,7 +296,7 @@ Application.Controllers.controller('AdminMembersController', ['$scope', '$sce', 
               return growl.success(_t('app.admin.members.member_successfully_deleted'));
             },
             function (error) {
-              growl.error(_t('app.admin.members.unable_to_delete_the_member'));
+              growl.error(deletionErrorMessage(error, _t('app.admin.members.unable_to_delete_the_member')));
               console.error(error);
             }
           );
@@ -353,7 +354,7 @@ Application.Controllers.controller('AdminMembersController', ['$scope', '$sce', 
               return growl.success(_t('app.admin.members.administrator_successfully_deleted'));
             },
             function (error) {
-              growl.error(_t('app.admin.members.unable_to_delete_the_administrator'));
+              growl.error(deletionErrorMessage(error, _t('app.admin.members.unable_to_delete_the_administrator')));
               console.error(error);
             }
           );
@@ -386,7 +387,7 @@ Application.Controllers.controller('AdminMembersController', ['$scope', '$sce', 
               return growl.success(_t('app.admin.members.partner_successfully_deleted'));
             },
             function (error) {
-              growl.error(_t('app.admin.members.unable_to_delete_the_partner'));
+              growl.error(deletionErrorMessage(error, _t('app.admin.members.unable_to_delete_the_partner')));
               console.error(error);
             }
           );
@@ -419,7 +420,7 @@ Application.Controllers.controller('AdminMembersController', ['$scope', '$sce', 
               return growl.success(_t('app.admin.members.manager_successfully_deleted'));
             },
             function (error) {
-              growl.error(_t('app.admin.members.unable_to_delete_the_manager'));
+              growl.error(deletionErrorMessage(error, _t('app.admin.members.unable_to_delete_the_manager')));
               console.error(error);
             }
           );
