@@ -94,14 +94,21 @@ angular.module('application', ['ngCookies', 'ngResource', 'ngSanitize', 'ui.rout
             } else step.tether.enable();
             step.reposition();
             const parentId = step.config('scrollParentId');
-            const parent = parentId === '$document' ? $document : angular.element($document[0].getElementById(parentId));
+            let parent = parentId === '$document' ? $document : angular.element($document[0].getElementById(parentId));
+            while (parent.length && parent[0] !== $document[0]) {
+              const node = parent[0];
+              const style = window.getComputedStyle(node);
+              if (node !== $document[0].body && node !== $document[0].documentElement &&
+                  /auto|scroll/.test(style.overflowY || style.overflow) && node.scrollHeight > node.clientHeight) break;
+              parent = node.parentElement ? angular.element(node.parentElement) : $document;
+            }
             if (parent.length) {
               tour.once('stepShown', shown => {
                 if (shown !== step) return;
                 step.reposition();
                 const popup = step.popup[0].getBoundingClientRect();
                 const target = step.element[0].getBoundingClientRect();
-                const height = parentId === '$document' ? $document[0].documentElement.clientHeight
+                const height = parent[0] === $document[0] ? $document[0].documentElement.clientHeight
                   : parent[0].clientHeight || parent[0].getBoundingClientRect().height;
                 const placement = step.config('placement').split('-')[0];
                 let offset = step.config('scrollOffset');

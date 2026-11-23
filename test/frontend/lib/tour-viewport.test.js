@@ -229,6 +229,69 @@ describe('application-wide tour viewport constraints', () => {
     expect(centre()).toBeCloseTo(620);
   });
 
+  test.each(['content-main', '$document'])('mobile auto-scroll uses the window with configured parent %s', async parentId => {
+    const animation = jest.spyOn(angular.element.prototype, 'duScrollToElementAnimated');
+    setViewport(390, 844, 390, 844, 0, 34);
+    window.scrollY = 34;
+    jest.spyOn(window, 'scrollTo').mockImplementation((_x, y) => {
+      window.pageYOffset = window.scrollY = y;
+      window.dispatchEvent(new Event('scroll'));
+    });
+    jest.spyOn(document.body, 'scrollHeight', 'get').mockReturnValue(1600);
+    const scope = injector.get('$rootScope').$new();
+    const content = document.createElement('section');
+    content.id = 'content-main';
+    content.style.cssText = 'overflow-y: auto';
+    Object.defineProperties(content, {
+      clientHeight: { value: 1500 },
+      scrollHeight: { value: 1500 },
+      scrollTop: { get: () => 0, set: () => {} }
+    });
+    const element = angular.element(`<div ui-tour="mobile-scroll" ui-tour-scroll-into-view="true" ui-tour-scroll-parent-id="${parentId}"></div>`);
+    content.appendChild(element[0]);
+    element[0].appendChild(target);
+    document.body.appendChild(content);
+    jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
+      if (this === content || this === element[0]) return rect(0, 60 - window.scrollY, 390, 1500);
+      if (this === target) return rect(280, 877.9 - window.scrollY, 54, 54);
+      if (this === document.body) return rect(0, -window.scrollY, 390, 1600);
+      if (this.hasAttribute('data-tether-id')) return rect(0, -window.scrollY, 0, 0);
+      if (this.classList.contains('ui-tour-popup')) {
+        const translation = parseFloat(this.style.transform.match(/translateY\(([-\d.]+)px\)/)?.[1]) || 0;
+        const fixed = this.style.position === 'fixed';
+        const top = this.style.top ? parseFloat(this.style.top)
+          : this.style.bottom ? (fixed ? window.innerHeight : document.body.scrollHeight) - parseFloat(this.style.bottom) - 255 : 0;
+        return rect(0, top + translation - (fixed ? 0 : window.scrollY), 375, 255);
+      }
+      return rect(0, 0, 0, 0);
+    });
+    injector.get('$compile')(element)(scope);
+    scope.$digest();
+    const tour = injector.get('uiTourService').getTourByName('mobile-scroll');
+    const step = tour.createStep({ selector: '.viewport-target', content: 'View', placement: 'top' });
+    try {
+      await tour.start();
+      await animation.mock.results[0].value;
+      await waitFor(() => {
+        expect(window.scrollY).toBeCloseTo(523);
+        const bounds = target.getBoundingClientRect();
+        const popup = step.popup[0].getBoundingClientRect();
+        expect(bounds.top).toBeCloseTo(354.9);
+        expect(bounds.bottom).toBeLessThanOrEqual(844);
+        expect(popup.top).toBeGreaterThanOrEqual(0);
+        expect(Math.abs(popup.bottom - bounds.top)).toBeLessThan(1);
+      }, { timeout: 2000, onTimeout: error => error });
+      expect(content.scrollTop).toBe(0);
+    } finally {
+      await tour.end();
+      step.tether?.destroy();
+      step.popup?.remove();
+      scope.$destroy();
+      content.remove();
+      window.scrollY = window.pageYOffset = 0;
+    }
+  });
+
   test.each([
     ['application defaults', {}, true],
     ['master local attachment', { appendToBody: false }, true],
@@ -255,6 +318,7 @@ describe('application-wide tour viewport constraints', () => {
       get: () => scrollTop,
       set: value => { scrollTop = Math.max(0, Math.min(1200, value)); }
     });
+    Object.defineProperties(content, { clientHeight: { value: 400 }, scrollHeight: { value: 1600 } });
     const attachment = options.appendToBody === undefined ? '' : `ui-tour-append-to-body="${options.appendToBody}"`;
     const element = angular.element(`<div ui-tour="scroll" ui-tour-scroll-into-view="${options.scrollIntoView !== false}" ${attachment} ui-tour-scroll-parent-id="${options.missingParent ? 'missing' : 'content-main'}" style="position: relative; overflow: hidden"></div>`);
     content.appendChild(element[0]);
