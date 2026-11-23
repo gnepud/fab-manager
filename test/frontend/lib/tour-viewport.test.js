@@ -232,6 +232,12 @@ describe('application-wide tour viewport constraints', () => {
   test.each([
     ['application defaults', {}, true],
     ['master local attachment', { appendToBody: false }, true],
+    ['top popup', { placement: 'top', popupHeight: 260, offset: 360, visiblePopup: true }, true],
+    ['bottom popup', { popupHeight: 300, offset: 70, visiblePopup: true }, true],
+    ['rendered top popup', { placement: 'top', popupHeight: 0, renderedPopupHeight: 260, offset: 360, visiblePopup: true }, true],
+    ['oversized top popup', { placement: 'top', popupHeight: 450 }, true],
+    ['oversized bottom popup', { popupHeight: 450 }, true],
+    ['empty popup', { popupHeight: 0 }, true],
     ['disabled auto-scroll', { scrollIntoView: false }, false],
     ['disabled step auto-scroll', { stepScrollIntoView: false }, false],
     ['revisited body popup', { revisit: true }, true],
@@ -244,6 +250,7 @@ describe('application-wide tour viewport constraints', () => {
     content.id = 'content-main';
     content.style.cssText = 'position: relative; overflow: auto; height: 400px';
     let scrollTop = 0;
+    let popupHeight = options.popupHeight ?? 200;
     Object.defineProperty(content, 'scrollTop', {
       get: () => scrollTop,
       set: value => { scrollTop = Math.max(0, Math.min(1200, value)); }
@@ -258,16 +265,22 @@ describe('application-wide tour viewport constraints', () => {
       if (this === element[0]) return rect(0, 60 - scrollTop, 1280, 1600);
       if (this === target) return rect(1220, 1060 - scrollTop, 40, 30);
       if (this.classList.contains('ui-tour-popup')) {
-        return rect(0, this.parentNode === document.body ? 0 : 1090 - scrollTop, 414, 200);
+        const translation = parseFloat(this.style.transform.match(/translateY\(([-\d.]+)px\)/)?.[1]) || 0;
+        const positionedTop = this.style.top ? parseFloat(this.style.top)
+          : this.style.bottom ? (this.style.position === 'fixed' ? window.innerHeight : document.body.scrollHeight) - parseFloat(this.style.bottom) - popupHeight
+            : undefined;
+        return rect(0, positionedTop === undefined ? (this.parentNode === document.body ? 0 : 1090 - scrollTop) : positionedTop + translation,
+          414, popupHeight);
       }
       return rect(0, 0, 0, 0);
     });
     injector.get('$compile')(element)(scope);
     scope.$digest();
     const tour = injector.get('uiTourService').getTourByName('scroll');
-    const step = tour.createStep({ selector: '.viewport-target', stepId: 'below-fold', content: 'Below-fold target', placement: 'bottom',
+    const step = tour.createStep({ selector: '.viewport-target', stepId: 'below-fold', content: 'Below-fold target', placement: options.placement || 'bottom',
       orphan: options.orphan === true, scrollIntoView: options.stepScrollIntoView });
-    const destination = target.getBoundingClientRect().top - content.getBoundingClientRect().top - step.config('scrollOffset');
+    if (options.renderedPopupHeight !== undefined) step.onShown = () => { popupHeight = options.renderedPopupHeight; };
+    const destination = target.getBoundingClientRect().top - content.getBoundingClientRect().top - (options.offset ?? step.config('scrollOffset'));
     expect(target.getBoundingClientRect().top).toBeGreaterThan(content.getBoundingClientRect().bottom);
     try {
       expect(tour.config('scrollIntoView')).toBe(options.scrollIntoView !== false);
@@ -280,6 +293,11 @@ describe('application-wide tour viewport constraints', () => {
         expect(target.getBoundingClientRect().bottom).toBeLessThanOrEqual(content.getBoundingClientRect().bottom);
         expect(content.scrollTop).toBeCloseTo(destination);
         expect(document.activeElement).toBe(step.popup[0]);
+        if (options.visiblePopup) {
+          const popup = step.popup[0].getBoundingClientRect();
+          expect(popup.top).toBeGreaterThanOrEqual(content.getBoundingClientRect().top);
+          expect(popup.bottom).toBeLessThanOrEqual(content.getBoundingClientRect().bottom);
+        }
       };
       if (shouldScroll) {
         await waitFor(expectTargetVisible, { timeout: 2000, onTimeout: error => error });

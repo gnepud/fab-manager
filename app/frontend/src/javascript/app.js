@@ -96,8 +96,25 @@ angular.module('application', ['ngCookies', 'ngResource', 'ngSanitize', 'ui.rout
             const parentId = step.config('scrollParentId');
             const parent = parentId === '$document' ? $document : angular.element($document[0].getElementById(parentId));
             if (parent.length) {
-              parent.duScrollToElementAnimated(step.element, step.config('scrollOffset'), 500)
-                .then(() => step.reposition(), angular.noop);
+              tour.once('stepShown', shown => {
+                if (shown !== step) return;
+                step.reposition();
+                const popup = step.popup[0].getBoundingClientRect();
+                const target = step.element[0].getBoundingClientRect();
+                const height = parentId === '$document' ? $document[0].documentElement.clientHeight
+                  : parent[0].clientHeight || parent[0].getBoundingClientRect().height;
+                const placement = step.config('placement').split('-')[0];
+                let offset = step.config('scrollOffset');
+                if (placement === 'top') {
+                  const space = popup.height + Math.max(0, target.top - popup.bottom);
+                  if (space + target.height <= height) offset = Math.min(offset + space, height - target.height);
+                } else if (placement === 'bottom') {
+                  const space = target.height + popup.height + Math.max(0, popup.top - target.bottom);
+                  if (space <= height) offset = Math.min(offset, height - space);
+                }
+                parent.duScrollToElementAnimated(step.element, offset, 500)
+                  .then(() => step.reposition(), angular.noop);
+              });
             }
             return result;
           } catch (error) {
