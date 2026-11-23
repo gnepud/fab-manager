@@ -526,6 +526,21 @@
       float: none;
       a { height: 100%; }
     }
+
+    @media (max-width: 767px) {
+      flex-wrap: wrap;
+      & > li {
+        flex: 1 1 12rem;
+        min-width: 0;
+        a {
+          white-space: normal;
+          overflow-wrap: break-word;
+          hyphens: auto;
+          padding-left: 8px;
+          padding-right: 8px;
+        }
+      }
+    }
   }
 }
 
