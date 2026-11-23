@@ -2,6 +2,150 @@
 
 ## Next release
 
+- Improvement: upgrade Ruby from 3.2.2 to 3.4.13
+- Improvement: upgrade Rails from 7.0.8.7 to 7.2.4
+- Fix a bug: generate admin XLSX exports in Sidekiq
+- Fix a bug: apply wallet checkout discounts only once
+- Fix a bug: refresh subscription details so admins can cancel the renewed plan
+- Fix a bug: keep member avatars visible after upload and allow them to be removed
+- Fix a bug: return users to space and training reservation pages after sign-in
+- Fix a bug: do not show a sign-in error to visitors browsing public plans
+- Fix a bug: translate the confirmation message after saving a member tag
+- Fix a bug: resume subscription checkout after a visitor signs in
+- Fix a bug: hide the sign-up link as soon as public registration is disabled
+- Fix a bug: use the configured currency in price displays and financial documents
+- Fix a bug: preserve the extension date in free-extension notifications
+- Fix a bug: enqueue notification emails only after the transaction commits
+- Fix a bug: show terms upload errors in a single notification
+- Fix a bug: show upload errors as one message on project, profile, member, and resource forms
+- Fix a bug: delete the selected Open API client even when the list is sorted
+- Fix a bug: allow cancelling a new group row while disabled groups are hidden
+- Fix a bug: remove a stray apostrophe from booked training titles on the calendar
+- Fix a bug: keep accounting codes visible after reload
+- Fix a bug: restore project keyword search on Rails 7.2
+- Fix a bug: accept STL files as project CAD attachments
+- Fix a bug: prevent project edits by collaborators with pending invitations
+- Fix a bug: hide cancelled event bookings from upcoming events on the member dashboard
+- Fix a bug: move event bookings that contain multiple price categories
+- Fix a bug: show paid event pre-registrations as paid in admin reservations
+- Fix a bug: save project changes from edit URLs that use a slug
+- Fix a bug: label the SKU correctly in the French product clone dialog
+- Fix a bug: show the product type in deletion notifications
+- Fix a bug: keep the store keyword filter after reload
+- Fix a bug: show the full total of wallet-paid orders in order lists
+- Fix a bug: avoid false fully booked errors and show readable event booking errors
+- Fix a bug: show a readable error when shop 3-D Secure authentication fails
+- Fix a bug: prevent managers from editing administrator or manager accounts
+- Fix a bug: hide the dashboard orders tab when the store module is disabled
+- Fix a bug: apply permanent coupon discounts to all scheduled installments
+- Fix a bug: limit partner member searches to public profiles
+- Fix a bug: toggle boolean settings when their labels are clicked
+- Fix a bug: repair the renewal link in expired subscription emails
+- Fix a bug: use prepaid pack wording in purchase confirmations
+- Fix a bug: translate the author badge on public member profiles
+- Fix a bug: translate default select placeholders
+- Fix a bug: allow clearing privacy tracking settings
+- Fix a bug: preserve iCalendar events when fetching the feed fails
+- Fix a bug: remind members about missing supporting documents after a group change
+- Fix a bug: send expiry alerts for subscriptions with a free extension
+- Fix a bug: send members the seven-day subscription expiry email again
+- Fix a bug: expire the subscription associated with the credited invoice
+- Fix a bug: apply daily booking limits using the local day
+- Fix a bug: reset the document refusal dialog between refusals
+- Fix a bug: display the average basket value as currency in statistics
+- Fix a bug: prevent moves to full, past, or unrelated reservation slots
+- Fix a bug: invoice each prepaid pack at its own price in a multi-pack cart
+- Fix a bug: return a not-found response for missing export files
+- Improvement: hide the member deletion button from managers
+- Fix a bug: show project author names without linking to private profiles
+- Fix a bug: reject event bookings with no tickets
+- Fix a bug: show the net cheque amount when confirming installment collection
+- Fix a bug: show prepaid pack renewal when the balance is below the threshold
+- Fix a bug: use the original invoice VAT rate on credit notes
+- Fix a bug: keep the subscription cancellation button visible after confirming an installment
+- Fix a bug: subtract credit note VAT from VAT exports
+- Fix a bug: keep reservations visible after reload
+- Improvement: refresh the invoice preview when VAT is toggled
+- Fix a bug: label bank transfer installments as “virement” in French
+- Fix a bug: use local day boundaries for accounting exports
+- Fix a bug: prevent members from changing paid reservations through the API
+- Fix a bug: skip cancelled slots in reservation reminders
+- Improvement: clarify who receives privacy policy notifications
+- Fix a bug: clear project references when a licence is deleted
+- Fix a bug: allow SAML sign-in retries after the identity provider rejects a request
+- Fix a bug: save removals from the allowed project CAD file types
+- Fix a bug: reject booking windows that open at or after their closing time
+- Fix a bug: warn about partial booking overlaps on the event page
+- Fix a bug: enforce the overlapping slot booking restriction on the server
+- Fix a bug: send the child-turning-18 reminder when the job runs after local midnight
+- Fix a bug: show the 18th birthday instead of the birth date in the reminder
+- Fix a bug: show a readable error for invalid or expired password reset links
+- Fix a bug: email members when a training session is automatically cancelled
+- Fix a bug: prevent the admin training tour from freezing at the filter step
+- Fix a bug: add missing translations for select placeholders and error messages
+- Fix a bug: restrict the authentication provider list to administrators
+- Fix a bug: make the translated admin machine tour available from Help
+- Fix a bug: allow customers to retry a declined PayZen card
+- Improvement: show a readable error when a new staff member's email is already in use
+- Fix a bug: do not show cancelled training sessions as pending during machine booking
+- Fix a bug: prevent members from booking locked availabilities
+- Fix a bug: keep the admin calendar tour's agenda step on screen
+- Fix a bug: show the recorded authorization date in training expiry and invalidation emails
+- Fix a bug: point the admin project tour's settings step at the Settings tab
+- Fix a bug: let managers load credits on the member edit page
+- Fix a bug: clear the stock movement reason when switching between additions and withdrawals
+- Fix a bug: prevent refunds on orders whose payments failed
+- Fix a bug: enforce a two-level product category hierarchy
+- Fix a bug: return to the first page when filtering stock movement history
+- Fix a bug: reject stock movement quantities of zero or less
+- Fix a bug: refresh pickup instructions after marking an order ready
+- Fix a bug: complete member imports with an error report when a row or CSV is invalid
+- Fix a bug: reject unknown tag and training IDs in member imports
+- Fix a bug: keep existing member values when import cells are blank
+- Fix a bug: accept member import CSVs with a UTF-8 byte order mark
+- Fix a bug: avoid duplicate training authorizations when validation is repeated
+- Fix a bug: replay tours each session when configured to do so
+- Fix a bug: keep PayZen checkout open when card validation fails
+- Fix a bug: avoid over-refunding when a coupon discount is split across slots
+- Fix a bug: remove a duplicate colon from the weak password error
+- Fix a bug: hide deleted children's names on event reservations
+- Fix a bug: restore Crowdin markers for Zulu password strength messages
+- Fix a bug: check cart offers against the cart owner's permissions
+- Fix a bug: show the card refund method on credit note PDFs
+- Fix a bug: prevent ready orders from moving back to in progress
+- Fix a bug: do not mark notifications as emailed when delivery fails
+- Fix a bug: enforce authorization when replacing a card on a PayZen payment schedule
+- Fix a bug: prevent account deletion while future reservations or an active subscription remain
+- Fix a bug: open the correct tabs during the admin event tour
+- Fix a bug: reprice cart reservations when the customer changes
+- Fix a bug: name the person who cancelled a reservation in the admin email
+- Fix a bug: show date-like values without crashing the member import results page
+- Fix a bug: make PayZen checkout easy to close when retries are exhausted
+- Fix a bug: preserve member IDs when imports match existing accounts by email
+- Fix a bug: start the Home tour when a manager signs in
+- Fix a bug: list username as a required field in member import instructions
+- Fix a bug: restrict member import pages to administrators
+- Fix a bug: prevent managers from booking on behalf of administrators or other managers
+- Fix a bug: show an error when a member import upload is rejected
+- Fix a bug: reject invalid birth dates in member imports instead of clearing them
+- Fix a bug: restore staff emails for failed PayZen installments
+- Fix a bug: do not promise a wallet refund for free training sessions that are automatically cancelled
+- Fix a bug: show training credits on the dashboard until they are used up
+- Fix a bug: keep onboarding tour popovers within the screen
+- Fix a bug: reject unsupported order status changes
+- Fix a bug: balance accounting entries for partial wallet credit notes
+- Fix a bug: load tour translations when opening a tour page directly
+- Fix a bug: reject unknown stock movement reasons and types with a validation error
+- Fix a bug: skip hidden steps in the mobile Welcome tour
+- Fix a bug: send low-stock alerts only after stock has been saved
+- Fix a bug: keep all admin tabs reachable on phones
+- Improvement: keep the Pricing “New plan” button visible on phones
+- Improvement: keep the Members “Import” button visible on phones and tablets
+- Fix a bug: keep imported iCalendar events readable when source colors have low contrast
+- Fix a bug: filter invoices by the selected local calendar day
+- Fix a bug: prevent the F1 Help dialog from covering an active tour
+- Improvement: add a reusable [browser test guide](doc/testing/README.md)
+
 ## v6.6.2 2026 October 29
 
 - Fix a security issue: update SAML, XML and HTML sanitizer dependencies (`omniauth-saml`, `ruby-saml`, `rexml`, `nokogiri`, `rails-html-sanitizer`, `loofah`, `crass`) to resolve public security advisories
