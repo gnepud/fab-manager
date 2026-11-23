@@ -4,6 +4,7 @@
 /* global setTimezone */
 import angular from 'angular';
 import moment from 'moment';
+import 'moment/locale/ar';
 
 let injector;
 let scope;
@@ -35,6 +36,7 @@ const buildController = (overrides = {}) => {
 
 beforeAll(() => {
   global.moment = moment;
+  moment.locale('en');
   const controllers = angular.module('invoicesControllerTest', []);
   Application.Controllers = controllers;
   require('controllers/admin/invoices');
@@ -71,7 +73,16 @@ describe('InvoicesController date filter', () => {
   afterEach(() => {
     jest.useRealTimers();
     setTimezone('UTC');
+    moment.locale('en');
   });
+
+  const searchedDate = Invoice => {
+    scope.searchInvoice.date = new Date(2026, 10, 21);
+    scope.handleFilterChange();
+    jest.runAllTimers();
+    expect(Invoice.list).toHaveBeenCalledTimes(1);
+    return Invoice.list.mock.calls[0][0].query.date;
+  };
 
   test.each(['Europe/Paris', 'America/New_York', 'UTC', 'Pacific/Kiritimati'])('searches the picked calendar day in %s', timezone => {
     setTimezone(timezone);
@@ -79,11 +90,16 @@ describe('InvoicesController date filter', () => {
     const Invoice = { list: jest.fn() };
     buildController({ Invoice });
 
-    scope.searchInvoice.date = new Date(2026, 10, 21);
-    scope.handleFilterChange();
-    jest.runAllTimers();
+    expect(searchedDate(Invoice)).toBe('2026-11-21');
+  });
 
-    expect(Invoice.list).toHaveBeenCalledTimes(1);
-    expect(Invoice.list.mock.calls[0][0].query.date).toBe('2026-11-21');
+  test('sends Latin digits whatever the moment locale', () => {
+    setTimezone('Europe/Paris');
+    moment.locale('ar');
+    jest.useFakeTimers();
+    const Invoice = { list: jest.fn() };
+    buildController({ Invoice });
+
+    expect(searchedDate(Invoice)).toBe('2026-11-21');
   });
 });
