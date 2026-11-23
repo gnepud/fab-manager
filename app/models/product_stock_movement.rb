@@ -8,18 +8,16 @@ class ProductStockMovement < ApplicationRecord
   attr_accessor :input_quantity
 
   ALL_STOCK_TYPES = %w[internal external].freeze
-  enum :stock_type, ALL_STOCK_TYPES.zip(ALL_STOCK_TYPES).to_h
+  enum :stock_type, ALL_STOCK_TYPES.zip(ALL_STOCK_TYPES).to_h, validate: true
 
   INCOMING_REASONS = %w[inward_stock returned cancelled inventory_fix other_in].freeze
   OUTGOING_REASONS = %w[sold missing damaged other_out].freeze
   ALL_REASONS = [].concat(INCOMING_REASONS).concat(OUTGOING_REASONS).freeze
-  enum :reason, ALL_REASONS.zip(ALL_REASONS).to_h
+  enum :reason, ALL_REASONS.zip(ALL_REASONS).to_h, validate: true
 
   validates :stock_type, presence: true
-  validates :stock_type, inclusion: { in: ALL_STOCK_TYPES }
 
   validates :reason, presence: true
-  validates :reason, inclusion: { in: ALL_REASONS }
   validates :quantity, numericality: { only_integer: true, other_than: 0 }
   validates :input_quantity, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
 end
