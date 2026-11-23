@@ -2,7 +2,8 @@
 
 ## Next release
 
-- Improvement: upgrade Rails from 7.0 to 7.2
+- Improvement: upgrade Ruby from 3.2.2 to 3.4.13
+- Improvement: upgrade Rails from 7.0.8.7 to 7.2.4
 - Fix a bug: generate admin XLSX exports in Sidekiq
 - Fix a bug: apply wallet checkout discounts only once
 - Fix a bug: refresh subscription details so admins can cancel the renewed plan
@@ -140,6 +141,9 @@
 - Fix a bug: keep all admin tabs reachable on phones
 - Improvement: keep the Pricing “New plan” button visible on phones
 - Improvement: keep the Members “Import” button visible on phones and tablets
+- Fix a bug: keep imported iCalendar events readable when source colors have low contrast
+- Fix a bug: filter invoices by the selected local calendar day
+- Fix a bug: prevent the F1 Help dialog from covering an active tour
 - Improvement: add a reusable [browser test guide](doc/testing/README.md)
 
 ## v6.6.2 2026 October 29
