@@ -1,22 +1,53 @@
+/**
+ * @jest-environment ./test/frontend/__setup__/timezone-environment.js
+ */
+/* global setTimezone */
 import angular from 'angular';
 import moment from 'moment';
+import 'moment/locale/ar';
+
+let injector;
+let scope;
+
+const buildController = (overrides = {}) => {
+  scope = injector.get('$rootScope').$new();
+  injector.get('$controller')('InvoicesController', {
+    $scope: scope,
+    $state: {},
+    Invoice: {},
+    AccountingPeriod: {},
+    AuthService: {},
+    invoices: [],
+    closedPeriods: [],
+    $uibModal: {},
+    growl: { success: jest.fn() },
+    Setting: {},
+    settings: {},
+    stripeSecretKey: {},
+    _t: key => key,
+    Member: {},
+    uiTourService: {},
+    Payment: {},
+    onlinePaymentStatus: {},
+    $uiRouter: {},
+    ...overrides
+  });
+};
+
+beforeAll(() => {
+  global.moment = moment;
+  moment.locale('en');
+  const controllers = angular.module('invoicesControllerTest', []);
+  Application.Controllers = controllers;
+  require('controllers/admin/invoices');
+  injector = angular.injector(['ng', controllers.name]);
+});
+
+afterAll(() => { delete global.moment; });
+
+afterEach(() => { scope.$destroy(); });
 
 describe('InvoicesController VAT preview', () => {
-  let injector;
-  let scope;
-
-  beforeAll(() => {
-    global.moment = moment;
-    const controllers = angular.module('invoicesControllerTest', []);
-    Application.Controllers = controllers;
-    require('controllers/admin/invoices');
-    injector = angular.injector(['ng', controllers.name]);
-  });
-
-  afterAll(() => { delete global.moment; });
-
-  afterEach(() => { scope.$destroy(); });
-
   test.each([
     ['false', 'true', true],
     ['true', 'false', false]
@@ -28,32 +59,47 @@ describe('InvoicesController VAT preview', () => {
         success(Object.fromEntries(Object.entries(savedSettings).filter(([name]) => names.includes(`'${name}'`))));
       }
     };
-    scope = injector.get('$rootScope').$new();
-    injector.get('$controller')('InvoicesController', {
-      $scope: scope,
-      $state: {},
-      Invoice: {},
-      AccountingPeriod: {},
-      AuthService: {},
-      invoices: [],
-      closedPeriods: [],
-      $uibModal: {},
-      growl: { success: jest.fn() },
-      Setting,
-      settings,
-      stripeSecretKey: {},
-      _t: key => key,
-      Member: {},
-      uiTourService: {},
-      Payment: {},
-      onlinePaymentStatus: {},
-      $uiRouter: {}
-    });
+    buildController({ Setting, settings });
 
     expect(scope.invoice.VAT.active).toBe(!active);
 
     scope.onVATSuccess('VAT settings saved');
 
     expect(scope.invoice.VAT.active).toBe(active);
+  });
+});
+
+describe('InvoicesController date filter', () => {
+  afterEach(() => {
+    jest.useRealTimers();
+    setTimezone('UTC');
+    moment.locale('en');
+  });
+
+  const searchedDate = Invoice => {
+    scope.searchInvoice.date = new Date(2026, 10, 21);
+    scope.handleFilterChange();
+    jest.runAllTimers();
+    expect(Invoice.list).toHaveBeenCalledTimes(1);
+    return Invoice.list.mock.calls[0][0].query.date;
+  };
+
+  test.each(['Europe/Paris', 'America/New_York', 'UTC', 'Pacific/Kiritimati'])('searches the picked calendar day in %s', timezone => {
+    setTimezone(timezone);
+    jest.useFakeTimers();
+    const Invoice = { list: jest.fn() };
+    buildController({ Invoice });
+
+    expect(searchedDate(Invoice)).toBe('2026-11-21');
+  });
+
+  test('sends Latin digits whatever the moment locale', () => {
+    setTimezone('Europe/Paris');
+    moment.locale('ar');
+    jest.useFakeTimers();
+    const Invoice = { list: jest.fn() };
+    buildController({ Invoice });
+
+    expect(searchedDate(Invoice)).toBe('2026-11-21');
   });
 });
