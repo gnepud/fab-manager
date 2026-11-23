@@ -16,10 +16,7 @@ class InvoiceItem < Footprintable
   delegate :footprint, to: :chained_element
 
   def amount_after_coupon
-    # deduct coupon discount
-    coupon_service = CouponService.new
-    total_without_coupon = coupon_service.invoice_total_no_coupon(invoice)
-    coupon_service.ventilate(total_without_coupon, amount, invoice.coupon)
+    CouponService.new.ventilate_invoice(invoice).fetch(self)
   end
 
   # return the item amount, coupon discount deducted, if any, and VAT excluded, if applicable

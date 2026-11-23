@@ -152,7 +152,8 @@ class InvoicesService
   def self.generate_reservation_item(invoice, reservation, payment_details, main: false)
     raise TypeError unless [Space, Machine, Training].include? reservation.reservable.class
 
-    reservation.slots_reservations.map(&:slot).each do |slot|
+    reservation.slots_reservations.sort_by.with_index { |sr, index| [sr.id || 0, index] }.each do |sr|
+      slot = sr.slot
       description = reservation.reservable.name +
                     " #{I18n.l slot.start_at, format: :long} - #{I18n.l slot.end_at, format: :hour_minute}"
 

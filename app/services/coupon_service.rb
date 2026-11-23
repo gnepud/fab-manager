@@ -94,6 +94,23 @@ class CouponService
     price
   end
 
+  # Allocate the stored paid total, rounding cumulative amounts to preserve every cent.
+  def ventilate_invoice(invoice)
+    items = invoice.invoice_items.sort_by.with_index { |item, index| [item.id || 0, index] }
+    total = items.sum(&:amount)
+    return items.index_with(&:amount) if invoice.coupon_id.nil? || total.zero?
+
+    cumulative = 0
+    allocated = 0
+    items.to_h do |item|
+      cumulative += item.amount
+      rounded = Rational(cumulative * invoice.total, total).round
+      amount = rounded - allocated
+      allocated = rounded
+      [item, amount]
+    end
+  end
+
   ##
   # Compute the total amount of the given invoice, without the applied coupon
   # Invoice.total stores the amount payed by the customer, coupon deducted
