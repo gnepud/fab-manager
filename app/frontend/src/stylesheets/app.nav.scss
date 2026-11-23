@@ -534,7 +534,10 @@
         min-width: 0;
         a {
           white-space: normal;
-          overflow-wrap: anywhere;
+          overflow-wrap: break-word;
+          hyphens: auto;
+          padding-left: 8px;
+          padding-right: 8px;
         }
       }
     }

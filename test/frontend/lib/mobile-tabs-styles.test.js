@@ -25,7 +25,7 @@ describe('mobile Bootstrap tab CSS contract (not a layout test)', () => {
     expect(mobile).toBeDefined();
     expect(mobile).toMatch(/\.nav\.nav-tabs \{\s*flex-wrap: wrap;/);
     expect(mobile).toMatch(/\.nav\.nav-tabs > li \{\s*flex: 1 1 12rem;\s*min-width: 0;/);
-    expect(mobile).toMatch(/\.nav\.nav-tabs > li a \{\s*white-space: normal;\s*overflow-wrap: anywhere;/);
+    expect(mobile).toMatch(/\.nav\.nav-tabs > li a \{\s*white-space: normal;\s*overflow-wrap: break-word;\s*hyphens: auto;\s*padding-left: 8px;\s*padding-right: 8px;/);
   });
 
   test('keeps the desktop flex rules unchanged', () => {
