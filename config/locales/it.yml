@@ -77,6 +77,7 @@ it:
     deleted_user: "Utente eliminato"
   #members management
   members:
+    deletion_blocked: "Impossibile eliminare questo account: ha prenotazioni future o un abbonamento attivo."
     unable_to_change_group_disabled: "Non è consentito cambiare gruppo"
     cannot_change_sso_password: "La password non può essere modificata per gli account SSO"
     unable_to_change_the_group_while_a_subscription_is_running: "Impossibile cambiare il gruppo mentre è in esecuzione una sottoscrizione"

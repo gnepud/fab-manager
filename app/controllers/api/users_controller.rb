@@ -35,8 +35,11 @@ class API::UsersController < API::APIController
 
   def destroy
     authorize User
-    @user.destroy
-    head :no_content
+    if @user.destroy
+      head :no_content
+    else
+      render json: @user.errors.full_messages, status: :unprocessable_entity
+    end
   end
 
   private

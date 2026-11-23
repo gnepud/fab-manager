@@ -59,7 +59,8 @@ class API::MembersController < API::APIController
 
   def destroy
     authorize @member
-    @member.destroy
+    return render(json: @member.errors.full_messages, status: :unprocessable_entity) unless @member.destroy
+
     sign_out(@member) if @member.id == current_user.id
     head :no_content
   end
@@ -136,7 +137,7 @@ class API::MembersController < API::APIController
           sign_in(@member, bypass: true)
           render :show, status: :ok, location: member_path(@member)
         else
-          render json: @member.errors, status: :unprocessable_entity
+          render json: { error: @member.errors.full_messages.to_sentence }, status: :unprocessable_entity
         end
       rescue DuplicateIndexError => e
         render json: { error: t('members.please_input_the_authentication_code_sent_to_the_address', EMAIL: e.message) },

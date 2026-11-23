@@ -63,7 +63,9 @@ namespace :fablab do
         confirm = $stdin.gets.chomp
         next unless confirm == 'y'
 
-        User.where(is_active: false).map(&:destroy!)
+        User.where(is_active: false).find_each do |user|
+          puts "Skipping user #{user.id}: #{user.errors.full_messages.to_sentence}" unless user.destroy
+        end
       else
         puts 'No inactive users to delete'
       end

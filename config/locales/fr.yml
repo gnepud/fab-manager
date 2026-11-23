@@ -79,6 +79,7 @@ fr:
     deleted_user: "Utilisateur supprimé"
   #members management
   members:
+    deletion_blocked: "Impossible de supprimer ce compte : il possède des réservations à venir ou un abonnement actif."
     cannot_change_sso_password: "Impossible de modifier le mot de passe pour les comptes SSO"
     unable_to_change_the_group_while_a_subscription_is_running: "Impossible de changer le groupe tant qu'un abonnement est en cours"
     unable_to_change_group_disabled: "Le changement de groupe n'est pas autorisé"
