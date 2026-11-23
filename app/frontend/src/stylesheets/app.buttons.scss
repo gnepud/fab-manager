@@ -101,3 +101,16 @@
     transform: rotate(360deg);
   }
 }
+
+@media (max-width: 767px) {
+  .fab-button.new-plan-button {
+    max-width: 100%;
+    white-space: normal;
+    margin-bottom: 1rem;
+
+    > span {
+      min-width: 0;
+      overflow-wrap: break-word;
+    }
+  }
+}
