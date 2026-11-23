@@ -14,7 +14,7 @@ class Members::ImportService
 
           # try to find member based on import.update_field
           user = User.find_by(import.update_field.to_sym => row[import.update_field])
-          errors = association_errors(row)
+          errors = association_errors(row).merge(birthdate_errors(row))
           unless errors.empty?
             log << { user: user&.id, status: user ? 'update' : 'create', result: false }
             log << errors
@@ -42,6 +42,13 @@ class Members::ImportService
     end
 
     private
+
+    def birthdate_errors(row)
+      return {} if row['birthdate'].blank?
+      return {} if StatisticProfile.type_for_attribute('birthday').cast(row['birthdate'])
+
+      { birthdate: ["Invalid birthdate: #{row['birthdate']}"] }
+    end
 
     def association_errors(row)
       errors = {}
