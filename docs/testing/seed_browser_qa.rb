@@ -28,6 +28,7 @@ class BrowserQaSeed
     %w[spaces_module store_module].each do |name|
       Setting.set(name, true).save! unless Setting.get(name)
     end
+    Setting.set('store_hidden', false).save! unless Setting.get('store_hidden') == false
   end
 
   def seed_users(group, other_group, password)
