@@ -830,7 +830,7 @@ Application.Controllers.controller('InvoicesController', ['$scope', '$state', 'I
      * @param [concat] {boolean} if true, the result will be append to $scope.invoices instead of being affected
      */
     const invoiceSearch = function (concat) {
-      const date = $scope.searchInvoice.date ? $scope.searchInvoice.date.toISOString().slice(0, 10) : null;
+      const date = $scope.searchInvoice.date ? moment($scope.searchInvoice.date).format('YYYY-MM-DD') : null;
       Invoice.list({
         query: {
           number: $scope.searchInvoice.reference,
