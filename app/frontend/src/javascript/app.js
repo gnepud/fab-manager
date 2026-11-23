@@ -114,10 +114,11 @@ angular.module('application', ['ngCookies', 'ngResource', 'ngSanitize', 'ui.rout
                 let offset = step.config('scrollOffset');
                 if (placement === 'top') {
                   const space = popup.height + Math.max(0, target.top - popup.bottom);
-                  if (space + target.height <= height) offset = Math.min(offset + space, height - target.height);
+                  offset += space;
+                  if (space + target.height <= height) offset = Math.min(offset, height - target.height);
                 } else if (placement === 'bottom') {
                   const space = target.height + popup.height + Math.max(0, popup.top - target.bottom);
-                  if (space <= height) offset = Math.min(offset, height - space);
+                  offset = Math.min(offset, height - space);
                 }
                 parent.duScrollToElementAnimated(step.element, offset, 500)
                   .then(() => step.reposition(), angular.noop);

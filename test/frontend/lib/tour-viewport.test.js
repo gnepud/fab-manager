@@ -298,8 +298,11 @@ describe('application-wide tour viewport constraints', () => {
     ['top popup', { placement: 'top', popupHeight: 260, offset: 360, visiblePopup: true }, true],
     ['bottom popup', { popupHeight: 300, offset: 70, visiblePopup: true }, true],
     ['rendered top popup', { placement: 'top', popupHeight: 0, renderedPopupHeight: 260, offset: 360, visiblePopup: true }, true],
-    ['oversized top popup', { placement: 'top', popupHeight: 450 }, true],
-    ['oversized bottom popup', { popupHeight: 450 }, true],
+    ['oversized top popup', { placement: 'top', popupHeight: 450, offset: 550, popupTop: 100 }, true],
+    ['oversized bottom popup', { popupHeight: 450, offset: -80, popupBottom: 400 }, true],
+    ['tall target 1846px above', { placement: 'top', targetHeight: 1846, popupHeight: 183, offset: 283, visiblePopup: true }, true],
+    ['tall target 2488px above', { placement: 'top', targetHeight: 2488, popupHeight: 183, offset: 283, visiblePopup: true }, true],
+    ['tall target below', { targetHeight: 1846, popupHeight: 183, offset: -1629, visiblePopup: true, popupBottom: 400 }, true],
     ['empty popup', { popupHeight: 0 }, true],
     ['disabled auto-scroll', { scrollIntoView: false }, false],
     ['disabled step auto-scroll', { stepScrollIntoView: false }, false],
@@ -314,11 +317,12 @@ describe('application-wide tour viewport constraints', () => {
     content.style.cssText = 'position: relative; overflow: auto; height: 400px';
     let scrollTop = 0;
     let popupHeight = options.popupHeight ?? 200;
+    const scrollHeight = options.targetHeight ? 4000 : 1600;
     Object.defineProperty(content, 'scrollTop', {
       get: () => scrollTop,
-      set: value => { scrollTop = Math.max(0, Math.min(1200, value)); }
+      set: value => { scrollTop = Math.max(0, Math.min(scrollHeight - 400, value)); }
     });
-    Object.defineProperties(content, { clientHeight: { value: 400 }, scrollHeight: { value: 1600 } });
+    Object.defineProperties(content, { clientHeight: { value: 400 }, scrollHeight: { value: scrollHeight } });
     const attachment = options.appendToBody === undefined ? '' : `ui-tour-append-to-body="${options.appendToBody}"`;
     const element = angular.element(`<div ui-tour="scroll" ui-tour-scroll-into-view="${options.scrollIntoView !== false}" ${attachment} ui-tour-scroll-parent-id="${options.missingParent ? 'missing' : 'content-main'}" style="position: relative; overflow: hidden"></div>`);
     content.appendChild(element[0]);
@@ -326,8 +330,8 @@ describe('application-wide tour viewport constraints', () => {
     document.body.appendChild(content);
     jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
       if (this === content) return rect(0, 60, 1280, 400);
-      if (this === element[0]) return rect(0, 60 - scrollTop, 1280, 1600);
-      if (this === target) return rect(1220, 1060 - scrollTop, 40, 30);
+      if (this === element[0]) return rect(0, 60 - scrollTop, 1280, scrollHeight);
+      if (this === target) return rect(1220, 1060 - scrollTop, 40, options.targetHeight ?? 30);
       if (this.classList.contains('ui-tour-popup')) {
         const translation = parseFloat(this.style.transform.match(/translateY\(([-\d.]+)px\)/)?.[1]) || 0;
         const positionedTop = this.style.top ? parseFloat(this.style.top)
@@ -353,14 +357,23 @@ describe('application-wide tour viewport constraints', () => {
       expect(step.popup[0].parentNode).toBe(document.body);
       if (!options.orphan) expect(step.tether.scrollParents).toContain(content);
       const expectTargetVisible = () => {
-        expect(target.getBoundingClientRect().top).toBeGreaterThanOrEqual(content.getBoundingClientRect().top);
-        expect(target.getBoundingClientRect().bottom).toBeLessThanOrEqual(content.getBoundingClientRect().bottom);
+        if (!options.targetHeight && popupHeight <= 400) {
+          expect(target.getBoundingClientRect().top).toBeGreaterThanOrEqual(content.getBoundingClientRect().top);
+          expect(target.getBoundingClientRect().bottom).toBeLessThanOrEqual(content.getBoundingClientRect().bottom);
+        }
         expect(content.scrollTop).toBeCloseTo(destination);
         expect(document.activeElement).toBe(step.popup[0]);
         if (options.visiblePopup) {
           const popup = step.popup[0].getBoundingClientRect();
           expect(popup.top).toBeGreaterThanOrEqual(content.getBoundingClientRect().top);
           expect(popup.bottom).toBeLessThanOrEqual(content.getBoundingClientRect().bottom);
+        }
+        if (options.targetHeight || options.popupTop !== undefined || options.popupBottom !== undefined) {
+          const popup = step.popup[0].getBoundingClientRect();
+          const bounds = target.getBoundingClientRect();
+          expect(options.placement === 'top' ? popup.bottom : popup.top).toBeCloseTo(options.placement === 'top' ? bounds.top : bounds.bottom);
+          if (options.placement === 'top') expect(popup.top).toBeCloseTo(content.getBoundingClientRect().top + (options.popupTop ?? 100));
+          if (options.popupBottom !== undefined) expect(popup.bottom).toBeCloseTo(content.getBoundingClientRect().top + options.popupBottom);
         }
       };
       if (shouldScroll) {
