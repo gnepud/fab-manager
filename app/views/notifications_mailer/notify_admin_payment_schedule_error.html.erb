@@ -5,6 +5,6 @@
         REFERENCE: @attached_object.payment_schedule.reference,
         AMOUNT: CurrencyFormatter.format(@attached_object.amount / 100.00),
         DATE: I18n.l(@attached_object.due_date, format: :long)) %>
-  <%= t('.body.error', GATEWAY: @attached_object.payment_gateway_object.gateway_object.gateway) %>
+  <%= t('.body.error') %>
 </p>
-<p><%= t('.body.action') %></p>
+<p><%= t('.body.action', GATEWAY: @attached_object.payment_schedule.gateway_subscription.gateway) %></p>
