@@ -26,6 +26,7 @@ describe('New plan phone button CSS contract (not a layout test)', () => {
     expect(mobile).toBeDefined();
     expect(mobile).toMatch(/max-width: 100%;/);
     expect(mobile).toMatch(/white-space: normal;/);
+    expect(mobile).toMatch(/margin-bottom: 1rem;/);
     expect(mobile).toMatch(/\.fab-button\.new-plan-button > span \{\s*min-width: 0;\s*overflow-wrap: break-word;/);
     expect(css).not.toMatch(/^\.fab-button\.new-plan-button\b/m);
   });
