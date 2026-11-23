@@ -72,6 +72,7 @@ export const PayzenModal: React.FC<PayzenModalProps> = ({ isOpen, toggleModal, a
       formId="payzen-form"
       formClassName="payzen-form"
       className="payzen-modal"
+      showCloseButton
       currentUser={currentUser}
       cart={cart}
       order={order}
