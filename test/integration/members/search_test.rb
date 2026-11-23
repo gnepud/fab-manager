@@ -59,4 +59,49 @@ class MembersSearchTest < ActionDispatch::IntegrationTest
 
     assert_response :unauthorized
   end
+
+  test 'booking search excludes other privileged accounts for managers but includes themselves' do
+    manager, other_manager = booking_managers
+    login_as(manager, scope: :user)
+
+    get '/api/members/search/SearchVisibility', params: { booking: true }, headers: default_headers
+
+    assert_response :success
+    ids = json_response(response.body).pluck(:id).uniq
+    assert_equal [@public_member.id, @private_member.id, manager.id].sort, ids.sort
+    assert_not_includes ids, @staff.id
+    assert_not_includes ids, other_manager.id
+  end
+
+  test 'booking search leaves admin access unchanged' do
+    manager, other_manager = booking_managers
+    login_as(@staff, scope: :user)
+
+    get '/api/members/search/SearchVisibility', params: { booking: true }, headers: default_headers
+
+    assert_response :success
+    assert_equal [@public_member.id, @private_member.id, @staff.id, manager.id, other_manager.id].sort,
+                 json_response(response.body).pluck(:id).uniq.sort
+  end
+
+  test 'booking search with no matches is empty' do
+    manager, = booking_managers
+    login_as(manager, scope: :user)
+
+    get '/api/members/search/NoSuchProfile', params: { booking: true }, headers: default_headers
+
+    assert_response :success
+    assert_empty json_response(response.body)
+  end
+
+  private
+
+  def booking_managers
+    %i[user4 user5].map do |fixture|
+      manager = users(fixture)
+      manager.add_role(:manager)
+      manager.profile.update!(last_name: 'SearchVisibility')
+      manager
+    end
+  end
 end

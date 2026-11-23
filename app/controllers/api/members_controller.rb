@@ -160,7 +160,7 @@ class API::MembersController < API::APIController
   end
 
   def search
-    @members = Members::ListService.search(current_user, params[:query], params[:subscription])
+    @members = Members::ListService.search(current_user, *params.values_at(:query, :subscription, :booking))
   end
 
   def mapping

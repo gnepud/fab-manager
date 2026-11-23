@@ -40,7 +40,7 @@ class Members::ListService
       @query
     end
 
-    def search(current_user, query, subscription)
+    def search(current_user, query, subscription, booking = nil)
       members = User.includes(:profile, :statistic_profile, invoicing_profile: [:address])
                     .joins(:profile,
                            :statistic_profile,
@@ -69,7 +69,10 @@ class Members::ListService
         members = members.where('subscriptions.id IS NULL OR subscriptions.expiration_date < :now', now: Time.zone.today.to_s)
       end
 
-      members.to_a.filter(&:valid?)
+      members = members.to_a.filter(&:valid?)
+      return members unless booking == 'true'
+
+      members.select { |member| UserPolicy.new(current_user, member).update? }
     end
 
     private

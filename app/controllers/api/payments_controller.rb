@@ -3,6 +3,7 @@
 # Abstract API Controller to be extended by each payment gateway/mean, for handling the payments processes in the front-end
 class API::PaymentsController < API::APIController
   before_action :authenticate_user!
+  include API::PaymentCustomerConcern
 
   # This method must be overridden by the the gateways controllers that inherits API::PaymentsControllers
   def confirm_payment

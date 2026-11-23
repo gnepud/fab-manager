@@ -64,6 +64,7 @@ class API::CartController < API::APIController
   def set_customer
     authorize @current_order, policy_class: CartPolicy
     customer = User.find(params[:user_id])
+    authorize customer, :update?
     @order = Cart::SetCustomerService.new(current_user).call(@current_order, customer)
     render 'api/orders/show'
   rescue ActiveRecord::RecordInvalid => e

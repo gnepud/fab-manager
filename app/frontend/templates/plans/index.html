@@ -38,7 +38,7 @@
   <div class="col-sm-12 col-md-12 col-lg-3">
 
     <div ng-if="isAuthorized(['admin', 'manager'])">
-      <select-member subscription="false"></select-member>
+      <select-member subscription="false" booking="true"></select-member>
     </div>
 
     <change-group user="ctrl.member"
