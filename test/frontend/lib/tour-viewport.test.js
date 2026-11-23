@@ -1,0 +1,448 @@
+import angular from 'angular';
+import 'angular-ui-tour';
+import fs from 'fs';
+import path from 'path';
+import * as sass from 'sass';
+import { waitFor } from '@testing-library/react';
+
+describe('application-wide tour viewport constraints', () => {
+  let injector;
+  let style;
+  let popup;
+  let target;
+  let tether;
+
+  beforeAll(() => {
+    const configurations = [];
+    const application = {
+      config: definition => { configurations.push(definition); return application; },
+      run: () => application,
+      constant: () => application
+    };
+    const module = angular.module;
+    const registration = jest.spyOn(angular, 'module').mockImplementation((...args) => args[0] === 'application' ? application : module(...args));
+    require('../../../app/frontend/src/javascript/app');
+    registration.mockRestore();
+
+    angular.module('tourViewportTest', ['bm.uiTour'])
+      .value('$rootElement', angular.element(document.body))
+      .config(['$injector', '$provide', 'TourConfigProvider', function ($injector, $provide, TourConfigProvider) {
+        const noop = () => {};
+        for (const configuration of configurations) {
+          $injector.invoke(configuration, null, {
+            $provide,
+            TourConfigProvider,
+            $httpProvider: {},
+            AuthProvider: {},
+            growlProvider: { globalTimeToLive: noop },
+            unsavedWarningsConfigProvider: {},
+            uibDatepickerPopupConfig: {},
+            $translateProvider: {
+              useLoader: noop,
+              useLoaderCache: noop,
+              useSanitizeValueStrategy: noop,
+              useMessageFormatInterpolation: noop,
+              preferredLanguage: noop
+            },
+            $sceDelegateProvider: { resourceUrlWhitelist: noop }
+          });
+        }
+        TourConfigProvider.set('scrollIntoView', false);
+      }]);
+    style = document.createElement('style');
+    style.textContent = sass.compileString(fs.readFileSync(path.resolve(__dirname, '../../../app/frontend/src/stylesheets/modules/tour.scss'), 'utf8')).css;
+    document.head.appendChild(style);
+  });
+
+  beforeEach(() => {
+    setViewport(1280, 841, 1280, 841);
+    injector = angular.injector(['ng', 'tourViewportTest']);
+    popup = document.createElement('div');
+    popup.className = 'ui-tour-popup popover';
+    target = document.createElement('button');
+    target.className = 'viewport-target';
+    document.body.append(target, popup);
+  });
+
+  afterEach(() => {
+    if (tether) tether.destroy();
+    tether = null;
+    target?.remove();
+    popup?.remove();
+    jest.restoreAllMocks();
+  });
+
+  afterAll(() => { style?.remove(); });
+
+  const rect = (left, top, width, height) => ({ left, top, width, height, right: left + width, bottom: top + height });
+  const setViewport = (width, height, clientWidth, clientHeight, scrollX = 0, scrollY = 0) => {
+    Object.defineProperty(document.documentElement, 'clientWidth', { configurable: true, value: clientWidth });
+    Object.defineProperty(document.documentElement, 'clientHeight', { configurable: true, value: clientHeight });
+    Object.assign(window, { innerWidth: width, innerHeight: height, pageXOffset: scrollX, pageYOffset: scrollY });
+  };
+
+  const gutterFixture = () => {
+    jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
+      if (this === target) return rect(350, 790, 20, 30);
+      if (this === popup) return rect(0, 0, 375, 200);
+      if (this.hasAttribute('data-tether-id')) return rect(-window.pageXOffset, -window.pageYOffset, 0, 0);
+      return rect(0, 0, 0, 0);
+    });
+    const Tether = injector.get('Tether');
+    tether = new Tether({ element: popup, target, attachment: 'top center', targetAttachment: 'bottom center', optimizations: { gpu: false } });
+  };
+
+  test.each([[0, 0], [120, 240]])('excludes scrollbar gutters at page scroll %s,%s', (scrollX, scrollY) => {
+    setViewport(390, 844, 375, 829, scrollX, scrollY);
+    gutterFixture();
+    expect(popup.style.position).toBe('absolute');
+    const left = parseFloat(popup.style.left) - scrollX;
+    const top = parseFloat(popup.style.top) - scrollY;
+    expect(left).toBeCloseTo(0);
+    expect(left + 375).toBeLessThanOrEqual(document.documentElement.clientWidth);
+    expect(top).toBeCloseTo(820);
+    expect(top + 200).toBeGreaterThan(document.documentElement.clientHeight);
+  });
+
+  test('recomputes viewport bounds on reposition after resizing and scrolling', () => {
+    gutterFixture();
+    setViewport(390, 844, 375, 829, 120, 240);
+    tether.position();
+    expect(tether.options.constraints).toContainEqual({ to: [120, 240, 495, 1069], pin: ['left', 'right'] });
+    setViewport(430, 880, 415, 865, 80, 160);
+    tether.position();
+    expect(tether.options.constraints).toContainEqual({ to: [80, 160, 495, 1025], pin: ['left', 'right'] });
+  });
+
+  test.each([
+    ['settings Reservations', 1080, 190, 160, 'top center', 'bottom center', 'shift-left-50'],
+    ['members Authentication', 1008.75, 190, 240, 'top center', 'bottom center', 'shift-left-50'],
+    ['statistics export', 1069, 190, 40, 'top center', 'bottom center', ''],
+    ['projects reports, centered', 1102, 100, 80, 'top center', 'bottom center', 'shift-left-40'],
+    ['projects reports, right aligned near the left edge', 50, 100, 80, 'top right', 'bottom right', ''],
+    ['left edge', 0, 100, 40, 'top center', 'bottom center', 'shift-right-40'],
+    ['already on screen', 600, 100, 40, 'top center', 'bottom center', '']
+  ])('keeps a popup inside 1280x841: %s', (_name, left, top, width, attachment, targetAttachment, popupClass) => {
+    popup.classList.add(...popupClass.split(' ').filter(Boolean));
+    jest.spyOn(target, 'getBoundingClientRect').mockReturnValue(rect(left, top, width, 30));
+    jest.spyOn(popup, 'getBoundingClientRect').mockReturnValue(rect(0, 0, 414, 200));
+    const Tether = injector.get('Tether');
+    tether = new Tether({ element: popup, target, attachment, targetAttachment, optimizations: { gpu: false } });
+    const x = parseFloat(popup.style.left) + (parseFloat(getComputedStyle(popup).marginLeft) || 0);
+    const y = parseFloat(popup.style.top) + (parseFloat(getComputedStyle(popup).marginTop) || 0);
+    expect(x).toBeGreaterThanOrEqual(0);
+    expect(x + 414).toBeLessThanOrEqual(1280);
+    expect(y).toBeGreaterThanOrEqual(0);
+    expect(y + 200).toBeLessThanOrEqual(841);
+  });
+
+  test('a top-placed mobile popup scrolls above the viewport without covering its target', () => {
+    setViewport(390, 844, 375, 844);
+    let bounds = rect(300, 400, 54, 54);
+    jest.spyOn(target, 'getBoundingClientRect').mockImplementation(() => bounds);
+    jest.spyOn(popup, 'getBoundingClientRect').mockReturnValue(rect(0, 0, 375, 255));
+    const Tether = injector.get('Tether');
+    tether = new Tether({ element: popup, target, attachment: 'bottom center', targetAttachment: 'top center', optimizations: { gpu: false } });
+    expect(parseFloat(popup.style.top)).toBeCloseTo(145);
+    bounds = rect(300, 108, 54, 54);
+    tether.position();
+    expect(parseFloat(popup.style.left)).toBeCloseTo(0);
+    expect(parseFloat(popup.style.top)).toBeCloseTo(-147);
+    expect(parseFloat(popup.style.top) + 255).toBeLessThanOrEqual(bounds.top);
+    expect(popup.classList.contains('tether-pinned-top')).toBe(false);
+    expect(popup.classList.contains('tether-pinned-bottom')).toBe(false);
+  });
+
+  const arrowFixture = (placement, bounds) => {
+    const horizontal = ['top', 'bottom'].includes(placement);
+    popup.classList.add(placement);
+    const arrow = document.createElement('div');
+    arrow.className = 'arrow';
+    popup.appendChild(arrow);
+    Object.defineProperties(popup, {
+      clientLeft: { value: 1 },
+      clientTop: { value: 1 },
+      clientWidth: { value: 412 },
+      clientHeight: { value: 198 }
+    });
+    jest.spyOn(target, 'getBoundingClientRect').mockImplementation(() => bounds);
+    jest.spyOn(popup, 'getBoundingClientRect').mockImplementation(() => rect(parseFloat(popup.style.left) || 0, parseFloat(popup.style.top) || 0, 414, 200));
+    jest.spyOn(arrow, 'getBoundingClientRect').mockReturnValue(rect(0, 0, horizontal ? 22 : 11, horizontal ? 11 : 22));
+    const positions = {
+      bottom: ['top center', 'bottom center'],
+      top: ['bottom center', 'top center'],
+      left: ['middle right', 'middle left'],
+      right: ['middle left', 'middle right']
+    };
+    const [attachment, targetAttachment] = positions[placement];
+    const Tether = injector.get('Tether');
+    tether = new Tether({ element: popup, target, attachment, targetAttachment, optimizations: { gpu: false } });
+    return {
+      arrow,
+      centre: () => {
+        const offset = parseFloat(arrow.style[horizontal ? 'left' : 'top']);
+        const origin = horizontal ? popup.getBoundingClientRect().left + popup.clientLeft : popup.getBoundingClientRect().top + popup.clientTop;
+        return origin + (Number.isFinite(offset) ? offset : (horizontal ? popup.clientWidth : popup.clientHeight) / 2);
+      }
+    };
+  };
+
+  test.each([
+    ['bottom', rect(1122.5, 190, 40, 30), 1142.5],
+    ['top', rect(1122.5, 400, 40, 30), 1142.5]
+  ])('the pinned %s popup arrow points at the target centre', (placement, bounds, expected) => {
+    const { centre } = arrowFixture(placement, bounds);
+    expect(popup.classList.contains('tether-pinned')).toBe(true);
+    expect(centre()).toBeCloseTo(expected);
+  });
+
+  test.each([
+    ['bottom', rect(-80, 190, 40, 30), 12],
+    ['bottom', rect(1400, 190, 40, 30), 1268]
+  ])('clamps the %s arrow inside the box for target %j', (placement, bounds, expected) => {
+    const { centre } = arrowFixture(placement, bounds);
+    expect(centre()).toBeCloseTo(expected);
+  });
+
+  test.each(['left', 'right'])('leaves %s placement arrows at their default offsets near a vertical edge', placement => {
+    const { arrow, centre } = arrowFixture(placement, rect(600, 800, 40, 30));
+    expect(popup.classList.contains('tether-pinned')).toBe(false);
+    expect(centre()).toBeCloseTo(815);
+    for (const side of ['left', 'right', 'top', 'bottom']) expect(arrow.style[side]).toBe('');
+  });
+
+  test('updates the arrow when the target moves but the pinned box stays still, then resets when unpinned', async () => {
+    const bounds = rect(1122.5, 190, 40, 30);
+    const { arrow, centre } = arrowFixture('bottom', bounds);
+    expect(centre()).toBeCloseTo(1142.5);
+    const left = popup.style.left;
+    Object.assign(bounds, rect(1150, 190, 40, 30));
+    tether.position();
+    await Promise.resolve();
+    expect(popup.style.left).toBe(left);
+    expect(centre()).toBeCloseTo(1170);
+    Object.assign(bounds, rect(600, 190, 40, 30));
+    tether.position();
+    await Promise.resolve();
+    expect(popup.classList.contains('tether-pinned')).toBe(false);
+    for (const side of ['left', 'right', 'top', 'bottom']) expect(arrow.style[side]).toBe('');
+    expect(centre()).toBeCloseTo(620);
+  });
+
+  test.each(['content-main', '$document'])('mobile auto-scroll uses the window with configured parent %s', async parentId => {
+    const animation = jest.spyOn(angular.element.prototype, 'duScrollToElementAnimated');
+    setViewport(390, 844, 390, 844, 0, 34);
+    window.scrollY = 34;
+    jest.spyOn(window, 'scrollTo').mockImplementation((_x, y) => {
+      window.pageYOffset = window.scrollY = y;
+      window.dispatchEvent(new Event('scroll'));
+    });
+    jest.spyOn(document.body, 'scrollHeight', 'get').mockReturnValue(1600);
+    const scope = injector.get('$rootScope').$new();
+    const content = document.createElement('section');
+    content.id = 'content-main';
+    content.style.cssText = 'overflow-y: auto';
+    Object.defineProperties(content, {
+      clientHeight: { value: 1500 },
+      scrollHeight: { value: 1500 },
+      scrollTop: { get: () => 0, set: () => {} }
+    });
+    const element = angular.element(`<div ui-tour="mobile-scroll" ui-tour-scroll-into-view="true" ui-tour-scroll-parent-id="${parentId}"></div>`);
+    content.appendChild(element[0]);
+    element[0].appendChild(target);
+    document.body.appendChild(content);
+    jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
+      if (this === content || this === element[0]) return rect(0, 60 - window.scrollY, 390, 1500);
+      if (this === target) return rect(280, 877.9 - window.scrollY, 54, 54);
+      if (this === document.body) return rect(0, -window.scrollY, 390, 1600);
+      if (this.hasAttribute('data-tether-id')) return rect(0, -window.scrollY, 0, 0);
+      if (this.classList.contains('ui-tour-popup')) {
+        const translation = parseFloat(this.style.transform.match(/translateY\(([-\d.]+)px\)/)?.[1]) || 0;
+        const fixed = this.style.position === 'fixed';
+        const top = this.style.top ? parseFloat(this.style.top)
+          : this.style.bottom ? (fixed ? window.innerHeight : document.body.scrollHeight) - parseFloat(this.style.bottom) - 255 : 0;
+        return rect(0, top + translation - (fixed ? 0 : window.scrollY), 375, 255);
+      }
+      return rect(0, 0, 0, 0);
+    });
+    injector.get('$compile')(element)(scope);
+    scope.$digest();
+    const tour = injector.get('uiTourService').getTourByName('mobile-scroll');
+    const step = tour.createStep({ selector: '.viewport-target', content: 'View', placement: 'top' });
+    try {
+      await tour.start();
+      await animation.mock.results[0].value;
+      await waitFor(() => {
+        expect(window.scrollY).toBeCloseTo(523);
+        const bounds = target.getBoundingClientRect();
+        const popup = step.popup[0].getBoundingClientRect();
+        expect(bounds.top).toBeCloseTo(354.9);
+        expect(bounds.bottom).toBeLessThanOrEqual(844);
+        expect(popup.top).toBeGreaterThanOrEqual(0);
+        expect(Math.abs(popup.bottom - bounds.top)).toBeLessThan(1);
+      }, { timeout: 2000, onTimeout: error => error });
+      expect(content.scrollTop).toBe(0);
+    } finally {
+      await tour.end();
+      step.tether?.destroy();
+      step.popup?.remove();
+      scope.$destroy();
+      content.remove();
+      window.scrollY = window.pageYOffset = 0;
+    }
+  });
+
+  test.each([
+    ['application defaults', {}, true],
+    ['master local attachment', { appendToBody: false }, true],
+    ['top popup', { placement: 'top', popupHeight: 260, offset: 360, visiblePopup: true }, true],
+    ['bottom popup', { popupHeight: 300, offset: 70, visiblePopup: true }, true],
+    ['rendered top popup', { placement: 'top', popupHeight: 0, renderedPopupHeight: 260, offset: 360, visiblePopup: true }, true],
+    ['oversized top popup', { placement: 'top', popupHeight: 450, offset: 550, popupTop: 100 }, true],
+    ['oversized bottom popup', { popupHeight: 450, offset: -80, popupBottom: 400 }, true],
+    ['tall target 1846px above', { placement: 'top', targetHeight: 1846, popupHeight: 183, offset: 283, visiblePopup: true }, true],
+    ['tall target 2488px above', { placement: 'top', targetHeight: 2488, popupHeight: 183, offset: 283, visiblePopup: true }, true],
+    ['tall target below', { targetHeight: 1846, popupHeight: 183, offset: -1629, visiblePopup: true, popupBottom: 400 }, true],
+    ['empty popup', { popupHeight: 0 }, true],
+    ['disabled auto-scroll', { scrollIntoView: false }, false],
+    ['disabled step auto-scroll', { stepScrollIntoView: false }, false],
+    ['revisited body popup', { revisit: true }, true],
+    ['orphan', { orphan: true }, false],
+    ['missing scroll parent', { missingParent: true }, false],
+    ['cancelled scrolling', { cancelScroll: true }, false]
+  ])('shows a below-fold target in content-main: %s', async (_name, options, shouldScroll) => {
+    const scope = injector.get('$rootScope').$new();
+    const content = document.createElement('section');
+    content.id = 'content-main';
+    content.style.cssText = 'position: relative; overflow: auto; height: 400px';
+    let scrollTop = 0;
+    let popupHeight = options.popupHeight ?? 200;
+    const scrollHeight = options.targetHeight ? 4000 : 1600;
+    Object.defineProperty(content, 'scrollTop', {
+      get: () => scrollTop,
+      set: value => { scrollTop = Math.max(0, Math.min(scrollHeight - 400, value)); }
+    });
+    Object.defineProperties(content, { clientHeight: { value: 400 }, scrollHeight: { value: scrollHeight } });
+    const attachment = options.appendToBody === undefined ? '' : `ui-tour-append-to-body="${options.appendToBody}"`;
+    const element = angular.element(`<div ui-tour="scroll" ui-tour-scroll-into-view="${options.scrollIntoView !== false}" ${attachment} ui-tour-scroll-parent-id="${options.missingParent ? 'missing' : 'content-main'}" style="position: relative; overflow: hidden"></div>`);
+    content.appendChild(element[0]);
+    element[0].appendChild(target);
+    document.body.appendChild(content);
+    jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
+      if (this === content) return rect(0, 60, 1280, 400);
+      if (this === element[0]) return rect(0, 60 - scrollTop, 1280, scrollHeight);
+      if (this === target) return rect(1220, 1060 - scrollTop, 40, options.targetHeight ?? 30);
+      if (this.classList.contains('ui-tour-popup')) {
+        const translation = parseFloat(this.style.transform.match(/translateY\(([-\d.]+)px\)/)?.[1]) || 0;
+        const positionedTop = this.style.top ? parseFloat(this.style.top)
+          : this.style.bottom ? (this.style.position === 'fixed' ? window.innerHeight : document.body.scrollHeight) - parseFloat(this.style.bottom) - popupHeight
+            : undefined;
+        return rect(0, positionedTop === undefined ? (this.parentNode === document.body ? 0 : 1090 - scrollTop) : positionedTop + translation,
+          414, popupHeight);
+      }
+      return rect(0, 0, 0, 0);
+    });
+    injector.get('$compile')(element)(scope);
+    scope.$digest();
+    const tour = injector.get('uiTourService').getTourByName('scroll');
+    const step = tour.createStep({ selector: '.viewport-target', stepId: 'below-fold', content: 'Below-fold target', placement: options.placement || 'bottom',
+      orphan: options.orphan === true, scrollIntoView: options.stepScrollIntoView });
+    if (options.renderedPopupHeight !== undefined) step.onShown = () => { popupHeight = options.renderedPopupHeight; };
+    const destination = target.getBoundingClientRect().top - content.getBoundingClientRect().top - (options.offset ?? step.config('scrollOffset'));
+    expect(target.getBoundingClientRect().top).toBeGreaterThan(content.getBoundingClientRect().bottom);
+    try {
+      expect(tour.config('scrollIntoView')).toBe(options.scrollIntoView !== false);
+      await tour.start();
+      await waitFor(() => expect(step.popup[0].style.visibility).toBe('visible'));
+      expect(step.popup[0].parentNode).toBe(document.body);
+      if (!options.orphan) expect(step.tether.scrollParents).toContain(content);
+      const expectTargetVisible = () => {
+        if (!options.targetHeight && popupHeight <= 400) {
+          expect(target.getBoundingClientRect().top).toBeGreaterThanOrEqual(content.getBoundingClientRect().top);
+          expect(target.getBoundingClientRect().bottom).toBeLessThanOrEqual(content.getBoundingClientRect().bottom);
+        }
+        expect(content.scrollTop).toBeCloseTo(destination);
+        expect(document.activeElement).toBe(step.popup[0]);
+        if (options.visiblePopup) {
+          const popup = step.popup[0].getBoundingClientRect();
+          expect(popup.top).toBeGreaterThanOrEqual(content.getBoundingClientRect().top);
+          expect(popup.bottom).toBeLessThanOrEqual(content.getBoundingClientRect().bottom);
+        }
+        if (options.targetHeight || options.popupTop !== undefined || options.popupBottom !== undefined) {
+          const popup = step.popup[0].getBoundingClientRect();
+          const bounds = target.getBoundingClientRect();
+          expect(options.placement === 'top' ? popup.bottom : popup.top).toBeCloseTo(options.placement === 'top' ? bounds.top : bounds.bottom);
+          if (options.placement === 'top') expect(popup.top).toBeCloseTo(content.getBoundingClientRect().top + (options.popupTop ?? 100));
+          if (options.popupBottom !== undefined) expect(popup.bottom).toBeCloseTo(content.getBoundingClientRect().top + options.popupBottom);
+        }
+      };
+      if (shouldScroll) {
+        await waitFor(expectTargetVisible, { timeout: 2000, onTimeout: error => error });
+        if (options.revisit) {
+          await tour.end();
+          content.scrollTop = 0;
+          await tour.start();
+          await waitFor(expectTargetVisible, { timeout: 2000, onTimeout: error => error });
+        }
+      } else if (options.cancelScroll) {
+        angular.element(content).triggerHandler({ type: 'mousedown', which: 1 });
+        const stoppedAt = content.scrollTop;
+        const frame = injector.get('requestAnimation');
+        await new Promise(resolve => frame(() => frame(resolve)));
+        expect(content.scrollTop).toBe(stoppedAt);
+        expect(tour.getStatus()).toBe(tour.Status.ON);
+      } else {
+        expect(content.scrollTop).toBe(0);
+      }
+    } finally {
+      await tour.end();
+      expect(step.scrollIntoView).toBe(options.stepScrollIntoView);
+      if (step.tether) step.tether.destroy();
+      if (step.popup) step.popup.remove();
+      scope.$destroy();
+      content.remove();
+    }
+  });
+
+  test('a right-edge target in an offset ancestor gets a body-attached popup beside it', async () => {
+    const scope = injector.get('$rootScope').$new();
+    const element = angular.element('<div ui-tour="viewport" style="position: relative; left: 900px; top: 100px; overflow: hidden"></div>');
+    document.body.appendChild(element[0]);
+    element[0].appendChild(target);
+    let initialParent;
+    jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
+      if (this === element[0]) return rect(900, 100, 350, 500);
+      if (this === target) return rect(1053.8, 200, 194.9, 30);
+      if (this.classList.contains('ui-tour-popup')) {
+        if (initialParent === undefined && this.parentNode) initialParent = this.parentNode;
+        const x = parseFloat(this.style.transform.match(/translateX\(([-\d.]+)px\)/)?.[1]) || 0;
+        const y = parseFloat(this.style.transform.match(/translateY\(([-\d.]+)px\)/)?.[1]) || 0;
+        return rect((this.parentNode === document.body ? 0 : 900) + (parseFloat(this.style.left) || 0) + x,
+          (this.parentNode === document.body ? 0 : 100) + (parseFloat(this.style.top) || 0) + y, 414, 200);
+      }
+      return rect(0, 0, 0, 0);
+    });
+    injector.get('$compile')(element)(scope);
+    scope.$digest();
+    const tour = injector.get('uiTourService').getTourByName('viewport');
+    const step = tour.createStep({ selector: '.viewport-target', stepId: 'target', content: 'Tour content', placement: 'bottom' });
+    try {
+      await tour.start();
+      await waitFor(() => expect(step.tether).toBeDefined());
+      expect(initialParent).toBe(document.body);
+      expect(step.popup[0].parentNode).toBe(document.body);
+      expect(step.popup[0].getBoundingClientRect().left).toBeCloseTo(866);
+      expect(step.popup[0].getBoundingClientRect().right).toBeCloseTo(1280);
+      const targetCentre = target.getBoundingClientRect().left + target.getBoundingClientRect().width / 2;
+      expect(targetCentre).toBeGreaterThan(step.popup[0].getBoundingClientRect().left);
+      expect(targetCentre).toBeLessThan(step.popup[0].getBoundingClientRect().right);
+      expect(step.tether.options.constraints).toContainEqual({ to: [0, 0, 1280, 841], pin: ['left', 'right'] });
+    } finally {
+      await tour.end();
+      if (step.tether) step.tether.destroy();
+      if (step.popup) step.popup.remove();
+      scope.$destroy();
+      element.remove();
+    }
+  });
+});

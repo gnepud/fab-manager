@@ -61,6 +61,122 @@ angular.module('application', ['ngCookies', 'ngResource', 'ngSanitize', 'ui.rout
       $translateProvider.preferredLanguage(Fablab.locale);
       // End the tour when the user clicks the forward or back buttons of the browser
       TourConfigProvider.enableNavigationInterceptors();
+      TourConfigProvider.set('appendToBody', true);
+      $provide.decorator('TourStepService', ['$delegate', '$document', 'Tether', 'positionMap', function (service, $document, Tether, positionMap) {
+        const showStep = service.showStep;
+        const hideStep = service.hideStep;
+        const scrollOptions = new WeakMap();
+        const restoreScrollOption = step => {
+          if (!scrollOptions.has(step)) return;
+          const value = scrollOptions.get(step);
+          if (value === undefined) delete step.scrollIntoView;
+          else step.scrollIntoView = value;
+          scrollOptions.delete(step);
+        };
+        service.showStep = function (step, tour) {
+          restoreScrollOption(step);
+          const scroll = !step.config('orphan') && step.config('scrollIntoView');
+          if (scroll) {
+            scrollOptions.set(step, step.scrollIntoView);
+            step.scrollIntoView = false;
+          }
+          try {
+            const result = showStep(step, tour);
+            if (!scroll) return result;
+            if (!step.tether) {
+              const placement = positionMap[step.config('placement')];
+              step.tether = new Tether({
+                element: step.popup[0],
+                target: step.element[0],
+                attachment: placement.popup,
+                targetAttachment: placement.target
+              });
+            } else step.tether.enable();
+            step.reposition();
+            const parentId = step.config('scrollParentId');
+            let parent = parentId === '$document' ? $document : angular.element($document[0].getElementById(parentId));
+            while (parent.length && parent[0] !== $document[0]) {
+              const node = parent[0];
+              const style = window.getComputedStyle(node);
+              if (node !== $document[0].body && node !== $document[0].documentElement &&
+                  /auto|scroll/.test(style.overflowY || style.overflow) && node.scrollHeight > node.clientHeight) break;
+              parent = node.parentElement ? angular.element(node.parentElement) : $document;
+            }
+            if (parent.length) {
+              tour.once('stepShown', shown => {
+                if (shown !== step) return;
+                step.reposition();
+                const popup = step.popup[0].getBoundingClientRect();
+                const target = step.element[0].getBoundingClientRect();
+                const height = parent[0] === $document[0] ? $document[0].documentElement.clientHeight
+                  : parent[0].clientHeight || parent[0].getBoundingClientRect().height;
+                const placement = step.config('placement').split('-')[0];
+                let offset = step.config('scrollOffset');
+                if (placement === 'top') {
+                  const space = popup.height + Math.max(0, target.top - popup.bottom);
+                  offset += space;
+                  if (space + target.height <= height) offset = Math.min(offset, height - target.height);
+                } else if (placement === 'bottom') {
+                  const space = target.height + popup.height + Math.max(0, popup.top - target.bottom);
+                  offset = Math.min(offset, height - space);
+                }
+                parent.duScrollToElementAnimated(step.element, offset, 500)
+                  .then(() => step.reposition(), angular.noop);
+              });
+            }
+            return result;
+          } catch (error) {
+            restoreScrollOption(step);
+            throw error;
+          }
+        };
+        service.hideStep = function (step) {
+          const result = hideStep(step);
+          restoreScrollOption(step);
+          return result;
+        };
+        return service;
+      }]);
+      $provide.decorator('Tether', ['$delegate', function (Tether) {
+        return class ViewportTether extends Tether {
+          constructor (options) {
+            super({
+              ...options,
+              constraints: [...(options.constraints || []), { to: 'window', pin: ['left', 'right'] }]
+            });
+            const updateArrow = () => Promise.resolve().then(() => this.positionArrow());
+            this.on('repositioned', updateArrow);
+            this.on('update', updateArrow);
+            this.positionArrow();
+          }
+
+          position (flushChanges = true) {
+            const viewport = this.options.constraints[this.options.constraints.length - 1];
+            const { pageXOffset: left, pageYOffset: top } = window;
+            const { clientWidth, clientHeight } = document.documentElement;
+            viewport.to = [left, top, left + clientWidth, top + clientHeight];
+            return super.position(flushChanges);
+          }
+
+          positionArrow () {
+            const arrow = this.element.querySelector('.arrow');
+            if (!arrow) return;
+            arrow.style.left = '';
+            arrow.style.right = '';
+            if (!this.element.classList.contains('top') && !this.element.classList.contains('bottom')) return;
+            if (!this.element.classList.contains(this.options.pinnedClass || this.getClass('pinned'))) return;
+            const element = this.element.getBoundingClientRect();
+            const target = this.target.getBoundingClientRect();
+            const size = this.element.clientWidth;
+            if (!size) return;
+            const arrowBounds = arrow.getBoundingClientRect();
+            const padding = Math.min(arrowBounds.width / 2, size / 2);
+            const offset = target.left + target.width / 2 - element.left - this.element.clientLeft;
+            arrow.style.left = `${Math.max(padding, Math.min(size - padding, offset))}px`;
+            arrow.style.right = 'auto';
+          }
+        };
+      }]);
 
       $sceDelegateProvider.resourceUrlWhitelist(['self']);
     }]).run(['$rootScope', '$transitions', '$log', 'Auth', 'amMoment', '$state', 'editableOptions',
