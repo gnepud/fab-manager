@@ -18,9 +18,27 @@ class ICalendarEventsTest < ActionDispatch::IntegrationTest
   end
 
   test 'keeps the white background when no source color is set' do
-    @calendar.update!(color: '')
+    @calendar.update!(color: '', text_color: nil)
 
     assert_equal 'white', public_event[:backgroundColor]
+  end
+
+  test 'keeps dark text readable on a dark source' do
+    @calendar.update!(color: '#151515', text_color: '#111')
+
+    assert_equal 'white', public_event[:backgroundColor]
+  end
+
+  test 'keeps the default black text readable on a black source' do
+    @calendar.update!(color: '#000', text_color: nil)
+
+    assert_equal 'white', public_event[:backgroundColor]
+  end
+
+  test 'uses a dark fallback when the configured colors are both light' do
+    @calendar.update!(color: '#eee', text_color: '#fff')
+
+    assert_equal 'black', public_event[:backgroundColor]
   end
 
   private
