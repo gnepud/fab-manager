@@ -100,18 +100,18 @@ describe('application-wide tour viewport constraints', () => {
     const top = parseFloat(popup.style.top) - scrollY;
     expect(left).toBeCloseTo(0);
     expect(left + 375).toBeLessThanOrEqual(document.documentElement.clientWidth);
-    expect(top).toBeCloseTo(629);
-    expect(top + 200).toBeLessThanOrEqual(document.documentElement.clientHeight);
+    expect(top).toBeCloseTo(820);
+    expect(top + 200).toBeGreaterThan(document.documentElement.clientHeight);
   });
 
   test('recomputes viewport bounds on reposition after resizing and scrolling', () => {
     gutterFixture();
     setViewport(390, 844, 375, 829, 120, 240);
     tether.position();
-    expect(tether.options.constraints).toContainEqual({ to: [120, 240, 495, 1069], pin: true });
+    expect(tether.options.constraints).toContainEqual({ to: [120, 240, 495, 1069], pin: ['left', 'right'] });
     setViewport(430, 880, 415, 865, 80, 160);
     tether.position();
-    expect(tether.options.constraints).toContainEqual({ to: [80, 160, 495, 1025], pin: true });
+    expect(tether.options.constraints).toContainEqual({ to: [80, 160, 495, 1025], pin: ['left', 'right'] });
   });
 
   test.each([
@@ -121,8 +121,6 @@ describe('application-wide tour viewport constraints', () => {
     ['projects reports, centered', 1102, 100, 80, 'top center', 'bottom center', 'shift-left-40'],
     ['projects reports, right aligned near the left edge', 50, 100, 80, 'top right', 'bottom right', ''],
     ['left edge', 0, 100, 40, 'top center', 'bottom center', 'shift-right-40'],
-    ['top edge', 600, 0, 40, 'bottom center', 'top center', ''],
-    ['bottom edge', 600, 810, 40, 'top center', 'bottom center', ''],
     ['already on screen', 600, 100, 40, 'top center', 'bottom center', '']
   ])('keeps a popup inside 1280x841: %s', (_name, left, top, width, attachment, targetAttachment, popupClass) => {
     popup.classList.add(...popupClass.split(' ').filter(Boolean));
@@ -136,6 +134,23 @@ describe('application-wide tour viewport constraints', () => {
     expect(x + 414).toBeLessThanOrEqual(1280);
     expect(y).toBeGreaterThanOrEqual(0);
     expect(y + 200).toBeLessThanOrEqual(841);
+  });
+
+  test('a top-placed mobile popup scrolls above the viewport without covering its target', () => {
+    setViewport(390, 844, 375, 844);
+    let bounds = rect(300, 400, 54, 54);
+    jest.spyOn(target, 'getBoundingClientRect').mockImplementation(() => bounds);
+    jest.spyOn(popup, 'getBoundingClientRect').mockReturnValue(rect(0, 0, 375, 255));
+    const Tether = injector.get('Tether');
+    tether = new Tether({ element: popup, target, attachment: 'bottom center', targetAttachment: 'top center', optimizations: { gpu: false } });
+    expect(parseFloat(popup.style.top)).toBeCloseTo(145);
+    bounds = rect(300, 108, 54, 54);
+    tether.position();
+    expect(parseFloat(popup.style.left)).toBeCloseTo(0);
+    expect(parseFloat(popup.style.top)).toBeCloseTo(-147);
+    expect(parseFloat(popup.style.top) + 255).toBeLessThanOrEqual(bounds.top);
+    expect(popup.classList.contains('tether-pinned-top')).toBe(false);
+    expect(popup.classList.contains('tether-pinned-bottom')).toBe(false);
   });
 
   const arrowFixture = (placement, bounds) => {
@@ -174,9 +189,7 @@ describe('application-wide tour viewport constraints', () => {
 
   test.each([
     ['bottom', rect(1122.5, 190, 40, 30), 1142.5],
-    ['top', rect(1122.5, 400, 40, 30), 1142.5],
-    ['left', rect(600, 800, 40, 30), 815],
-    ['right', rect(600, 800, 40, 30), 815]
+    ['top', rect(1122.5, 400, 40, 30), 1142.5]
   ])('the pinned %s popup arrow points at the target centre', (placement, bounds, expected) => {
     const { centre } = arrowFixture(placement, bounds);
     expect(popup.classList.contains('tether-pinned')).toBe(true);
@@ -185,12 +198,17 @@ describe('application-wide tour viewport constraints', () => {
 
   test.each([
     ['bottom', rect(-80, 190, 40, 30), 12],
-    ['bottom', rect(1400, 190, 40, 30), 1268],
-    ['right', rect(600, -80, 40, 30), 12],
-    ['right', rect(600, 900, 40, 30), 829]
+    ['bottom', rect(1400, 190, 40, 30), 1268]
   ])('clamps the %s arrow inside the box for target %j', (placement, bounds, expected) => {
     const { centre } = arrowFixture(placement, bounds);
     expect(centre()).toBeCloseTo(expected);
+  });
+
+  test.each(['left', 'right'])('leaves %s placement arrows at their default offsets near a vertical edge', placement => {
+    const { arrow, centre } = arrowFixture(placement, rect(600, 800, 40, 30));
+    expect(popup.classList.contains('tether-pinned')).toBe(false);
+    expect(centre()).toBeCloseTo(815);
+    for (const side of ['left', 'right', 'top', 'bottom']) expect(arrow.style[side]).toBe('');
   });
 
   test('updates the arrow when the target moves but the pinned box stays still, then resets when unpinned', async () => {
@@ -323,7 +341,7 @@ describe('application-wide tour viewport constraints', () => {
       const targetCentre = target.getBoundingClientRect().left + target.getBoundingClientRect().width / 2;
       expect(targetCentre).toBeGreaterThan(step.popup[0].getBoundingClientRect().left);
       expect(targetCentre).toBeLessThan(step.popup[0].getBoundingClientRect().right);
-      expect(step.tether.options.constraints).toContainEqual({ to: [0, 0, 1280, 841], pin: true });
+      expect(step.tether.options.constraints).toContainEqual({ to: [0, 0, 1280, 841], pin: ['left', 'right'] });
     } finally {
       await tour.end();
       if (step.tether) step.tether.destroy();
