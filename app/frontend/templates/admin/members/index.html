@@ -5,12 +5,12 @@
         <a ng-click="backPrevLocation($event)"><i class="fas fa-long-arrow-alt-left "></i></a>
       </section>
     </div>
-    <div class="col-xs-8 col-sm-8 col-md-8 b-l">
+    <div class="col-xs-7 col-sm-8 col-md-8 b-l">
       <section class="heading-title">
         <h1 translate>{{ 'app.admin.members.users_management' }}</h1>
       </section>
     </div>
-    <div class="col-xs-1 col-xs-offset-1 col-md-offset-2 b-l">
+    <div class="col-xs-3 col-sm-1 col-sm-offset-1 col-md-offset-2 b-l">
       <section class="heading-actions wrapper" ng-show="isAuthorized('admin')">
         <a role="button" class="btn btn-default b-2x rounded m-t-sm import-members" ui-sref="app.admin.members_import" title="{{ 'app.admin.members.import' | translate }}">
           <i class="fa fa-cloud-upload"></i>
