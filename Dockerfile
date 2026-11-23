@@ -1,4 +1,4 @@
-FROM ruby:3.2.2
+FROM ruby:3.4.13
 MAINTAINER contact@sleede.com
 
 # First we need to be able to fetch from https repositories

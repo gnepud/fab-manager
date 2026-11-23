@@ -12,6 +12,7 @@ gem 'shakapacker', '6.6.0'
 
 # rails 6 compatibility with ruby 3 (may not be required after upgrade to rails 7)
 gem 'matrix'
+gem 'mutex_m'
 gem 'net-imap', require: false
 gem 'net-pop', require: false
 gem 'net-smtp', require: false
