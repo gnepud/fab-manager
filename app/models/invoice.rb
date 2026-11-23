@@ -86,6 +86,7 @@ class Invoice < PaymentDocument
       avoir_ii.invoice_item_id = ii.id
       avoir.total += ii.amount_after_coupon
     end
+    avoir.wallet_amount = avoir.payment_method == 'wallet' ? avoir.total : 0
     avoir
   end
 
