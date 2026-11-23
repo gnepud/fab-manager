@@ -1137,8 +1137,8 @@ Application.Controllers.controller('NewMemberController', ['$scope', '$state', '
 /**
  * Controller used in the member's import page: import from CSV (admin view)
  */
-Application.Controllers.controller('ImportMembersController', ['$scope', '$state', 'Group', 'Training', 'CSRF', 'tags', 'growl',
-  function ($scope, $state, Group, Training, CSRF, tags, growl) {
+Application.Controllers.controller('ImportMembersController', ['$scope', '$state', 'Group', 'Training', 'CSRF', 'tags', 'growl', '_t',
+  function ($scope, $state, Group, Training, CSRF, tags, growl, _t) {
     CSRF.setMetaTags();
 
     /* PUBLIC SCOPE */
@@ -1152,15 +1152,26 @@ Application.Controllers.controller('ImportMembersController', ['$scope', '$state
     // List of all tags
     $scope.tags = tags;
 
+    $scope.onImportError = function () {
+      $scope.$isUploading = false;
+      growl.error(_t('app.admin.members_import.upload_failed'));
+    };
+
     /*
      * Callback run after the form was submitted
      * @param content {*} The result provided by the server, may be an Import object, or an error message
      */
     $scope.onImportResult = function (content) {
-      if (content.id) {
+      $scope.$isUploading = false;
+      if (content && content.id) {
         $state.go('app.admin.members_import_result', { id: content.id });
       } else {
-        growl.error(JSON.stringify(content));
+        const messages = uploadErrorMessages(content && content.attachment);
+        if (Array.isArray(messages) && messages.length && messages.every(message => typeof message === 'string' && message.trim() && !/[<>]/.test(message))) {
+          growl.error(messages.join(' '));
+        } else {
+          $scope.onImportError();
+        }
       }
     };
 
