@@ -41,6 +41,15 @@ describe('Home tour after login without a reload', () => {
       .value('$uibModal', modal)
       .value('$state', { current: { name: 'app.public.home' } });
     injector = angular.injector(['ng', 'homeTourDependencies', 'homeTourTest']);
+    const $q = injector.get('$q');
+    modal.open.mockImplementation(() => {
+      const result = $q.defer();
+      return {
+        opened: $q.resolve(true),
+        result: result.promise,
+        close: jest.fn(value => result.resolve(value))
+      };
+    });
     root = injector.get('$rootScope');
     root.modules = { spaces: false };
     publishUser({ id: 1, role: 'member', profile_attributes: { tours: [] } });
@@ -86,7 +95,7 @@ describe('Home tour after login without a reload', () => {
     const modalScope = {};
     injector.invoke(options.controller, null, {
       $scope: modalScope,
-      $uibModalInstance: { close: jest.fn() },
+      $uibModalInstance: modal.open.mock.results[0].value,
       tourName: options.resolve.tourName()
     });
     modalScope.onTour();
