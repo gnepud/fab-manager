@@ -20,14 +20,19 @@ describe('Members import header grid contract (not a layout test)', () => {
     expect(columns[2].contains(button)).toBe(true);
   });
 
-  test('explicitly restores the original tablet and desktop widths and offsets', () => {
+  test('allocates two tablet columns to the import action with a twelve-column row and no offset', () => {
     expect(columns[0].classList.contains('col-sm-2')).toBe(true);
-    expect(columns[0].classList.contains('col-md-1')).toBe(true);
     expect(columns[1].classList.contains('col-sm-8')).toBe(true);
+    expect(columns[2].classList.contains('col-sm-2')).toBe(true);
+    expect(Array.from(columns[2].classList).some(name => name.startsWith('col-sm-offset-'))).toBe(false);
+  });
+
+  test('explicitly restores the original desktop widths and offsets, inherited by large screens', () => {
+    expect(columns[0].classList.contains('col-md-1')).toBe(true);
     expect(columns[1].classList.contains('col-md-8')).toBe(true);
-    expect(columns[2].classList.contains('col-sm-1')).toBe(true);
-    expect(columns[2].classList.contains('col-sm-offset-1')).toBe(true);
+    expect(columns[2].classList.contains('col-md-1')).toBe(true);
     expect(columns[2].classList.contains('col-md-offset-2')).toBe(true);
+    expect(columns.every(column => Array.from(column.classList).every(name => !name.startsWith('col-lg-')))).toBe(true);
   });
 
   test('preserves the import action, admin visibility, and shared button styling', () => {
