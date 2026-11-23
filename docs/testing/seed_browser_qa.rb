@@ -9,15 +9,17 @@ class BrowserQaSeed
 
     password = ENV.fetch('BROWSER_QA_PASSWORD')
     day = Time.zone.tomorrow + 1
-    ApplicationRecord.transaction do
+    availability_ids = ApplicationRecord.transaction do
       enable_modules
       group = Group.find_or_create_by!(name: 'QA Browser', slug: 'qa-browser')
       other_group = Group.find_or_create_by!(name: 'QA Browser Other', slug: 'qa-browser-other')
       member = seed_users(group, other_group, password)
-      seed_resources(group, other_group, day)
-      seed_events(day)
+      resources = seed_resources(group, other_group, day)
+      events = seed_events(day)
       seed_catalog(member)
+      resources + events
     end
+    index_availabilities(availability_ids)
     puts 'Browser QA ready: 7 accounts, 2 groups, 2 machines, 1 training, 1 space, 1 plan, 1 pack, 2 events, 1 product, 1 project.'
     puts "Machine, training and space availability begins #{day.iso8601} (#{Time.zone.name})."
   end
@@ -29,6 +31,12 @@ class BrowserQaSeed
       Setting.set(name, true).save! unless Setting.get(name)
     end
     Setting.set('store_hidden', false).save! unless Setting.get('store_hidden') == false
+  end
+
+  def index_availabilities(ids)
+    worker = AvailabilityIndexerWorker.new
+    ids.each { |id| worker.perform('index', id) }
+    AvailabilityIndexerWorker::Client.indices.refresh(index: Availability.index_name)
   end
 
   def seed_users(group, other_group, password)
@@ -57,11 +65,13 @@ class BrowserQaSeed
     space = Space.find_or_create_by!(name: 'QA Space') { |item| item.default_places = 4 }
     seed_prices(group, other_group, [machine, open_machine, space], training)
     seed_plan(group, machine, training)
-    3.times do |offset|
+    (0...3).flat_map do |offset|
       date = day + offset
-      seed_availability(machine, date, 10, 'machines', machines: [machine, open_machine], slot_duration: 60)
-      seed_availability(training, date, 13, 'training', trainings: [training], nb_total_places: 4)
-      seed_availability(space, date, 15, 'space', spaces: [space], nb_total_places: 4, slot_duration: 60)
+      [
+        seed_availability(machine, date, 10, 'machines', machines: [machine, open_machine], slot_duration: 60),
+        seed_availability(training, date, 13, 'training', trainings: [training], nb_total_places: 4),
+        seed_availability(space, date, 15, 'space', spaces: [space], nb_total_places: 4, slot_duration: 60)
+      ]
     end
   end
 
@@ -92,6 +102,7 @@ class BrowserQaSeed
     times = { start_at: start_at, end_at: start_at + 2.hours, available_type: type }
     availability = resource.availabilities.find_by(times) || Availability.create!(times.merge(attributes))
     Availabilities::CreateAvailabilitiesService.new.create(availability, []) unless availability.slots.exists?
+    availability.id
   end
 
   def seed_events(day)
@@ -100,7 +111,7 @@ class BrowserQaSeed
     {
       'QA Standard Event' => ['standard', 1_200, 11],
       'QA Family Event' => ['family', 0, 15]
-    }.each do |title, (type, amount, hour)|
+    }.map do |title, (type, amount, hour)|
       event = Event.find_or_create_by!(title: title) do |item|
         start_at = Time.zone.local(day.year, day.month, day.day, hour)
         item.assign_attributes(description: 'Browser QA event', event_type: type, amount: amount, nb_total_places: 8,
@@ -109,6 +120,7 @@ class BrowserQaSeed
       end
       Availabilities::CreateAvailabilitiesService.new.create_slots(event.availability) unless event.availability.slots.exists?
       event.event_price_categories.find_or_create_by!(price_category: fare) { |price| price.amount = 600 } if type == 'standard'
+      event.availability_id
     end
   end
 

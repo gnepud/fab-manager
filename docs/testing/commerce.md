@@ -16,7 +16,7 @@
 | INV-01 · 发票预览和会计代码持久化 | full | 是 | 管理员；启用会计设置；Sidekiq；有已付发票 | 在 `/admin/invoices` 下载 PDF；更改会计代码并刷新；切换 VAT 查看预览 | 代码持久显示，预览反映开关，发票可打开 | [#21](https://github.com/gnepud/fab-manager/pull/21)、[#65](https://github.com/gnepud/fab-manager/pull/65) |
 | INV-02 · Avoir 的业务和税额口径 | full | 是 | 管理员；原含税发票、订阅发票及另一份钱包付款多行发票；之后变更 VAT；记录余额与付款流水 | 在原票开具全额 Avoir；在钱包票只选部分明细行；查看 PDF、订阅、税务与会计导出 | 沿用原票 VAT，VAT 导出扣减凭证；只让被凭证冲销的订阅失效；部分凭证只记选中行的金额、会计线平衡；不发起卡/钱包退款 | [#49](https://github.com/gnepud/fab-manager/pull/49)、[#61](https://github.com/gnepud/fab-manager/pull/61)、[#63](https://github.com/gnepud/fab-manager/pull/63)、[#133](https://github.com/gnepud/fab-manager/pull/133) |
 | INV-03 · 会计日期边界 | full | 是 | 管理员，本地时区午夜附近两张发票；执行 `AccountingWorker` 生成会计线 | 在会计界面选本地起止日期并下载导出，检查午夜两侧单据 | 以站点日期边界筛选，目标日记录纳入且邻日不混入 | [#67](https://github.com/gnepud/fab-manager/pull/67) |
-| STA-01 · 统计、筛选与导出 | smoke | 是 | 管理员，已构建统计索引，存在销售；Sidekiq | 遍历 `/admin/statistics` 标签；选择子类型、按 CA 排序；导出当前筛选及全量 XLSX；查看 Evolution | 排序/筛选正确，`Panier moyen` 按货币格式显示，导出通知可下载，趋势可打开 | [#52](https://github.com/gnepud/fab-manager/pull/52) |
+| STA-01 · 统计、筛选与导出 | smoke | 是 | 管理员，已构建统计索引，存在销售；Sidekiq；保留初始种子的机器及培训时段 | 遍历 `/admin/statistics` 标签；以覆盖三个种子日的日期范围检查机器小时与培训名额；选择子类型、按 CA 排序；导出当前筛选及全量 XLSX；查看 Evolution | 初始夹具合计 12 机器小时、12 培训名额；排序/筛选正确，`Panier moyen` 按货币格式显示，导出通知可下载，趋势可打开 | [#52](https://github.com/gnepud/fab-manager/pull/52) |
 | STA-02 · 导出文件不存在 | full | 是 | 管理员；在一次性环境生成一份导出，之后清除其本地文件 | 从原通知再次下载 | 返回 404，而不是 500 | [#55](https://github.com/gnepud/fab-manager/pull/55) |
 
 ## 商店与订单

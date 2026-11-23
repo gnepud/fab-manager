@@ -25,7 +25,7 @@ RAILS_ENV=development bundle exec rails fablab:es:build_stats
 RAILS_ENV=development bundle exec rails runner docs/testing/seed_browser_qa.rb
 ~~~
 
-`db:schema:load` 只用于首次准备空库，`db:migrate` 补上 schema 尚未包含的迁移。runner 要求关闭在线支付，会启用空间及商店并让会员可见商店，不会重置余额、库存、密码或已经用过的预约。可用时段按执行日之后的日期创建；同一天重跑不会重复创建基线记录。需要重复消费、支付、删除或跨日验证时，使用新的库或恢复预先保存的本地快照。
+`db:schema:load` 只用于首次准备空库，`db:migrate` 补上 schema 尚未包含的迁移。runner 要求关闭在线支付，会启用空间及商店并让会员可见商店，不会重置余额、库存、密码或已经用过的预约。可用时段按执行日之后的日期创建，提交数据后同步写入 Elasticsearch；同一天重跑不会重复创建基线记录。需要重复消费、支付、删除或跨日验证时，使用新的库或恢复预先保存的本地快照。
 
 | 数据 | 用途 |
 | --- | --- |
