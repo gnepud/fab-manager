@@ -2064,7 +2064,7 @@ en:
           draft_from_USER_DATE: "Draft, saved by {USER}, on {DATE}"
           save_or_publish: "Save or publish?"
           save_or_publish_body: "Do you want to publish a new version of the privacy policy or save it as a draft?"
-          publish_will_notify: "Publish a new version will send a notification to every users."
+          publish_will_notify: "Publishing a new version will notify all members."
           publish: "Publish"
           users_notified: "Platform users will be notified of the update."
           about_analytics: "I agree to share anonymous data with the development team to help improve Fab-manager."

@@ -2063,7 +2063,7 @@ sv:
           draft_from_USER_DATE: "Utkast, sparat av {USER}, den {DATE}"
           save_or_publish: "Spara eller publicera?"
           save_or_publish_body: "Vill du publicera en ny version av sekretesspolicyn eller spara den som ett utkast?"
-          publish_will_notify: "Publicera en ny version kommer att skicka ett meddelande till alla användare."
+          publish_will_notify: "När en ny version publiceras får alla medlemmar en avisering."
           publish: "Publicera"
           users_notified: "Plattformsanvändare kommer att meddelas om uppdateringen."
           about_analytics: "Jag samtycker till att dela anonym data med utvecklingsteamet för att hjälpa till att förbättra Fab-manager."

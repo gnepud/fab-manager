@@ -2063,7 +2063,7 @@ zh-CN:
           draft_from_USER_DATE: "草稿，由{USER}保存于{DATE}"
           save_or_publish: "保存或发布？"
           save_or_publish_body: "您想发布隐私政策的新版本还是将其保存为草稿？"
-          publish_will_notify: "发布新版本将向每个用户发送通知。"
+          publish_will_notify: "发布新版本后，所有会员都会收到通知。"
           publish: "发布"
           users_notified: "平台用户将收到更新通知。"
           about_analytics: "我同意与开发团队分享匿名数据，以帮助改进Fab-manager。"

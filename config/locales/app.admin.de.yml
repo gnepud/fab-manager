@@ -2063,7 +2063,7 @@ de:
           draft_from_USER_DATE: "Entwurf gespeichert von {USER} am {DATE}"
           save_or_publish: "Speichern oder veröffentlichen?"
           save_or_publish_body: "Möchten Sie eine neue Version der Datenschutzrichtlinie veröffentlichen oder sie als Entwurf speichern?"
-          publish_will_notify: "Veröffentlichen der neuen Version sendet eine Benachrichtigung an alle Benutzer."
+          publish_will_notify: "Wenn Sie eine neue Version veröffentlichen, werden alle Mitglieder benachrichtigt."
           publish: "Veröffentlichen"
           users_notified: "Plattform-Nutzer werden über das Update benachrichtigt."
           about_analytics: "Ich stimme zu, anonyme Daten mit dem Entwicklerteam zu teilen, um Fab-Manager zu verbessern."

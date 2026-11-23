@@ -2063,7 +2063,7 @@ es-MX:
           draft_from_USER_DATE: "Borrador, guardado por {USER}, el {DATE}"
           save_or_publish: "¿Guardar o publicar?"
           save_or_publish_body: "¿Desea publicar una nueva versión de la política de privacidad o guardarla como borrador?"
-          publish_will_notify: "Publicar una nueva versión enviará una notificación a todos los usuarios."
+          publish_will_notify: "Al publicar una nueva versión, se notificará a todos los miembros."
           publish: "Publicar"
           users_notified: "Se notificará la actualización a los usuarios de la plataforma."
           about_analytics: "Acepto compartir datos anónimos con el equipo de desarrollo para ayudar a mejorar Fab-manager."
