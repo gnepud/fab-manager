@@ -8,12 +8,12 @@ class ICalendarEventsTest < ActionDispatch::IntegrationTest
     i_calendar_events(:one).update!(i_calendar: @calendar, summary: 'Imported event')
   end
 
-  test 'uses the configured source color for the event background' do
+  test 'lets events inherit the configured source color' do
     @calendar.update!(color: '#2458a6', text_color: '#ffffff')
 
     event = public_event
 
-    assert_equal '#2458a6', event[:backgroundColor]
+    assert_not event.key?(:backgroundColor), "event background #{event[:backgroundColor].inspect} overrides the source color"
     assert_equal 'Imported event', event[:title]
   end
 
