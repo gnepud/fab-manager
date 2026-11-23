@@ -61,6 +61,57 @@ angular.module('application', ['ngCookies', 'ngResource', 'ngSanitize', 'ui.rout
       $translateProvider.preferredLanguage(Fablab.locale);
       // End the tour when the user clicks the forward or back buttons of the browser
       TourConfigProvider.enableNavigationInterceptors();
+      TourConfigProvider.set('appendToBody', true);
+      $provide.decorator('TourStepService', ['$delegate', '$document', 'Tether', 'positionMap', function (service, $document, Tether, positionMap) {
+        const showStep = service.showStep;
+        const hideStep = service.hideStep;
+        const scrollOptions = new WeakMap();
+        const restoreScrollOption = step => {
+          if (!scrollOptions.has(step)) return;
+          const value = scrollOptions.get(step);
+          if (value === undefined) delete step.scrollIntoView;
+          else step.scrollIntoView = value;
+          scrollOptions.delete(step);
+        };
+        service.showStep = function (step, tour) {
+          restoreScrollOption(step);
+          const scroll = !step.config('orphan') && step.config('scrollIntoView');
+          if (scroll) {
+            scrollOptions.set(step, step.scrollIntoView);
+            step.scrollIntoView = false;
+          }
+          try {
+            const result = showStep(step, tour);
+            if (!scroll) return result;
+            if (!step.tether) {
+              const placement = positionMap[step.config('placement')];
+              step.tether = new Tether({
+                element: step.popup[0],
+                target: step.element[0],
+                attachment: placement.popup,
+                targetAttachment: placement.target
+              });
+            } else step.tether.enable();
+            step.reposition();
+            const parentId = step.config('scrollParentId');
+            const parent = parentId === '$document' ? $document : angular.element($document[0].getElementById(parentId));
+            if (parent.length) {
+              parent.duScrollToElementAnimated(step.element, step.config('scrollOffset'), 500)
+                .then(() => step.reposition(), angular.noop);
+            }
+            return result;
+          } catch (error) {
+            restoreScrollOption(step);
+            throw error;
+          }
+        };
+        service.hideStep = function (step) {
+          const result = hideStep(step);
+          restoreScrollOption(step);
+          return result;
+        };
+        return service;
+      }]);
       $provide.decorator('Tether', ['$delegate', function (Tether) {
         return class ViewportTether extends Tether {
           constructor (options) {

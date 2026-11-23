@@ -214,7 +214,12 @@ describe('application-wide tour viewport constraints', () => {
   test.each([
     ['application defaults', {}, true],
     ['master local attachment', { appendToBody: false }, true],
-    ['disabled auto-scroll', { scrollIntoView: false }, false]
+    ['disabled auto-scroll', { scrollIntoView: false }, false],
+    ['disabled step auto-scroll', { stepScrollIntoView: false }, false],
+    ['revisited body popup', { revisit: true }, true],
+    ['orphan', { orphan: true }, false],
+    ['missing scroll parent', { missingParent: true }, false],
+    ['cancelled scrolling', { cancelScroll: true }, false]
   ])('shows a below-fold target in content-main: %s', async (_name, options, shouldScroll) => {
     const scope = injector.get('$rootScope').$new();
     const content = document.createElement('section');
@@ -226,7 +231,7 @@ describe('application-wide tour viewport constraints', () => {
       set: value => { scrollTop = Math.max(0, Math.min(1200, value)); }
     });
     const attachment = options.appendToBody === undefined ? '' : `ui-tour-append-to-body="${options.appendToBody}"`;
-    const element = angular.element(`<div ui-tour="scroll" ui-tour-scroll-into-view="${options.scrollIntoView !== false}" ${attachment} ui-tour-scroll-parent-id="content-main" style="position: relative; overflow: hidden"></div>`);
+    const element = angular.element(`<div ui-tour="scroll" ui-tour-scroll-into-view="${options.scrollIntoView !== false}" ${attachment} ui-tour-scroll-parent-id="${options.missingParent ? 'missing' : 'content-main'}" style="position: relative; overflow: hidden"></div>`);
     content.appendChild(element[0]);
     element[0].appendChild(target);
     document.body.appendChild(content);
@@ -242,25 +247,43 @@ describe('application-wide tour viewport constraints', () => {
     injector.get('$compile')(element)(scope);
     scope.$digest();
     const tour = injector.get('uiTourService').getTourByName('scroll');
-    const step = tour.createStep({ selector: '.viewport-target', stepId: 'below-fold', content: 'Below-fold target', placement: 'bottom' });
+    const step = tour.createStep({ selector: '.viewport-target', stepId: 'below-fold', content: 'Below-fold target', placement: 'bottom',
+      orphan: options.orphan === true, scrollIntoView: options.stepScrollIntoView });
+    const destination = target.getBoundingClientRect().top - content.getBoundingClientRect().top - step.config('scrollOffset');
     expect(target.getBoundingClientRect().top).toBeGreaterThan(content.getBoundingClientRect().bottom);
     try {
       expect(tour.config('scrollIntoView')).toBe(options.scrollIntoView !== false);
       await tour.start();
-      await waitFor(() => expect(step.tether).toBeDefined());
+      await waitFor(() => expect(step.popup[0].style.visibility).toBe('visible'));
       expect(step.popup[0].parentNode).toBe(document.body);
-      expect(step.tether.scrollParents).toContain(content);
+      if (!options.orphan) expect(step.tether.scrollParents).toContain(content);
+      const expectTargetVisible = () => {
+        expect(target.getBoundingClientRect().top).toBeGreaterThanOrEqual(content.getBoundingClientRect().top);
+        expect(target.getBoundingClientRect().bottom).toBeLessThanOrEqual(content.getBoundingClientRect().bottom);
+        expect(content.scrollTop).toBeCloseTo(destination);
+        expect(document.activeElement).toBe(step.popup[0]);
+      };
       if (shouldScroll) {
-        await waitFor(() => {
-          expect(target.getBoundingClientRect().top).toBeGreaterThanOrEqual(content.getBoundingClientRect().top);
-          expect(target.getBoundingClientRect().bottom).toBeLessThanOrEqual(content.getBoundingClientRect().bottom);
-          expect(document.activeElement).toBe(step.popup[0]);
-        }, { timeout: 2000, onTimeout: error => error });
+        await waitFor(expectTargetVisible, { timeout: 2000, onTimeout: error => error });
+        if (options.revisit) {
+          await tour.end();
+          content.scrollTop = 0;
+          await tour.start();
+          await waitFor(expectTargetVisible, { timeout: 2000, onTimeout: error => error });
+        }
+      } else if (options.cancelScroll) {
+        angular.element(content).triggerHandler({ type: 'mousedown', which: 1 });
+        const stoppedAt = content.scrollTop;
+        const frame = injector.get('requestAnimation');
+        await new Promise(resolve => frame(() => frame(resolve)));
+        expect(content.scrollTop).toBe(stoppedAt);
+        expect(tour.getStatus()).toBe(tour.Status.ON);
       } else {
         expect(content.scrollTop).toBe(0);
       }
     } finally {
       await tour.end();
+      expect(step.scrollIntoView).toBe(options.stepScrollIntoView);
       if (step.tether) step.tether.destroy();
       if (step.popup) step.popup.remove();
       scope.$destroy();
@@ -268,20 +291,38 @@ describe('application-wide tour viewport constraints', () => {
     }
   });
 
-  test('Tether moves popups out of clipping ancestors after their initial local attachment', async () => {
+  test('a right-edge target in an offset ancestor gets a body-attached popup beside it', async () => {
     const scope = injector.get('$rootScope').$new();
-    const element = angular.element('<div ui-tour="viewport" style="position: relative; overflow: hidden"></div>');
+    const element = angular.element('<div ui-tour="viewport" style="position: relative; left: 900px; top: 100px; overflow: hidden"></div>');
     document.body.appendChild(element[0]);
     element[0].appendChild(target);
+    let initialParent;
+    jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
+      if (this === element[0]) return rect(900, 100, 350, 500);
+      if (this === target) return rect(1053.8, 200, 194.9, 30);
+      if (this.classList.contains('ui-tour-popup')) {
+        if (initialParent === undefined && this.parentNode) initialParent = this.parentNode;
+        const x = parseFloat(this.style.transform.match(/translateX\(([-\d.]+)px\)/)?.[1]) || 0;
+        const y = parseFloat(this.style.transform.match(/translateY\(([-\d.]+)px\)/)?.[1]) || 0;
+        return rect((this.parentNode === document.body ? 0 : 900) + (parseFloat(this.style.left) || 0) + x,
+          (this.parentNode === document.body ? 0 : 100) + (parseFloat(this.style.top) || 0) + y, 414, 200);
+      }
+      return rect(0, 0, 0, 0);
+    });
     injector.get('$compile')(element)(scope);
     scope.$digest();
     const tour = injector.get('uiTourService').getTourByName('viewport');
     const step = tour.createStep({ selector: '.viewport-target', stepId: 'target', content: 'Tour content', placement: 'bottom' });
     try {
       await tour.start();
-      expect(injector.get('TourConfig').get('appendToBody')).toBe(false);
       await waitFor(() => expect(step.tether).toBeDefined());
+      expect(initialParent).toBe(document.body);
       expect(step.popup[0].parentNode).toBe(document.body);
+      expect(step.popup[0].getBoundingClientRect().left).toBeCloseTo(866);
+      expect(step.popup[0].getBoundingClientRect().right).toBeCloseTo(1280);
+      const targetCentre = target.getBoundingClientRect().left + target.getBoundingClientRect().width / 2;
+      expect(targetCentre).toBeGreaterThan(step.popup[0].getBoundingClientRect().left);
+      expect(targetCentre).toBeLessThan(step.popup[0].getBoundingClientRect().right);
       expect(step.tether.options.constraints).toContainEqual({ to: [0, 0, 1280, 841], pin: true });
     } finally {
       await tour.end();
