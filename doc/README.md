@@ -11,6 +11,7 @@
 4.2. [How to setup a development environment](#how-to-setup-a-development-environment)<br/>
 4.3. [Externals](#externals)<br/>
 4.4. [Diagrams](#diagrams)<br/>
+4.5. [Browser test guide](testing/README.md)<br/>
 
 ### User's manual
 The following guide describes what you can do and how to use Fab-manager.
@@ -45,6 +46,7 @@ If you intend to translate Fab-manager to a new, or an already supported languag
 
 ### Developer's documentation
 The following guides should help those who want to contribute to the code.
+- [Browser test guide](testing/README.md) · [Guide des tests navigateur](fr/testing/README.md)
 #### Architecture
 - [Code architecture](architecture.md)
 
