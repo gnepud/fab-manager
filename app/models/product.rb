@@ -30,9 +30,25 @@ class Product < ApplicationRecord
   validates :amount, numericality: { greater_than_or_equal_to: 0, allow_nil: true }
   validates :amount, exclusion: { in: [nil], message: I18n.t('.errors.messages.undefined_in_store') }, if: -> { is_active }
 
+  after_commit :notify_on_low_stock, on: %i[create update], if: :saved_change_to_stock?
+
   scope :active, -> { where(is_active: true) }
 
   def main_image
     product_images.find_by(is_main: true)
+  end
+
+  private
+
+  def notify_on_low_stock
+    return unless low_stock_alert && low_stock_threshold
+
+    previous_stock, current_stock = saved_change_to_stock
+    previous_stock ||= {}
+    return unless current_stock.any? { |type, quantity| previous_stock.fetch(type, 0) != quantity && quantity <= low_stock_threshold }
+
+    NotificationCenter.call type: 'notify_admin_low_stock_threshold',
+                            receiver: User.admins_and_managers,
+                            attached_object: self
   end
 end
