@@ -108,7 +108,8 @@ angular.module('application', ['ngCookies', 'ngResource', 'ngSanitize', 'ui.rout
                 step.reposition();
                 const popup = step.popup[0].getBoundingClientRect();
                 const target = step.element[0].getBoundingClientRect();
-                const height = parent[0] === $document[0] ? $document[0].documentElement.clientHeight
+                const height = parent[0] === $document[0]
+                  ? $document[0].documentElement.clientHeight
                   : parent[0].clientHeight || parent[0].getBoundingClientRect().height;
                 const placement = step.config('placement').split('-')[0];
                 let offset = step.config('scrollOffset');
