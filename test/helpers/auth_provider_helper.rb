@@ -2,6 +2,11 @@
 
 # Provides methods to help authentication providers
 module AuthProviderHelper
+  def reset_auth_provider_config!
+    FileUtils.rm(ProviderConfig.config_path, force: true)
+    Rails.configuration.auth_provider = ProviderConfig.new
+  end
+
   def github_provider_params(name)
     {
       name: name,

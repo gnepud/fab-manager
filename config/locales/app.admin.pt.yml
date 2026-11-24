@@ -1293,6 +1293,7 @@ pt:
       #members bulk import
       members_import:
         import_members: "Importar membros"
+        upload_failed: "Não foi possível enviar o arquivo. Escolha um arquivo CSV válido e tente novamente."
         info: "Você pode enviar um arquivo CSV para criar novos membros ou atualizar os já existentes. Seu arquivo deve utilizar os identificadores abaixo para especificar o grupo, os treinamentos e as tags dos membros."
         required_fields: "Seu arquivo deve conter, pelo menos, as seguintes informações para cada usuário criar: e-mail, nome, nome e grupo. Se a senha estiver vazia, ela será gerada. Em atualizações, os campos vazios serão mantidos como está."
         about_example_html: "Por favor, consulte o arquivo de exemplo fornecido para gerar um arquivo CSV correto.<br>Este exemplo irá:<ol><li>criar um novo membro (Jean Dupont) com uma senha gerada</li><li>atualizar a senha de um membro existente (ID 43) usando a nova senha fornecida</li></ol><br>Tome cuidado em usar a codificação <strong>Unicode UTF-8</strong>."

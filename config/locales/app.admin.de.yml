@@ -1293,6 +1293,7 @@ de:
       #members bulk import
       members_import:
         import_members: "Mitglieder importieren"
+        upload_failed: "Die Datei konnte nicht hochgeladen werden. Bitte wählen Sie eine gültige CSV-Datei und versuchen Sie es erneut."
         info: "Sie können eine CSV-Datei hochladen, um neue Mitglieder zu erstellen oder bestehende zu aktualisieren. Ihre Datei muss die unten angegebenen Identifikatoren verwenden, um die Gruppe, die Schulungen und die Tags der Mitglieder festzulegen."
         required_fields: "Ihre Datei muss mindestens folgende Informationen enthalten, die für jeden Benutzer erstellt werden: E-Mail, Name, Vorname und Gruppe. Wenn das Passwort leer ist, wird es generiert. Bei Aktualisierungen werden leere Felder so beibehalten, wie sie sind."
         about_example_html: "Please refer to the provided example file to generate a correct CSV file.<br>This example will:<ol><li>create a new member (Jean Dupont) with a generated password</li><li>update the password of an existing membre (ID 43) using the new given password</li></ol><br>Be careful to use <strong>Unicode UTF-8</strong> encoding."

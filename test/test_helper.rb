@@ -1,7 +1,16 @@
 # frozen_string_literal: true
 
-require 'coveralls'
-Coveralls.wear!('rails')
+require 'fileutils'
+
+auth_provider_config_path = File.expand_path('../tmp/auth_provider-test.yml', __dir__)
+ENV['AUTH_PROVIDER_CONFIG_PATH'] = auth_provider_config_path
+FileUtils.rm_f(auth_provider_config_path)
+at_exit { FileUtils.rm_f(auth_provider_config_path) }
+
+if ENV['CI'].to_s != '' || %w[1 true yes].include?(ENV['COVERAGE'].to_s.downcase)
+  require 'coveralls'
+  Coveralls.wear!('rails')
+end
 
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
@@ -13,7 +22,6 @@ require 'minitest/reporters'
 require 'helpers/archive_helper'
 require 'helpers/invoice_helper'
 require 'helpers/payment_schedule_helper'
-require 'fileutils'
 
 # We remove this constraint before running tests, otherwise it will prevent loading the fixtures into the DB
 ActiveRecord::Base.lease_connection.execute("DROP RULE IF EXISTS accounting_periods_del_protect ON #{AccountingPeriod.arel_table.name};")

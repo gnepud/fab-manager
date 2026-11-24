@@ -1293,6 +1293,7 @@ it:
       #members bulk import
       members_import:
         import_members: "Importa membri"
+        upload_failed: "Impossibile caricare il file. Scegli un file CSV valido e riprova."
         info: "È possibile caricare un file CSV per creare nuovi membri o aggiornare quelli esistenti. Il tuo file deve utilizzare gli identificatori qui sotto per specificare il gruppo, le abilitazioni e le etichette dei membri."
         required_fields: "Il file deve contenere almeno le seguenti informazioni per ogni utente da creare: email, cognome, nome e gruppo. Se la password è vuota, verrà generata. Se trattasi di aggiornamenti, i campi vuoti verranno mantenuti inalterati."
         about_example_html: "Fare riferimento al file di esempio fornito per generare un file CSV corretto.<br>Questo esempio:<ol><li>crea un nuovo membro (Mario Rossi) con una password generata</li><li>aggiorna la password di un membro esistente (ID 43) utilizzando la nuova password data</li></ol><br>Fai attenzione a utilizzare codifica <strong>Unicode UTF-8</strong>."

@@ -376,7 +376,8 @@ class NotificationsTest < ActionDispatch::IntegrationTest
 
   test 'child turning 18 notification shows the eighteenth birthday' do
     parent = users(:user2)
-    child = Child.create!(user: parent, first_name: 'Arthur', last_name: 'Pendelton', birthday: Date.new(2008, 11, 24))
+    birthday = Date.current.advance(years: -18)
+    child = Child.create!(user: parent, first_name: 'Arthur', last_name: 'Pendelton', birthday: birthday)
     NotificationType.find_or_create_by!(name: 'notify_user_when_child_age_will_be_18') do |type|
       type.category = 'users_accounts'
       type.is_configurable = false
@@ -391,7 +392,7 @@ class NotificationsTest < ActionDispatch::IntegrationTest
       n[:notification_type] == 'notify_user_when_child_age_will_be_18' && n[:attached_object][:id] == child.id
     end
     assert_not_nil notification
-    assert_includes notification[:message][:description], I18n.l(Date.new(2026, 11, 24), format: :default)
-    assert_not_includes notification[:message][:description], I18n.l(Date.new(2008, 11, 24), format: :default)
+    assert_includes notification[:message][:description], I18n.l(birthday.advance(years: 18), format: :default)
+    assert_not_includes notification[:message][:description], I18n.l(birthday, format: :default)
   end
 end

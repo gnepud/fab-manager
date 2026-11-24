@@ -55,6 +55,8 @@ de:
       slug_already_used: "wird bereits verwendet"
       birthday_less_than_18_years_ago: "Geburtstag muss unter 18 Jahre zurückliegen"
       gateway_authentication_failed: "Ihre Karte konnte nicht authentifiziert werden. Bitte versuchen Sie es erneut oder verwenden Sie eine andere Karte."
+      invalid_category_hierarchy: "Kategorien können nur zwei Ebenen haben: Wählen Sie eine übergeordnete Kategorie auf oberster Ebene und weisen Sie weder einer Kategorie mit Unterkategorien noch sich selbst eine übergeordnete Kategorie zu."
+      invalid_order_state: "Diese Bestellung kann aus ihrem aktuellen Status nicht aktualisiert werden."
   coupon:
     code_format_error: "nur Großbuchstaben, Zahlen und Bindestriche sind erlaubt"
   apipie:

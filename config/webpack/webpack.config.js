@@ -11,7 +11,7 @@ const uiTour = require('./modules/ui-tour');
 const hmr = require('./modules/hmr');
 const svg = require('./modules/svg');
 
-const isDevelopment = process.env.NODE_ENV !== 'production';
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 // See the shakacode/shakapacker README and docs directory for advice on customizing your webpackConfig.
 const customConfig = {

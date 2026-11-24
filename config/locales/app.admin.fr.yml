@@ -1293,6 +1293,7 @@ fr:
       #members bulk import
       members_import:
         import_members: "Importer des membres"
+        upload_failed: "Le fichier n'a pas pu être téléversé. Veuillez choisir un fichier CSV valide et réessayer."
         info: "Vous pouvez téléverser un fichier CSV afin de créer des nouveaux membres ou de mettre à jour les existants. Votre fichier doit utiliser les identifiants ci-dessous pour spécifier le groupe, les formations et les étiquettes des membres."
         required_fields: "Votre fichier doit obligatoirement comporter, au minimum, les informations suivantes pour chaque utilisateur à créer : courriel, nom, prénom et groupe. Si le mot passe n'est pas rempli, il sera généré automatiquement. Lors d'une mise à jour, les champs non remplis seront gardés tel quels."
         about_example_html: "Veuillez vous référer au fichier d'exemple fourni pour générer un fichier CSV correct.<br>Cet exemple va :<ol><li>créer un nouveau membre (Jean Dupont) avec un mot de passe généré.</li><li>mettre à jour le mot de passe d'un membre existant (ID 43) en utilisant le nouveau mot de passe donné</li></ol><br>Veillez à utiliser l'encodage <strong>Unicode UTF-8</strong>."

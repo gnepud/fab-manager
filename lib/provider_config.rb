@@ -2,9 +2,14 @@
 
 # Deals with the yml file keeping the configuration of the current authentication provider
 class ProviderConfig
+  def self.config_path
+    ENV.fetch('AUTH_PROVIDER_CONFIG_PATH', Rails.root.join('config/auth_provider.yml').to_s)
+  end
+
   def initialize
-    @config = if File.exist?('config/auth_provider.yml')
-                content = YAML.safe_load_file('config/auth_provider.yml')
+    config_path = self.class.config_path
+    @config = if File.exist?(config_path)
+                content = YAML.safe_load_file(config_path)
                 content.blank? ? simple_provider : content.with_indifferent_access
               else
                 simple_provider
@@ -48,8 +53,7 @@ class ProviderConfig
       handlers: [:jbuilder],
       formats: [:json]
     )
-    file_path = Rails.root.join('config/auth_provider.yml')
-    File.open(file_path, File::WRONLY | File::CREAT) do |file|
+    File.open(config_path, File::WRONLY | File::CREAT) do |file|
       file.truncate(0)
       file.write(JSON.parse(data).to_yaml)
     end

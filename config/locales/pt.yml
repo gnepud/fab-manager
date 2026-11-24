@@ -55,6 +55,8 @@ pt:
       slug_already_used: "já está em uso"
       birthday_less_than_18_years_ago: "Birthday must be under 18 years ago"
       gateway_authentication_failed: "Não foi possível autenticar seu cartão. Tente novamente ou use outro cartão."
+      invalid_category_hierarchy: "As categorias podem ter apenas dois níveis: escolha um pai raiz e não atribua um pai a uma categoria com filhos ou a si mesma."
+      invalid_order_state: "Este pedido não pode ser atualizado a partir do estado atual."
   coupon:
     code_format_error: "only caps letters, numbers, and dashes are allowed"
   apipie:

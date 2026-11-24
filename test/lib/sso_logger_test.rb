@@ -3,6 +3,20 @@
 require 'test_helper'
 require 'sso_logger'
 
+unless defined?(OmniAuth::Strategies::SsoOauth2Provider)
+  original_provider = Rails.configuration.auth_provider
+  oauth2_class = Struct.new(:base_url, :authorization_endpoint, :token_endpoint)
+  oauth2 = oauth2_class.new('https://sso.example.test', '/authorize', '/token')
+  provider = Struct.new(:providable_type, :strategy_name, :providable).new('OAuth2Provider', 'oauth2-test', oauth2)
+
+  begin
+    Rails.configuration.auth_provider = provider
+    require 'omni_auth/strategies/sso_oauth2_provider'
+  ensure
+    Rails.configuration.auth_provider = original_provider
+  end
+end
+
 class SsoLoggerTest < ActiveSupport::TestCase
   def setup
     @original_sso_debug = ENV['SSO_DEBUG']

@@ -55,6 +55,8 @@
       slug_already_used: "is already used"
       birthday_less_than_18_years_ago: "Birthday must be under 18 years ago"
       gateway_authentication_failed: "Kortet ditt kunne ikke autentiseres. Prøv igjen eller bruk et annet kort."
+      invalid_category_hierarchy: "Kategorier kan bare ha to nivåer: velg en rotforelder, og ikke tilordne en forelder til en kategori med barn eller til seg selv."
+      invalid_order_state: "Denne bestillingen kan ikke oppdateres fra gjeldende status."
   coupon:
     code_format_error: "only caps letters, numbers, and dashes are allowed"
   apipie:

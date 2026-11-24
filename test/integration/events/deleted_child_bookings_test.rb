@@ -35,6 +35,7 @@ class Events::DeletedChildBookingsTest < ActionDispatch::IntegrationTest
   end
 
   test 'self account deletion anonymizes child bookings without canceling reservations' do
+    move_reservation_to_the_past
     login_as(@parent, scope: :user)
 
     delete "/api/members/#{@parent.id}", headers: default_headers
@@ -44,6 +45,7 @@ class Events::DeletedChildBookingsTest < ActionDispatch::IntegrationTest
   end
 
   test 'admin account deletion anonymizes child bookings without canceling reservations' do
+    move_reservation_to_the_past
     login_as(@admin, scope: :user)
 
     delete "/api/members/#{@parent.id}", headers: default_headers
@@ -77,6 +79,11 @@ class Events::DeletedChildBookingsTest < ActionDispatch::IntegrationTest
   end
 
   private
+
+  def move_reservation_to_the_past
+    starts_at = 2.days.ago
+    @reservation.slots.first.update!(start_at: starts_at, end_at: starts_at + 1.hour)
+  end
 
   def assert_anonymized_booking
     assert_response :no_content

@@ -1293,6 +1293,7 @@ zu:
       #members bulk import
       members_import:
         import_members: "crwdns25738:0crwdne25738:0"
+        upload_failed: "The file could not be uploaded. Please choose a valid CSV file and try again."
         info: "crwdns25740:0crwdne25740:0"
         required_fields: "crwdns25742:0crwdne25742:0"
         about_example_html: "crwdns25744:0crwdne25744:0"

@@ -117,6 +117,11 @@ class Availabilities::AsPublicTest < ActionDispatch::IntegrationTest
   end
 
   test "[level == 'slot'] get public spaces availabilities" do
+    availability = Availability.find(21)
+    start_at = 2.hours.from_now
+    availability.update!(start_at: start_at, end_at: start_at + 1.hour)
+    availability.slots.first.update!(start_at: start_at, end_at: start_at + 1.hour)
+
     start_date = Time.current.to_date
     end_date = start_date + 1.day
 

@@ -4,18 +4,27 @@ require 'test_helper'
 
 class ChildAgeNotificationMailerTest < ActionMailer::TestCase
   test 'the English child age email shows the eighteenth birthday' do
-    assert_birthday_date(:en, Date.new(2008, 11, 24), Date.new(2026, 11, 24))
+    assert_birthday_date(:en, eighteenth_birthday, Date.current)
   end
 
   test 'the French child age email shows the eighteenth birthday' do
-    assert_birthday_date(:fr, Date.new(2008, 11, 24), Date.new(2026, 11, 24))
+    assert_birthday_date(:fr, eighteenth_birthday, Date.current)
   end
 
   test 'the child age email handles a leap day birthday' do
-    assert_birthday_date(:en, Date.new(2012, 2, 29), Date.new(2030, 2, 28))
+    assert_birthday_date(:en, leap_day_birthday, leap_day_birthday.advance(years: 18))
   end
 
   private
+
+  def eighteenth_birthday
+    Date.current.advance(years: -18)
+  end
+
+  def leap_day_birthday
+    year = (Date.current.year - 1).downto(Date.current.year - 17).find { |candidate| Date.leap?(candidate) }
+    Date.new(year, 2, 29)
+  end
 
   def assert_birthday_date(locale, birthday, expected_date)
     parent = users(:user2)

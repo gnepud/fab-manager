@@ -55,6 +55,8 @@ zu:
       slug_already_used: "crwdns31697:0crwdne31697:0"
       birthday_less_than_18_years_ago: "crwdns38003:0crwdne38003:0"
       gateway_authentication_failed: "Your card could not be authenticated. Please try again or use another card."
+      invalid_category_hierarchy: "Categories can have only two levels: choose a root parent, and do not assign a parent to a category with children or to itself."
+      invalid_order_state: "This order cannot be updated from its current state."
   coupon:
     code_format_error: "crwdns37201:0crwdne37201:0"
   apipie:

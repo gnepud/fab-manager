@@ -55,6 +55,8 @@ zh-CN:
       slug_already_used: "已被使用"
       birthday_less_than_18_years_ago: "生日必须在18年前"
       gateway_authentication_failed: "您的银行卡未能通过身份验证。请重试或使用其他银行卡。"
+      invalid_category_hierarchy: "分类只能有两个层级：请选择一个根父级，并且不要为已有子级的分类或分类本身指定父级。"
+      invalid_order_state: "此订单无法从当前状态更新。"
   coupon:
     code_format_error: "只允许大写字母、数字和破折号"
   apipie:

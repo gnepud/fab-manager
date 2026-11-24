@@ -12,9 +12,13 @@ class OpenIdConnectTest < ActionDispatch::IntegrationTest
     FabManager::Application.load_tasks if Rake::Task.tasks.empty?
   end
 
+  teardown do
+    reset_auth_provider_config!
+  end
+
   test 'create and activate an OIDC provider' do
     # clean any existing auth provider config
-    FileUtils.rm('config/auth_provider.yml', force: true)
+    FileUtils.rm(ProviderConfig.config_path, force: true)
 
     name = 'Sleede'
     post '/api/auth_providers',
@@ -46,12 +50,12 @@ class OpenIdConnectTest < ActionDispatch::IntegrationTest
     assert_equal AuthProvider.active.id, db_provider&.id
 
     # Check the configuration file
-    assert File.exist?('config/auth_provider.yml')
+    assert File.exist?(ProviderConfig.config_path)
     config = ProviderConfig.new
     assert_equal 'OpenIdConnectProvider', config.providable_type
     assert_equal name, config.name
 
     # clean test provider config
-    FileUtils.rm('config/auth_provider.yml', force: true)
+    FileUtils.rm(ProviderConfig.config_path, force: true)
   end
 end

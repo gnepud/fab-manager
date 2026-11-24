@@ -441,6 +441,8 @@
       stripe_card_update_modal:
         update_card: "Oppdater kortet"
         validate_button: "Valider det nye kortet"
+      payzen_form:
+        unexpected_error: "Noe gikk galt. Prøv igjen."
       payzen_card_update_modal:
         update_card: "Oppdater kortet"
         validate_button: "Valider det nye kortet"

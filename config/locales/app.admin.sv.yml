@@ -1293,6 +1293,7 @@ sv:
       #members bulk import
       members_import:
         import_members: "Importera medlemmar"
+        upload_failed: "Filen kunde inte laddas upp. Välj en giltig CSV-fil och försök igen."
         info: "Du kan ladda upp en CSV-fil för att skapa nya medlemmar eller uppdatera befintliga. Filen måste ange identifierarna nedan för att ange gruppen, utbildningarna och medlemmarnas taggar."
         required_fields: "Din fil måste åtminstone innehålla följande information för varje användare att skapa: e-post, namn, förnamn och grupp. Om lösenordet är tomt kommer det att genereras. Vid uppdateringar kommer de tomma fälten att behållas som de är."
         about_example_html: "Se den angivna exempelfilen för att generera en korrekt CSV-fil.<br>Detta exempel kommer:<ol><li>skapa en ny medlem (Jean Dupont) med ett genererat lösenord</li><li>uppdatera lösenordet för en befintlig medlem (ID 43) med det nya givna lösenordet</li></ol><br>Var försiktig med att använda <strong>Unicode UTF-8</strong> kodning."

@@ -441,6 +441,8 @@ de:
       stripe_card_update_modal:
         update_card: "Karte aktualisieren"
         validate_button: "Neue Karte validieren"
+      payzen_form:
+        unexpected_error: "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
       payzen_card_update_modal:
         update_card: "Karte aktualisieren"
         validate_button: "Neue Karte validieren"

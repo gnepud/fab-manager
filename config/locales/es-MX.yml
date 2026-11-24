@@ -55,6 +55,8 @@ es-MX:
       slug_already_used: "ya está en uso"
       birthday_less_than_18_years_ago: "El cumpleaños debe ser menor de 18 años"
       gateway_authentication_failed: "No se pudo autenticar su tarjeta. Inténtelo de nuevo o utilice otra tarjeta."
+      invalid_category_hierarchy: "Las categorías solo pueden tener dos niveles: elija una categoría raíz como padre y no asigne un padre a una categoría con hijos ni a sí misma."
+      invalid_order_state: "Este pedido no puede actualizarse desde su estado actual."
   coupon:
     code_format_error: "sólo se permiten letras de mayúsculas, números y guiones"
   apipie:

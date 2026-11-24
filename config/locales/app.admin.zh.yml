@@ -1293,6 +1293,7 @@ zh-CN:
       #members bulk import
       members_import:
         import_members: "批量导入会员"
+        upload_failed: "文件上传失败。请选择有效的 CSV 文件并重试。"
         info: "您可以上传 CSV 文件以创建新会员或更新现有会员。您的文件必须使用以下标识符来指定会员的组、培训和标签。"
         required_fields: "您的文件至少必须包含每个用户创建所需的以下信息：邮箱、姓、名和组。如果密码为空，将自动生成密码。在更新时，空字段将保持不变。"
         about_example_html: "请参考提供的示例文件以生成正确的 CSV 文件。<br>此示例将：<ol><li>创建一个新会员（Jean Dupont）并生成密码</li><li>使用新给定的密码更新现有会员（ID 43）的密码</li></ol><br>请注意使用<strong>Unicode UTF-8</strong>编码。"

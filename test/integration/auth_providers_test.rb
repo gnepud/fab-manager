@@ -12,9 +12,13 @@ class AuthProvidersTest < ActionDispatch::IntegrationTest
     FabManager::Application.load_tasks if Rake::Task.tasks.empty?
   end
 
+  teardown do
+    reset_auth_provider_config!
+  end
+
   test 'create an auth external provider and activate it' do
     # clean any existing auth provider config
-    FileUtils.rm('config/auth_provider.yml', force: true)
+    FileUtils.rm(ProviderConfig.config_path, force: true)
 
     name = 'GitHub'
     post '/api/auth_providers',
@@ -48,13 +52,13 @@ class AuthProvidersTest < ActionDispatch::IntegrationTest
     end
 
     # Check the configuration file
-    assert File.exist?('config/auth_provider.yml')
+    assert File.exist?(ProviderConfig.config_path)
     config = ProviderConfig.new
     assert_equal 'OAuth2Provider', config.providable_type
     assert_equal name, config.name
 
     # clean test provider config
-    FileUtils.rm('config/auth_provider.yml', force: true)
+    FileUtils.rm(ProviderConfig.config_path, force: true)
   end
 
   test 'update an authentication provider' do

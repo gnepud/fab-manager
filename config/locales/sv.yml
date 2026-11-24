@@ -55,6 +55,8 @@ sv:
       slug_already_used: "används redan"
       birthday_less_than_18_years_ago: "Födelsedag måste vara mindre än 18 år sedan"
       gateway_authentication_failed: "Ditt kort kunde inte autentiseras. Försök igen eller använd ett annat kort."
+      invalid_category_hierarchy: "Kategorier kan bara ha två nivåer: välj en rotförälder och tilldela inte en förälder till en kategori med barn eller till sig själv."
+      invalid_order_state: "Den här beställningen kan inte uppdateras från sitt aktuella tillstånd."
   coupon:
     code_format_error: "bara stora bokstäver, siffror och bindestreck är tillåtna"
   apipie:

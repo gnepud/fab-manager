@@ -69,7 +69,7 @@ module SamlSecurityHelper
 
   def strategy_options
     {
-      name: 'security_saml', sp_entity_id: SP_ENTITY, assertion_consumer_service_url: CALLBACK,
+      name: 'security_saml', path_prefix: '/auth', sp_entity_id: SP_ENTITY, assertion_consumer_service_url: CALLBACK,
       idp_sso_service_url: 'https://idp.example.test/sso', idp_slo_service_url: 'https://idp.example.test/logout',
       idp_cert: signing_certificate.to_pem, slo_default_relay_state: '/',
       security: OneLogin::RubySaml::Settings::DEFAULTS[:security].merge(want_assertions_signed: true)

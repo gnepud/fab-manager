@@ -9,6 +9,9 @@ class Reservations::LastMinuteTest < ActionDispatch::IntegrationTest
     @user = User.members.first
     @space = Space.first
     @availability = Availability.find(21)
+    start_at = 30.minutes.from_now
+    @availability.update!(start_at: start_at, end_at: start_at + 1.hour)
+    @availability.slots.first.update!(start_at: start_at, end_at: start_at + 1.hour)
     @admin = User.with_role(:admin).first
   end
 
