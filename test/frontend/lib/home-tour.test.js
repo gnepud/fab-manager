@@ -36,6 +36,16 @@ describe('Home tour after login without a reload', () => {
   };
 
   beforeEach(() => {
+    jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(() => ({
+      x: 20,
+      y: 100,
+      left: 20,
+      top: 100,
+      width: 120,
+      height: 30,
+      right: 140,
+      bottom: 130
+    }));
     modal = { open: jest.fn() };
     angular.module('homeTourDependencies', [])
       .value('$uibModal', modal)
@@ -64,7 +74,9 @@ describe('Home tour after login without a reload', () => {
       _t: key => key
     });
     injector.get('$templateCache').put('/shared/tour-step-template.html', fs.readFileSync(path.resolve(__dirname, '../../../app/frontend/templates/shared/tour-step-template.html'), 'utf8'));
-    template = angular.element(fs.readFileSync(path.resolve(__dirname, '../../../app/frontend/templates/home.html'), 'utf8'));
+    template = angular.element('<div></div>');
+    template.html(fs.readFileSync(path.resolve(__dirname, '../../../app/frontend/templates/home.html'), 'utf8') +
+      '<div class="app-generator"><span class="app-version">Version</span></div>');
     document.body.appendChild(template[0]);
     injector.get('$compile')(template)(scope);
     root.$digest();
@@ -78,6 +90,7 @@ describe('Home tour after login without a reload', () => {
     scope.$destroy();
     template.remove();
     document.querySelectorAll('.ui-tour-popup').forEach(popup => popup.remove());
+    jest.restoreAllMocks();
   });
 
   const login = (role, tours = []) => publishUser({ id: 2, role, profile_attributes: { tours } });
