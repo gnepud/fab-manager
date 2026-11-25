@@ -2,8 +2,10 @@
 
 ## Next release
 
+- Improvement: add a reusable [browser test guide](doc/testing/README.md)
 - Improvement: upgrade Ruby from 3.2.2 to 3.4.13
 - Improvement: upgrade Rails from 7.0.8.7 to 7.2.4
+- Improvement: upgrade Node.js from 18.15.0 to 24.22.3
 - Fix a bug: generate admin XLSX exports in Sidekiq
 - Fix a bug: apply wallet checkout discounts only once
 - Fix a bug: refresh subscription details so admins can cancel the renewed plan
@@ -144,7 +146,8 @@
 - Fix a bug: keep imported iCalendar events readable when source colors have low contrast
 - Fix a bug: filter invoices by the selected local calendar day
 - Fix a bug: prevent the F1 Help dialog from covering an active tour
-- Improvement: add a reusable [browser test guide](doc/testing/README.md)
+- Fix a bug: show the default Fab-manager logo in notification emails
+- Fix a bug: add missing translations for member import upload, PayZen form, category hierarchy, and order status errors
 
 ## v6.6.2 2026 October 29
 
