@@ -9,7 +9,7 @@ RUN apt-get update && \
 
 RUN locale-gen C.UTF-8
 
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -\
+RUN curl -sL https://deb.nodesource.com/setup_24.x | bash -\
   && apt-get update -qq && apt-get install -qq --no-install-recommends \
     nodejs libjemalloc2 \
   && apt-get upgrade -qq \
